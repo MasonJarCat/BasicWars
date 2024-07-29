@@ -6,8 +6,8 @@ CREATE TABLE games(
 	p1_id INTEGER,
 	p2_id INTEGER,
 	map_id INTEGER,
-	p1_units ARRAY,
-	p2_units ARRAY
+	p1_units INTEGER[],
+	p2_units INTEGER[]
 );
 
 CREATE TABLE unitTypes(
