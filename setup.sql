@@ -18,6 +18,8 @@ CREATE TABLE unitTypes(
 	speed INTEGER,
 	flying BOOLEAN,
 	infantry BOOLEAN,
+	armor BOOLEAN,
+	naval BOOLEAN,
 	minrange INTEGER,
 	maxrange INTEGER,
 	sightrange INTEGER
@@ -34,5 +36,27 @@ CREATE TABLE units(
 	capturing BOOLEAN,
 	capture_prog INTEGER
 );
+
+CREATE TABLE terrainTypes(
+	id SERIAL PRIMARY KEY,
+	title VARCHAR(15),
+	cover INTEGER,
+	moveCost INTEGER,
+	capturable BOOLEAN,
+	armorAccess BOOLEAN,
+	groundAccess BOOLEAN,
+	seaAccess BOOLEAN,
+	hiding BOOLEAN,
+	canPrintUnits BOOLEAN,
+	unitPrintList INTEGER[]
+)
+
+CREATE TABLE maps(
+	id SERIAL PRIMARY KEY,
+	title VARCHAR(25),
+	width INTEGER,
+	height INTEGER,
+	terrain INTEGER[]
+)
 
 
