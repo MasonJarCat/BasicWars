@@ -49,7 +49,7 @@ CREATE TABLE terrainTypes(
 	hiding BOOLEAN,
 	canPrintUnits BOOLEAN,
 	unitPrintList INTEGER[]
-)
+);
 
 CREATE TABLE maps(
 	id SERIAL PRIMARY KEY,
