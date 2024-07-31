@@ -2,7 +2,7 @@ CREATE DATABASE basicwars;
 \c basicwars
 CREATE TABLE games(
 	id SERIAL PRIMARY KEY,
-	title VARCHAR(15),
+	title VARCHAR(25),
 	p1_id INTEGER,
 	p2_id INTEGER,
 	map_id INTEGER,
@@ -56,7 +56,8 @@ CREATE TABLE maps(
 	title VARCHAR(25),
 	width INTEGER,
 	height INTEGER,
-	terrain INTEGER[]
-)
+	terrain INTEGER[][],
+);
+
 
 
