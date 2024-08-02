@@ -104,7 +104,14 @@ app.post("/add/map", (req,res) => {
     });
 });
 /* Get data routes*/
-app.get("/data/gameState")
+/*app.get("/data/gameState")*/
+
+app.get("/games", (req, res) => {
+  let text = "SELECT * FROM games";
+
+  
+
+});
 
 app.listen(port, hostname, () => {
   console.log(`Listening at: http://${hostname}:${port}`);
