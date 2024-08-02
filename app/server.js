@@ -5,6 +5,7 @@ const app = express();
 
 const port = 3000;
 const hostname = "localhost";
+const path = require('path');
 
 const env = require("../env.json");
 const Pool = pg.Pool;
@@ -19,6 +20,16 @@ app.get("/test", (req,res) => {
   res.sendFile(`C:\\Users\\bigbu\\code\\basic\\BasicWars\\app\\public\\test.html`)
 })
 /*ADD Routes*/
+
+app.get("/", (req, res) =>{
+  res.sendFile("public\\index.html", {root: __dirname});
+})
+
+app.get("/gamelist", (req, res) =>{
+  res.sendFile("public\\gamelist.html", {root: __dirname});
+})
+
+
 app.post("/add/game", (req,res) => {
   if(!(req.body.hasOwnProperty("title") && req.body.hasOwnProperty("p1_id") && req.body.hasOwnProperty("p2_id") && req.body.hasOwnProperty("map_id"))){
     return res.sendStatus(400);
@@ -108,9 +119,11 @@ app.post("/add/map", (req,res) => {
 
 app.get("/games", (req, res) => {
   let text = "SELECT * FROM games";
-
-  
-
+  pool.query(text).then(result => {
+    res.setHeader('Content-Type', 'application/json');
+    console.log(result.rows);
+    return res.json({"rows": result.rows});
+  });
 });
 
 app.listen(port, hostname, () => {

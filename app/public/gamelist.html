@@ -19,5 +19,25 @@
         <a href="./index.html">Back to homepage</a>
     </div>
 
-    <script src="gamelist.js"></script>
+    <script>
+        let games = document.getElementById("gamelist");
+
+        fetch("/games", {
+            method: "GET"
+        }).then(response => {
+            console.log("Data get");
+            return response.json();
+        }).then(body => {
+            if (body.rows.length <= 0){
+                console.log("No games found")
+            } else {
+                for (let i = 0; i < body.rows.length; i++){
+                    let gamelink = document.createElement("a");
+                    gamelink.textContent = body.rows[i].title;
+                    games.append(gamelink);
+                }
+            }
+        });
+    </script>
 </body>
+</html>
