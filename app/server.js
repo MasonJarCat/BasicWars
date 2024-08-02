@@ -15,6 +15,9 @@ pool.connect().then(function () {
 
 app.use(express.json());
 
+app.get("/test", (req,res) => {
+  res.sendFile(`C:\\Users\\bigbu\\code\\basic\\BasicWars\\app\\public\\test.html`)
+})
 /*ADD Routes*/
 app.post("/add/game", (req,res) => {
   if(!(req.body.hasOwnProperty("title") && req.body.hasOwnProperty("p1_id") && req.body.hasOwnProperty("p2_id") && req.body.hasOwnProperty("map_id"))){
@@ -35,10 +38,18 @@ app.post("/add/game", (req,res) => {
     if(Number.isNaN(p1_id) || Number.isNaN(p2_id) || Number.isNaN(map_id)){
       return res.sendStatus(400);
     }
-    res.body =pool.query(text,values);
-    return res.send();
+    
+    
+    pool.query(text,values).then(result => {
+      res.setHeader('Content-Type', 'application/json');
+      res.body = result.rows;
+      console.log(res.body);
+      return res.json();
+    });
+    return
 });
 
+/* not done */
 app.post("/add/unit", (req,res) => {
   if(!(req.body.hasOwnProperty("type_id") && req.body.hasOwnProperty("game_id") && req.body.hasOwnProperty("player_id") && req.body.hasOwnProperty("pos_x")&& req.body.hasOwnProperty("pos_y") 
     && req.body.hasOwnProperty("player_id") && req.body.hasOwnProperty("map_id"))){
@@ -86,8 +97,11 @@ app.post("/add/map", (req,res) => {
     if(Number.isNaN(height) || Number.isNaN(width)){
       return res.sendStatus(400);
     }
-    res.body = pool.query(text,values);
-    return res.send();
+    pool.query(text,values).then(result => {
+      res.setHeader('Content-Type', 'application/json');
+      res.body = result.result.rows;
+      return res.json();
+    });
 });
 /* Get data routes*/
 app.get("/data/gameState")
