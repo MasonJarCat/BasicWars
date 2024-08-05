@@ -34,7 +34,7 @@
                 for (let i = 0; i < body.rows.length; i++){
                     let gamelink = document.createElement("a");
                     gamelink.textContent = body.rows[i].title;
-                    gamelink.href = "/gamescreen?id=" + body.rows[i].id;
+                    gamelink.href = "/gamescreen?gameid=" + body.rows[i].id + "&mapid=" + body.rows[i]["map_id"];
                     games.append(gamelink);
                 }
             }

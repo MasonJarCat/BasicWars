@@ -10,12 +10,20 @@
 
     <p>Welcome to the game!</p>
 
+    <p id="maptitle"></p>
+
+    <canvas id="map"></canvas>
+
 
 </body>
 
 <script>
     let gametitle = document.getElementById("gametitle");
-    fetch("/game?id=" + window.location.href.slice(-1), {
+    let maptitle = document.getElementById("maptitle");
+    let querystring = window.location.href.slice(32)
+    console.log(querystring);
+    let gamedata;
+    fetch("/game" + querystring, {
         method: "GET"
     }).then(response => {
         console.log("game fetched");
@@ -25,9 +33,26 @@
             console.log("No game found")
         } else {
             gametitle.textContent=body.rows[0].title;
+            gamedata = body.rows[0];
             console.log(body.rows[0]);
         }
 
     });
+
+    fetch("/map" + querystring, {
+        method: "GET"
+    }).then(response => {
+        console.log("map fetched");
+        return response.json();
+    }).then(body => {
+        if (body.rows.length <= 0){
+            console.log("No game found")
+        } else {
+            maptitle.textContent = body.rows[0].title;
+            console.log(body.rows[0]);
+        }
+    })
+
+
 </script>
 </html>

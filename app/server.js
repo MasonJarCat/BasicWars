@@ -132,7 +132,7 @@ app.get("/games", (req, res) => {
 
 app.get("/game", (req, res)=> {
   console.log("game request received");
-  let gameid = req.query.id;
+  let gameid = req.query.gameid;
   console.log(gameid);
   let text = "SELECT * FROM games WHERE id = " + gameid;
   pool.query(text).then(result => {
@@ -141,6 +141,18 @@ app.get("/game", (req, res)=> {
     return res.json({"rows": result.rows});
   });
 })
+
+app.get("/map", (req, res) => {
+  console.log("map request received");
+  let mapid = req.query.mapid;
+  console.log(mapid);
+  let text = "SELECT * FROM maps WHERE id = " + mapid;
+  pool.query(text).then(result => {
+    res.setHeader('Content-Type', 'application/json');
+    console.log(result.rows);
+    return res.json({"rows": result.rows});
+  });
+});
 
 app.listen(port, hostname, () => {
   console.log(`Listening at: http://${hostname}:${port}`);

@@ -78,7 +78,7 @@ VALUES('jfitz', 'pword1234', 'jf879@drexel.edu');
 INSERT INTO users (username, pword, email)
 VALUES('mason', '4321drowp', 'mcm542@drexel.edu');
 INSERT INTO games (title, p1_id, p2_id, map_id, p1_units, p2_units)
-VALUES('testgame1', 0, 1, 0, '{}', '{}');
+VALUES('testgame1', 1, 2, 1, '{}', '{}');
 
 
 
