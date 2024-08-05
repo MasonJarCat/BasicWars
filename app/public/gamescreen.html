@@ -12,7 +12,9 @@
 
     <p id="maptitle"></p>
 
-    <canvas id="map"></canvas>
+    <canvas id="map">
+
+    </canvas>
 
 
 </body>
@@ -20,6 +22,16 @@
 <script>
     let gametitle = document.getElementById("gametitle");
     let maptitle = document.getElementById("maptitle");
+    let map = document.getElementById("map");
+    const gl = map.getContext("webgl");
+    let factorySprite = new Image();
+    let fieldSprite = new Image();
+    factorySprite.src = ".\\sprites\\neutralfactory.png";
+    fieldSprite.src = ".\\sprites\\field.png";
+    render(factorySprite);
+    if (gl === null){
+        console.log("No GL");
+    }
     let querystring = window.location.href.slice(32)
     console.log(querystring);
     let gamedata;
@@ -50,6 +62,13 @@
         } else {
             maptitle.textContent = body.rows[0].title;
             console.log(body.rows[0]);
+            map.width = body.rows[0].width * 64;
+            map.height = body.rows[0].height * 64;        
+            // Set clear color to black, fully opaque
+            gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            // Clear the color buffer with specified clear color
+            gl.clear(gl.COLOR_BUFFER_BIT);
+
         }
     })
 
