@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Gamescreen</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <h1 id="gametitle"></h1>
+
+    <p>Welcome to the game!</p>
+
+
+</body>
+
+<script>
+    let gametitle = document.getElementById("gametitle");
+    fetch("/game?id=" + window.location.href.slice(-1), {
+        method: "GET"
+    }).then(response => {
+        console.log("game fetched");
+        return response.json();
+    }).then(body => {
+    if (body.rows.length <= 0){
+            console.log("No game found")
+        } else {
+            gametitle.textContent=body.rows[0].title;
+            console.log(body.rows[0]);
+        }
+
+    });
+</script>
+</html>

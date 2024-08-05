@@ -29,6 +29,10 @@ app.get("/gamelist", (req, res) =>{
   res.sendFile("public\\gamelist.html", {root: __dirname});
 })
 
+app.get("/gamescreen", (req, res) =>{
+  res.sendFile("public\\gamescreen.html", {root: __dirname});
+})
+
 
 app.post("/add/game", (req,res) => {
   if(!(req.body.hasOwnProperty("title") && req.body.hasOwnProperty("p1_id") && req.body.hasOwnProperty("p2_id") && req.body.hasOwnProperty("map_id"))){
@@ -125,6 +129,18 @@ app.get("/games", (req, res) => {
     return res.json({"rows": result.rows});
   });
 });
+
+app.get("/game", (req, res)=> {
+  console.log("game request received");
+  let gameid = req.query.id;
+  console.log(gameid);
+  let text = "SELECT * FROM games WHERE id = " + gameid;
+  pool.query(text).then(result => {
+    res.setHeader('Content-Type', 'application/json');
+    console.log(result.rows);
+    return res.json({"rows": result.rows});
+  });
+})
 
 app.listen(port, hostname, () => {
   console.log(`Listening at: http://${hostname}:${port}`);
