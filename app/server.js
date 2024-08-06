@@ -33,13 +33,9 @@ app.get("/gamescreen", (req, res) =>{
   res.sendFile("public\\gamescreen.html", {root: __dirname});
 })
 
-app.get("/gamescreen/neutralfactory.png", (req, res) =>{
-  res.sendFile("public\\neutralfactory.png", {root: __dirname});
+app.get("/gamescreen/:spritename", (req, res) =>{
+  res.sendFile("public\\sprites\\" + req.params.spritename, {root: __dirname});
 });
-
-app.get("/gamescreen/field.png", (req, res) =>{
-  res.sendFile("public\\field.png", {root: __dirname});
-})
 
 
 app.post("/add/game", (req,res) => {

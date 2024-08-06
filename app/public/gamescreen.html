@@ -27,7 +27,11 @@
     document.body.appendChild(app.canvas);
 
     await PIXI.Assets.load('neutralfactory.png');
-
+    await PIXI.Assets.load('neutralHQ.png');
+    await PIXI.Assets.load('redfactory.png');
+    await PIXI.Assets.load('redHQ.png');
+    await PIXI.Assets.load('bluefactory.png');
+    await PIXI.Assets.load('blueHQ.png');
     await PIXI.Assets.load('field.png');
     fetch("/map" + querystring, {
         method: "GET"
@@ -42,16 +46,47 @@
             maptitle.textContent = mapdata.title;
             for (let i = 0; i < mapdata.terrain.length; i++){
                 let row = mapdata.terrain[i];
+                let ownerRow = mapdata.cellowner[i];
                 console.log(row);
                 let y = i * 16;
                 for (let j = 0; j < row.length; j++){
                     let x = j * 16;
                     if (row[j] == 1){
-                        let neutralfactory = PIXI.Sprite.from('neutralfactory.png');
-                        neutralfactory.y = y;
-                        neutralfactory.x = x;
-                        app.stage.addChild(neutralfactory);
-                    } else {
+                        if (ownerRow[j] == 0){
+                            let neutralHQ = PIXI.Sprite.from('neutralHQ.png');
+                            neutralHQ.y = y;
+                            neutralHQ.x = x;
+                            app.stage.addChild(neutralHQ);
+                        } else if (ownerRow[j] == 1){
+                            let redHQ = PIXI.Sprite.from('redHQ.png');
+                            redHQ.y = y;
+                            redHQ.x = x;
+                            app.stage.addChild(redHQ);
+                        } else {
+                            let blueHQ = PIXI.Sprite.from('blueHQ.png');
+                            blueHQ.y = y;
+                            blueHQ.x = x;
+                            app.stage.addChild(blueHQ);
+                        }
+                    } else if (row[j] == 2){
+                        if (ownerRow[j] == 0){
+                            let neutralfactory = PIXI.Sprite.from('neutralfactory.png');
+                            neutralfactory.y = y;
+                            neutralfactory.x = x;
+                            app.stage.addChild(neutralfactory);
+                        } else if (ownerRow[j] == 1){
+                            let redfactory = PIXI.Sprite.from('redfactory.png');
+                            redfactory.y = y;
+                            redfactory.x = x;
+                            app.stage.addChild(redfactory);
+                        } else {
+                            let bluefactory = PIXI.Sprite.from('bluefactory.png');
+                            bluefactory.y = y;
+                            bluefactory.x = x;
+                            app.stage.addChild(bluefactory);
+                        }
+                    }
+                    else {
                         let field = PIXI.Sprite.from('field.png');
                         field.x = x;
                         field.y = y;
