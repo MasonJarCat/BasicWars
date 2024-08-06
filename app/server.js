@@ -33,6 +33,14 @@ app.get("/gamescreen", (req, res) =>{
   res.sendFile("public\\gamescreen.html", {root: __dirname});
 })
 
+app.get("/gamescreen/neutralfactory.png", (req, res) =>{
+  res.sendFile("public\\neutralfactory.png", {root: __dirname});
+});
+
+app.get("/gamescreen/field.png", (req, res) =>{
+  res.sendFile("public\\field.png", {root: __dirname});
+})
+
 
 app.post("/add/game", (req,res) => {
   if(!(req.body.hasOwnProperty("title") && req.body.hasOwnProperty("p1_id") && req.body.hasOwnProperty("p2_id") && req.body.hasOwnProperty("map_id"))){

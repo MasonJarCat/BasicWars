@@ -72,7 +72,7 @@ VALUES('hq', 4, 1, 'true', 'true', 'true', 'true', 'true', 'false', '{}');
 INSERT INTO terrainTypes (title, cover, moveCost, capturable, vehicleAccess, groundAccess, seaAccess, hiding, canPrintUnits, unitPrintList)
 VALUES('plains', 1, 1, 'false', 'true', 'true', 'false', 'false', 'false', '{}');
 INSERT INTO maps (title, width, height, terrain)
-VALUES('testmap1', 3, 3, '{{0, 1, 1},{1, 1, 1},{1, 1, 0}}');
+VALUES('testmap1', 3, 3, '{{1, 2, 2},{2, 2, 2},{2, 2, 1}}');
 INSERT INTO users (username, pword, email)
 VALUES('jfitz', 'pword1234', 'jf879@drexel.edu');
 INSERT INTO users (username, pword, email)
