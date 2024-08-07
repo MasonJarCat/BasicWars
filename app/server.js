@@ -25,6 +25,10 @@ app.get("/", (req, res) =>{
   res.sendFile("public\\index.html", {root: __dirname});
 })
 
+app.get("/index.html",(req, res) => {
+  res.sendFile("public\\index.html", {root: __dirname});
+})
+
 app.get("/gamelist", (req, res) =>{
   res.sendFile("public\\gamelist.html", {root: __dirname});
 })
