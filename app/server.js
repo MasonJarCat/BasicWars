@@ -25,6 +25,10 @@ app.get("/", (req, res) =>{
   res.sendFile("public\\index.html", {root: __dirname});
 })
 
+app.get("/index.html",(req, res) => {
+  res.sendFile("public\\index.html", {root: __dirname});
+})
+
 app.get("/gamelist", (req, res) =>{
   res.sendFile("public\\gamelist.html", {root: __dirname});
 })
@@ -65,10 +69,9 @@ app.post("/add/game", (req,res) => {
       console.log(res.body);
       return res.json();
     });
-    return
+    return;
 });
 
-/* not done */
 app.post("/add/unit", (req,res) => {
   if(!(req.body.hasOwnProperty("type_id") && req.body.hasOwnProperty("game_id") && req.body.hasOwnProperty("player_id") && req.body.hasOwnProperty("pos_x")&& req.body.hasOwnProperty("pos_y") 
     && req.body.hasOwnProperty("player_id") && req.body.hasOwnProperty("map_id"))){
@@ -96,7 +99,6 @@ app.post("/add/unit", (req,res) => {
         units.append(unit_id);
         pool.query(`UPDATE game SET p2_units = "units" WHERE game.id = "game"`, [units,game_id]);
     } 
-    /*add unit_id to coresponding map title */ 
 });
 app.post("/add/map", (req,res) => {
   if(!(req.body.hasOwnProperty("title") && req.body.hasOwnProperty("p1_id") && req.body.hasOwnProperty("p2_id") && req.body.hasOwnProperty("map_id"))){
