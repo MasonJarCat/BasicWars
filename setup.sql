@@ -74,6 +74,8 @@ INSERT INTO terrainTypes (title, cover, moveCost, capturable, vehicleAccess, gro
 VALUES('factory', 4, 1, 'true', 'true', 'true', 'true', 'true', 'true', '{}');
 INSERT INTO terrainTypes (title, cover, moveCost, capturable, vehicleAccess, groundAccess, seaAccess, hiding, canPrintUnits, unitPrintList)
 VALUES('plains', 1, 1, 'false', 'true', 'true', 'false', 'false', 'false', '{}');
+INSERT INTO unitTypes(title, blurb, armor, speed, flying, infantry, vehicle, naval, minrange, maxrange, sightrange)
+VALUES('infantry', 'Basic infantry unit', 0, 3, 'false', 'true', 'false', 'false', 0, 1, 2);
 INSERT INTO maps (title, width, height, terrain, cellOwner) VALUES('testmap1', 3, 3, '{{1, 2, 3},{3, 3, 3},{3, 2, 1}}', '{{1, 1, 0},{0, 0, 0},{0, 2, 2}}');
 INSERT INTO users (username, pword, email) VALUES('jfitz', 'pword1234', 'jf879@drexel.edu');
 INSERT INTO users (username, pword, email) VALUES('mason', '4321drowp', 'mcm542@drexel.edu');
