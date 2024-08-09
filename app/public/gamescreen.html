@@ -119,7 +119,7 @@
                 }
             }
             let redinfantry = PIXI.Sprite.from('redinfantry.png');         
-            redinfantry.on('click', onClickTerrain(redinfantry, unittypes[0], null));
+            redinfantry.on('click', (event) => onClickUnit(redinfantry, unittypes[0], null));
             redinfantry.eventMode = 'dynamic';
             app.stage.addChild(redinfantry);
         }
@@ -161,10 +161,6 @@
         selectedUnit = {'sprite': sprite, 'type': type, 'stats': stats};
         selectedUnitMovableTiles = new Array();
         let closedTiles = new Array();
-        for (let i = 0; i < mapterrain.length; i++){
-            curTile = mapterrain[i];
-            
-        }
     }
 </script>
 
