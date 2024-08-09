@@ -21,7 +21,8 @@
 
     let gametitle = document.getElementById("gametitle");
     let gamedata;
-    let querystring = window.location.href.slice(32)
+    let querystring = window.location.href.slice(32);
+    let selectedUnit;
     const app = new PIXI.Application();
     await app.init({ width: 640, height: 360 })
     document.body.appendChild(app.canvas);
@@ -33,6 +34,8 @@
     await PIXI.Assets.load('bluefactory.png');
     await PIXI.Assets.load('blueHQ.png');
     await PIXI.Assets.load('field.png');
+    await PIXI.Assets.load('redinfantry.png');
+    await PIXI.Assets.load('blueinfantry.png');
     fetch("/map" + querystring, {
         method: "GET"
     }).then(response => {
@@ -54,46 +57,39 @@
                     if (row[j] == 1){
                         if (ownerRow[j] == 0){
                             let neutralHQ = PIXI.Sprite.from('neutralHQ.png');
-                            neutralHQ.y = y;
-                            neutralHQ.x = x;
-                            app.stage.addChild(neutralHQ);
+                            terrainBuilder(neutralHQ, x, y);
                         } else if (ownerRow[j] == 1){
                             let redHQ = PIXI.Sprite.from('redHQ.png');
-                            redHQ.y = y;
-                            redHQ.x = x;
-                            app.stage.addChild(redHQ);
+                            terrainBuilder(redHQ, x, y);
                         } else {
                             let blueHQ = PIXI.Sprite.from('blueHQ.png');
-                            blueHQ.y = y;
-                            blueHQ.x = x;
-                            app.stage.addChild(blueHQ);
+                            terrainBuilder(blueHQ, x, y);
                         }
                     } else if (row[j] == 2){
                         if (ownerRow[j] == 0){
                             let neutralfactory = PIXI.Sprite.from('neutralfactory.png');
-                            neutralfactory.y = y;
-                            neutralfactory.x = x;
-                            app.stage.addChild(neutralfactory);
+                            terrainBuilder(neutralfactory, x, y);
                         } else if (ownerRow[j] == 1){
                             let redfactory = PIXI.Sprite.from('redfactory.png');
-                            redfactory.y = y;
-                            redfactory.x = x;
-                            app.stage.addChild(redfactory);
+                            terrainBuilder(redfactory, x, y);
                         } else {
                             let bluefactory = PIXI.Sprite.from('bluefactory.png');
-                            bluefactory.y = y;
-                            bluefactory.x = x;
-                            app.stage.addChild(bluefactory);
+                            terrainBuilder(bluefactory, x, y);
                         }
                     }
                     else {
                         let field = PIXI.Sprite.from('field.png');
-                        field.x = x;
-                        field.y = y;
-                        app.stage.addChild(field)
+                        terrainBuilder(field, x, y);
                     }
                 }
             }
+            let redinfantry = PIXI.Sprite.from('redinfantry.png');         
+            redinfantry.on('click', (event) => {
+                selectedUnit = {sprite: redinfantry};
+                console.log(selectedUnit);
+            });
+            redinfantry.eventMode = 'dynamic';
+            app.stage.addChild(redinfantry);
         }
     })
 
@@ -112,6 +108,21 @@
         }
 
     });
+
+    function onClickTerrain(terrain){
+        if (selectedUnit != null && selectedUnit != undefined){
+            selectedUnit.sprite.x = terrain.x;
+            selectedUnit.sprite.y = terrain.y; 
+        }
+    }
+
+    function terrainBuilder(sprite, x, y){
+        sprite.y = y;
+        sprite.x = x;
+        sprite.on('click', (event) => onClickTerrain(sprite));
+        sprite.eventMode = 'dynamic';
+        app.stage.addChild(sprite);
+    }
 </script>
 
 <script>
