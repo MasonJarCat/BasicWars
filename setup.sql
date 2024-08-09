@@ -80,6 +80,7 @@ INSERT INTO maps (title, width, height, terrain, cellOwner) VALUES('testmap1', 3
 INSERT INTO users (username, pword, email) VALUES('jfitz', 'pword1234', 'jf879@drexel.edu');
 INSERT INTO users (username, pword, email) VALUES('mason', '4321drowp', 'mcm542@drexel.edu');
 INSERT INTO games (title, p1_id, p2_id, map_id, p1_units, p2_units) VALUES('testgame1', 1, 2, 1, '{}', '{}');
+INSERT INTO units(type_id, game_id, player_id, pos_x, pos_y, cur_hp, capturing, capture_prog) VALUES (1, 1, 1, 0, 0, 10, 'false', 0);
 
 
 

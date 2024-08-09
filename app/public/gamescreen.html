@@ -24,6 +24,7 @@
     let unittypes;
     let terraintypes;
     let gameunits;
+    let mapdata;
     let querystring = window.location.href.slice(32);
     let selectedUnit;
     let selectedUnitMovableTiles;
@@ -80,7 +81,7 @@
         if (body.rows.length <= 0){
             console.log("No game found")
         } else {
-            let mapdata = body.rows[0]
+            mapdata = body.rows[0]
             maptitle.textContent = mapdata.title;
             for (let i = 0; i < mapdata.terrain.length; i++){
                 let row = mapdata.terrain[i];
@@ -92,34 +93,34 @@
                     if (row[j] == 1){
                         if (ownerRow[j] == 0){
                             let neutralHQ = PIXI.Sprite.from('neutralHQ.png');
-                            terrainBuilder(neutralHQ, x, y, terraintypes[0]);
+                            terrainBuilder(neutralHQ, x, y, i, j, terraintypes[0]);
                         } else if (ownerRow[j] == 1){
                             let redHQ = PIXI.Sprite.from('redHQ.png');
-                            terrainBuilder(redHQ, x, y, terraintypes[0]);
+                            terrainBuilder(redHQ, x, y, i, j, terraintypes[0]);
                         } else {
                             let blueHQ = PIXI.Sprite.from('blueHQ.png');
-                            terrainBuilder(blueHQ, x, y, terraintypes[0]);
+                            terrainBuilder(blueHQ, x, y, i, j, terraintypes[0]);
                         }
                     } else if (row[j] == 2){
                         if (ownerRow[j] == 0){
                             let neutralfactory = PIXI.Sprite.from('neutralfactory.png');
-                            terrainBuilder(neutralfactory, x, y, terraintypes[1]);
+                            terrainBuilder(neutralfactory, x, y, i, j, terraintypes[1]);
                         } else if (ownerRow[j] == 1){
                             let redfactory = PIXI.Sprite.from('redfactory.png');
-                            terrainBuilder(redfactory, x, y, terraintypes[1]);
+                            terrainBuilder(redfactory, x, y, i, j, terraintypes[1]);
                         } else {
                             let bluefactory = PIXI.Sprite.from('bluefactory.png');
-                            terrainBuilder(bluefactory, x, y, terraintypes[1]);
+                            terrainBuilder(bluefactory, x, y, i, j, terraintypes[1]);
                         }
                     }
                     else {
                         let field = PIXI.Sprite.from('field.png');
-                        terrainBuilder(field, x, y, terraintypes[2]);
+                        terrainBuilder(field, x, y, i, j, terraintypes[2]);
                     }
                 }
             }
             let redinfantry = PIXI.Sprite.from('redinfantry.png');         
-            redinfantry.on('click', (event) => onClickUnit(redinfantry, unittypes[0], null));
+            redinfantry.on('click', (event) => onClickUnit(redinfantry, unittypes[0], gameunits[0]));
             redinfantry.eventMode = 'dynamic';
             app.stage.addChild(redinfantry);
         }
@@ -141,26 +142,49 @@
 
     });
 
-    function onClickTerrain(terrain){
+    function onClickTerrain(terrain, x, y){
         if (selectedUnit != null && selectedUnit != undefined){
-            selectedUnit.sprite.x = terrain.x;
-            selectedUnit.sprite.y = terrain.y; 
+            let goalCell = selectedUnitMovableTiles.find(c => c['pos_x'] == x && c['pos_y'] == y);
+            console.log(goalCell);
+            if (goalCell != undefined){
+                selectedUnit.sprite.x = terrain.x;
+                selectedUnit.sprite.y = terrain.y;
+                selectedUnit.stats.pos_x = x;
+                selectedUnit.stats.pos_y = y;
+            } else {
+                console.log('Out of range');
+            }
         }
     }
 
-    function terrainBuilder(sprite, x, y, type){
-        sprite.y = y;
-        sprite.x = x;
-        sprite.on('click', (event) => onClickTerrain(sprite));
+    function terrainBuilder(sprite, spritex, spritey, posx, posy, type){
+        sprite.y = spritey;
+        sprite.x = spritex;
+        sprite.on('click', (event) => onClickTerrain(sprite, posx, posy));
         sprite.eventMode = 'dynamic';
-        mapterrain.push({'sprite': sprite, 'type': type})
+        mapterrain.push({'sprite': sprite, 'type': type, 'pos_x': posx, 'pos_y': posy})
         app.stage.addChild(sprite);
     }
 
     function onClickUnit(sprite, type, stats){
         selectedUnit = {'sprite': sprite, 'type': type, 'stats': stats};
+        console.log(type);
         selectedUnitMovableTiles = new Array();
-        let closedTiles = new Array();
+        for (let i = 0; i < mapterrain.length; i++){
+            let dx = mapterrain[i]['pos_x'] - stats['pos_x'];
+            let dy = mapterrain[i]['pos_y'] - stats['pos_y'];
+            if (dx < 0){
+                dx = dx * -1;
+            }
+            if (dy < 0){
+                dy = dy * -1;
+            }
+            let distance = dx + dy;
+            if (distance <= selectedUnit.type.speed){
+                selectedUnitMovableTiles.push(mapterrain[i]);
+            }
+        }
+        console.log(selectedUnitMovableTiles);
     }
 </script>
 

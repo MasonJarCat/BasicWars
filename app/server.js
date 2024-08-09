@@ -128,6 +128,7 @@ app.post("/add/unit", (req,res) => {
         pool.query(`UPDATE game SET p2_units = "units" WHERE game.id = "game"`, [units,game_id]);
     } 
 });
+
 app.post("/add/map", (req,res) => {
   if(!(req.body.hasOwnProperty("title") && req.body.hasOwnProperty("p1_id") && req.body.hasOwnProperty("p2_id") && req.body.hasOwnProperty("map_id"))){
     return res.sendStatus(400);
