@@ -189,6 +189,38 @@ app.get("/map", (req, res) => {
   });
 });
 
-app.listen(port, hostname, () => {
+/* user auth */
+app.post("/add/user", (req, res) => {
+  if(!(req.body.hasOwnProperty("username") && req.body.hasOwnProperty("password"))){
+    return res.sendStatus(400);
+  }
+  let username = req.body.username;
+  let password = req.body.password;
+  
+  let text = "INSERT INTO users(username, password) VALUES($1, $2) RETURNING id";
+  let values = [username, password];
+  
+  pool.query(text, values).then(result => {
+    res.setHeader('Content-Type', 'application/json');
+    res.body = result.rows;
+    console.log(res.body);
+    return res.json();
+  });
+});
+
+app.post("/login", (req, res) => {
+
+})
+
+app.post("/logout", (req, res) => {
+
+})
+
+app.post("/update/user", (req, res) => {
+
+})
+
+
+app.listen(port, () => {
   console.log(`Listening at: http://${hostname}:${port}`);
 });
