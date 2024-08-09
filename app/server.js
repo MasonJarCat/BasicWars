@@ -61,7 +61,7 @@ app.get("/unittypes", (req, res) => {
 
 app.get("/gameunits", (req, res) => {
   let gameid = req.query.gameid; 
-  let text = "SELECT * FROM unitTypes WHERE game_id = " + gameid;
+  let text = "SELECT * FROM units WHERE game_id = " + gameid;
   pool.query(text).then(result => {
     res.setHeader('Content-Type', 'application/json');
     console.log(result.rows);
