@@ -41,6 +41,34 @@ app.get("/gamescreen/:spritename", (req, res) =>{
   res.sendFile("public\\sprites\\" + req.params.spritename, {root: __dirname});
 });
 
+app.get("/terraintypes", (req, res) => {
+  let text = "SELECT * FROM terrainTypes";
+  pool.query(text).then(result => {
+    res.setHeader('Content-Type', 'application/json');
+    console.log(result.rows);
+    return res.json({"rows": result.rows});
+  });
+});
+
+app.get("/unittypes", (req, res) => {
+  let text = "SELECT * FROM unitTypes";
+  pool.query(text).then(result => {
+    res.setHeader('Content-Type', 'application/json');
+    console.log(result.rows);
+    return res.json({"rows": result.rows});
+  });
+});
+
+app.get("/gameunits", (req, res) => {
+  let gameid = req.query.gameid; 
+  let text = "SELECT * FROM unitTypes WHERE game_id = " + gameid;
+  pool.query(text).then(result => {
+    res.setHeader('Content-Type', 'application/json');
+    console.log(result.rows);
+    return res.json({"rows": result.rows});
+  });
+})
+
 
 app.post("/add/game", (req,res) => {
   if(!(req.body.hasOwnProperty("title") && req.body.hasOwnProperty("p1_id") && req.body.hasOwnProperty("p2_id") && req.body.hasOwnProperty("map_id"))){

@@ -21,6 +21,9 @@
 
     let gametitle = document.getElementById("gametitle");
     let gamedata;
+    let unittypes;
+    let terraintypes;
+    let gameunits;
     let querystring = window.location.href.slice(32);
     let selectedUnit;
     const app = new PIXI.Application();
@@ -36,12 +39,41 @@
     await PIXI.Assets.load('field.png');
     await PIXI.Assets.load('redinfantry.png');
     await PIXI.Assets.load('blueinfantry.png');
+
+    fetch("/terraintypes", {
+        method: "GET"
+    }).then(response => {
+        console.log("terrain types fetched");
+        return response.json();
+    }).then(body => {
+        terraintypes = body.rows;
+    })
+
+    fetch("/unittyppes", {
+        method: "GET"
+    }).then(response => {
+        console.log("unit types fetched");
+        return response.json();
+    }).then(body => {
+        unittypes = body.rows;
+    });
+
+    fetch("/gameunits" + querystring, {
+        method: "GET"
+    }).then(response => {
+        console.log("game units fetched");
+        return response.json();
+    }).then(body => {
+        gameunits = body.rows;
+    })
+
     fetch("/map" + querystring, {
         method: "GET"
     }).then(response => {
         console.log("map fetched");
         return response.json();
     }).then(body => {
+        console.log(terraintypes);
         if (body.rows.length <= 0){
             console.log("No game found")
         } else {
@@ -122,6 +154,10 @@
         sprite.on('click', (event) => onClickTerrain(sprite));
         sprite.eventMode = 'dynamic';
         app.stage.addChild(sprite);
+    }
+
+    function onClickUnit(sprite, type, stats){
+
     }
 </script>
 
