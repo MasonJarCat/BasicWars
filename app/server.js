@@ -1,37 +1,46 @@
-/*TODO write document for what is require for each api call */
 const pg = require("pg");
 const express = require("express");
-const app = express();
-
-const port = 3000;
-const hostname = "localhost";
 const path = require('path');
 
-const env = require("../env.json");
-const Pool = pg.Pool;
-const pool = new Pool(env);
-pool.connect().then(function () {
-  console.log(`Connected to database ${env.database}`);
+const app = express();
+
+// Use environment variables for port and hostname
+const port = process.env.PORT || 3000;
+const hostname = process.env.HOST || '0.0.0.0';
+
+// Configure database connection using environment variables
+const pool = new pg.Pool({
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT, 
 });
 
+pool.connect()
+  .then(() => console.log(`Connected to database ${process.env.DB_NAME}`))
+  .catch(err => console.error('Database connection error:', err));
+
+// Middleware to parse JSON bodies
 app.use(express.json());
 
-app.get("/test", (req,res) => {
-  res.sendFile(`C:\\Users\\bigbu\\code\\basic\\BasicWars\\app\\public\\test.html`)
-})
-/*ADD Routes*/
+// Serve static files
+app.get("/test", (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'test.html'));
+});
 
-app.get("/", (req, res) =>{
-  res.sendFile("public\\index.html", {root: __dirname});
-})
+/* Routes */
 
-app.get("/index.html",(req, res) => {
-  res.sendFile("public\\index.html", {root: __dirname});
-})
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+app.get("/index.hmtl", (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
-app.get("/gamelist", (req, res) =>{
-  res.sendFile("public\\gamelist.html", {root: __dirname});
-})
+app.get("/gamelist", (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'gamelist.html'));
+});
 
 app.get("/gamescreen", (req, res) =>{
   res.sendFile("public\\gamescreen.html", {root: __dirname});
@@ -153,74 +162,75 @@ app.post("/add/map", (req,res) => {
       return res.json();
     });
 });
-/* Get data routes*/
-/*app.get("/data/gameState")*/
 
+// Get all games
 app.get("/games", (req, res) => {
-  let text = "SELECT * FROM games";
-  pool.query(text).then(result => {
-    res.setHeader('Content-Type', 'application/json');
-    console.log(result.rows);
-    return res.json({"rows": result.rows});
-  });
+  const query = "SELECT * FROM games";
+
+  pool.query(query)
+    .then(result => res.json({ rows: result.rows }))
+    .catch(err => res.status(500).json({ error: err.message }));
 });
 
-app.get("/game", (req, res)=> {
-  console.log("game request received");
-  let gameid = req.query.gameid;
-  console.log(gameid);
-  let text = "SELECT * FROM games WHERE id = " + gameid;
-  pool.query(text).then(result => {
-    res.setHeader('Content-Type', 'application/json');
-    console.log(result.rows);
-    return res.json({"rows": result.rows});
-  });
-})
+// Get a specific game by ID
+app.get("/game", (req, res) => {
+  const { gameid } = req.query;
 
-app.get("/map", (req, res) => {
-  console.log("map request received");
-  let mapid = req.query.mapid;
-  console.log(mapid);
-  let text = "SELECT * FROM maps WHERE id = " + mapid;
-  pool.query(text).then(result => {
-    res.setHeader('Content-Type', 'application/json');
-    console.log(result.rows);
-    return res.json({"rows": result.rows});
-  });
-});
-
-/* user auth */
-app.post("/add/user", (req, res) => {
-  if(!(req.body.hasOwnProperty("username") && req.body.hasOwnProperty("password"))){
-    return res.sendStatus(400);
+  if (!gameid) {
+    return res.status(400).json({ error: 'Missing game ID' });
   }
-  let username = req.body.username;
-  let password = req.body.password;
+
+  const query = "SELECT * FROM games WHERE id = $1";
   
-  let text = "INSERT INTO users(username, password) VALUES($1, $2) RETURNING id";
-  let values = [username, password];
+  pool.query(query, [gameid])
+    .then(result => res.json({ rows: result.rows }))
+    .catch(err => res.status(500).json({ error: err.message }));
+});
+
+// Get a specific map by ID
+app.get("/map", (req, res) => {
+  const { mapid } = req.query;
+
+  if (!mapid) {
+    return res.status(400).json({ error: 'Missing map ID' });
+  }
+
+  const query = "SELECT * FROM maps WHERE id = $1";
   
-  pool.query(text, values).then(result => {
-    res.setHeader('Content-Type', 'application/json');
-    res.body = result.rows;
-    console.log(res.body);
-    return res.json();
-  });
+  pool.query(query, [mapid])
+    .then(result => res.json({ rows: result.rows }))
+    .catch(err => res.status(500).json({ error: err.message }));
+});
+
+// Add a new user
+app.post("/add/user", (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  const query = "INSERT INTO users(username, password) VALUES($1, $2) RETURNING id";
+  const values = [username, password];
+
+  pool.query(query, values)
+    .then(result => res.json({ id: result.rows[0].id }))
+    .catch(err => res.status(500).json({ error: err.message }));
 });
 
 app.post("/login", (req, res) => {
-
-})
+  // Implement login logic here
+});
 
 app.post("/logout", (req, res) => {
-
-})
+  // Implement logout logic here
+});
 
 app.post("/update/user", (req, res) => {
+  // Implement user update logic here
+});
 
-})
-
-
-app.listen(port, () => {
+// Start the server
+app.listen(port, hostname, () => {
   console.log(`Listening at: http://${hostname}:${port}`);
 });
