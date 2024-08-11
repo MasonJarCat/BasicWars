@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Page</title>
+
+</head>
+<body>
+    <h1>Login</h1>
+    <form>
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required><br><br>
+            
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <input type="submit" value="Login">
+    </form>
+</body>
+<script>
+    fetch('/your-server-endpoint', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            username: document.getElementById('username').value,
+            password: hashPassword(document.getElementById('password').value)
+        })
+    })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the response from the server
+            console.log(data);
+        })
+        .catch(error => {
+            // Handle any errors that occurred during the request
+            console.error(error);
+        });
+
+    function hashPassword(password) {
+
+        let encoder = new TextEncoder();
+        let data = encoder.encode(password);
+        let hashBuffer = crypto.subtle.digest('SHA-256', data);
+        let hashArray = Array.from(new Uint8Array(hashBuffer));
+        let hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+        return hashHex;
+    }
+</script>
+</html>
