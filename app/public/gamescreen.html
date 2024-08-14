@@ -25,7 +25,7 @@
     let terraintypes;
     let gameunits;
     let mapdata;
-    let querystring = window.location.href.slice(32);
+    let querystring = window.location.href.slice(window.location.href.indexOf('?'));
     let selectedUnit;
     let selectedUnitMovableTiles;
     let mapterrain = new Array();
