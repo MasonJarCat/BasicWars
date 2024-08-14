@@ -153,8 +153,9 @@ app.get("/games", (req, res) => {
 
 // Get a specific game by ID
 app.get("/game", (req, res) => {
-  const { gameid } = req.query;
-
+  console.log(req.body);
+  let gameid = req.query.gameid;
+  console.log(gameid);
   if (!gameid) {
     return res.status(400).json({ error: 'Missing game ID' });
   }
@@ -168,8 +169,9 @@ app.get("/game", (req, res) => {
 
 // Get a specific map by ID
 app.get("/map", (req, res) => {
-  const { mapid } = req.query;
-
+  console.log(req.body);
+  const mapid = req.query.mapid;
+  console.log(gameid);
   if (!mapid) {
     return res.status(400).json({ error: 'Missing map ID' });
   }
