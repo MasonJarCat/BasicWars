@@ -171,7 +171,7 @@ app.get("/game", (req, res) => {
 app.get("/map", (req, res) => {
   console.log(req.body);
   const mapid = req.query.mapid;
-  console.log(gameid);
+  console.log(mapid);
   if (!mapid) {
     return res.status(400).json({ error: 'Missing map ID' });
   }
