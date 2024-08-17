@@ -12,6 +12,8 @@
 
     <p id="maptitle"></p>
 
+    <div id="unitproductionmenu"></div>
+
 
 </body>
 
@@ -20,6 +22,7 @@
 <script type="module">   
 
     let gametitle = document.getElementById("gametitle");
+    let unitproductionmenu = document.getElementById("unitproductionmenu");
     let gamedata;
     let unittypes;
     let terraintypes;
@@ -142,7 +145,7 @@
 
     });
 
-    function onClickTerrain(terrain, x, y){
+    function onClickTerrain(terrain, x, y, type){
         if (selectedUnit != null && selectedUnit != undefined){
             let goalCell = selectedUnitMovableTiles.find(c => c['pos_x'] == x && c['pos_y'] == y);
             console.log(goalCell);
@@ -160,7 +163,7 @@
     function terrainBuilder(sprite, spritex, spritey, posx, posy, type){
         sprite.y = spritey;
         sprite.x = spritex;
-        sprite.on('click', (event) => onClickTerrain(sprite, posx, posy));
+        sprite.on('click', (event) => onClickTerrain(sprite, posx, posy, type));
         sprite.eventMode = 'dynamic';
         mapterrain.push({'sprite': sprite, 'type': type, 'pos_x': posx, 'pos_y': posy})
         app.stage.addChild(sprite);
