@@ -158,9 +158,31 @@
                 console.log('Out of range');
             }
         } else {
-            if (type['canPrintUnits']){
-                
+            console.log(type)
+            if (type['canprintunits']){
+                for (let i = 0; i < type['unitprintlist'].length; i++){
+                    let unitTypeID = type['unitprintlist'][i];
+                    let unitType = unittypes.find(c => c['id'] == unitTypeID);
+                    let printRow = document.createElement('div'); 
+                    printRow.textContent = unitType['title'] + ", " + unitType['cost']; 
+                    console.log(unitType['title']);
+                    let buybutton = document.createElement('button');
+                    buybutton.addEventListener('click', () => buyUnit(unitType, x, y, terrain.x, terrain.y));
+                    printRow.append(buybutton);
+                    unitproductionmenu.append(printRow);
+                }
             }
+        }
+    }
+
+    function buyUnit(unitType, gamex, gamey, mapx, mapy){
+        if (unitType['id'] == 1){
+            let infantry = PIXI.Sprite.from('blueinfantry.png'); 
+            infantry.on('click', (event) => onClickUnit(infantry, unittypes[0], gameunits[0]));
+            infantry.eventMode = 'dynamic';
+            infantry.x = mapx;
+            infantry.y = mapy;
+            app.stage.addChild(infantry);
         }
     }
 
