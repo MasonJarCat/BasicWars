@@ -199,6 +199,72 @@ app.post("/add/user", (req, res) => {
     .catch(err => res.status(500).json({ error: err.message }));
 });
 
+
+
+// Function to calculate damage
+async function calculateDamage(unit1, unit2) {
+  const terrainQuery = `
+    SELECT tt.cover
+    FROM maps m
+    JOIN terrainTypes tt ON m.terrain[$1][$2] = tt.id
+    WHERE m.id = $3;
+  `;
+
+  // Fetch the terrain cover for both units
+  const unit1Terrain = (await pool.query(terrainQuery, [unit1.pos_y + 1, unit1.pos_x + 1, unit1.game_id])).rows[0];
+  const unit2Terrain = (await pool.query(terrainQuery, [unit2.pos_y + 1, unit2.pos_x + 1, unit2.game_id])).rows[0];
+
+  // Calculate damage
+  const damageToUnit2 = Math.max(0, unit1.attack_power - (unit2.armor + unit2Terrain.cover));
+  const damageToUnit1 = Math.max(0, unit2.attack_power - (unit1.armor + unit1Terrain.cover));
+
+  return {
+    damageToUnit1,
+    damageToUnit2
+  };
+}
+
+// Route to handle attack between two units
+app.post("/attack", async (req, res) => {
+  const { unit1_id, unit2_id } = req.body;
+
+  if (!unit1_id || !unit2_id) {
+    return res.status(400).json({ error: 'Missing unit IDs' });
+  }
+
+  try {
+    const getUnitQuery = `
+      SELECT u.*, ut.attack_power, ut.armor
+      FROM units u
+      JOIN unitTypes ut ON u.type_id = ut.id
+      WHERE u.id IN ($1, $2);
+    `;
+    const updateUnitQuery = "UPDATE units SET cur_hp = cur_hp - $1 WHERE id = $2";
+
+    const result = await pool.query(getUnitQuery, [unit1_id, unit2_id]);
+
+    if (result.rows.length !== 2) {
+      return res.status(404).json({ error: 'Units not found' });
+    }
+
+    const unit1 = result.rows.find(unit => unit.id === unit1_id);
+    const unit2 = result.rows.find(unit => unit.id === unit2_id);
+
+    const { damageToUnit1, damageToUnit2 } = await calculateDamage(unit1, unit2);
+
+    const updateUnit1 = pool.query(updateUnitQuery, [damageToUnit1, unit1_id]);
+    const updateUnit2 = pool.query(updateUnitQuery, [damageToUnit2, unit2_id]);
+
+    await Promise.all([updateUnit1, updateUnit2]);
+
+    res.status(200).json({ message: 'Attack successful', damageToUnit1, damageToUnit2 });
+  } catch (err) {
+    console.error('Error during attack:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 app.post("/login", (req, res) => {
     const { username, password } = req.body;
   
