@@ -43,12 +43,15 @@
     document.body.appendChild(app.canvas);
     console.log(querystring);
     await PIXI.Assets.load('neutralfactory.png');
-    await PIXI.Assets.load('neutralHQ.png');
+    await PIXI.Assets.load('neutralhq.png');
     await PIXI.Assets.load('redfactory.png');
-    await PIXI.Assets.load('redHQ.png');
+    await PIXI.Assets.load('redhq.png');
     await PIXI.Assets.load('bluefactory.png');
-    await PIXI.Assets.load('blueHQ.png');
-    await PIXI.Assets.load('field.png');
+    await PIXI.Assets.load('bluehq.png');
+    await PIXI.Assets.load('plains.png');
+    await PIXI.Assets.load('neutralsettlement.png');
+    await PIXI.Assets.load('redsettlement.png');
+    await PIXI.Assets.load('bluesettlement.png');
     await PIXI.Assets.load('redinfantry.png');
     await PIXI.Assets.load('blueinfantry.png');
 
@@ -99,33 +102,23 @@
                 let y = i * 16;
                 for (let j = 0; j < row.length; j++){
                     let x = j * 16;
-                    if (row[j] == 1){
-                        if (ownerRow[j] == 0){
-                            let neutralHQ = PIXI.Sprite.from('neutralHQ.png');
-                            terrainBuilder(neutralHQ, x, y, i, j, terraintypes[0]);
-                        } else if (ownerRow[j] == 1){
-                            let redHQ = PIXI.Sprite.from('redHQ.png');
-                            terrainBuilder(redHQ, x, y, i, j, terraintypes[0]);
+                    let type = row[j];
+                    let typeData = terraintypes[type - 1];
+                    let owner = ownerRow[j];
+                    let spriteName; 
+                    if (typeData['capturable']){
+                        if (owner == 0){
+                            spriteName = 'neutral' + typeData['title'] + '.png';
+                        } else if (owner == 1){
+                            spriteName = 'red' + typeData['title'] + '.png';
                         } else {
-                            let blueHQ = PIXI.Sprite.from('blueHQ.png');
-                            terrainBuilder(blueHQ, x, y, i, j, terraintypes[0]);
+                            spriteName = 'blue' + typeData['title'] + '.png';
                         }
-                    } else if (row[j] == 2){
-                        if (ownerRow[j] == 0){
-                            let neutralfactory = PIXI.Sprite.from('neutralfactory.png');
-                            terrainBuilder(neutralfactory, x, y, i, j, terraintypes[1]);
-                        } else if (ownerRow[j] == 1){
-                            let redfactory = PIXI.Sprite.from('redfactory.png');
-                            terrainBuilder(redfactory, x, y, i, j, terraintypes[1]);
-                        } else {
-                            let bluefactory = PIXI.Sprite.from('bluefactory.png');
-                            terrainBuilder(bluefactory, x, y, i, j, terraintypes[1]);
-                        }
+                    } else {
+                        spriteName = typeData['title'] + '.png';
                     }
-                    else {
-                        let field = PIXI.Sprite.from('field.png');
-                        terrainBuilder(field, x, y, i, j, terraintypes[2]);
-                    }
+                    let sprite = PIXI.Sprite.from(spriteName);
+                    terrainBuilder(sprite, x, y, i, j, typeData);
                 }
             }
         }
