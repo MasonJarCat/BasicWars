@@ -11,6 +11,7 @@
     <p>Welcome to the game!</p>
 
     <p id="maptitle"></p>
+    <div id="economyInfo"></div>
 
     <div id="unitproductionmenu"></div>
 
@@ -23,6 +24,8 @@
 
     let gametitle = document.getElementById("gametitle");
     let unitproductionmenu = document.getElementById("unitproductionmenu");
+    let economyInfo = document.getElementById("economyInfo");
+
     let gamedata;
     let unittypes;
     let terraintypes;
@@ -31,6 +34,9 @@
     let querystring = window.location.href.slice(window.location.href.indexOf('?'));
     let selectedUnit;
     let selectedUnitMovableTiles;
+    let income; 
+    let funds; 
+
     let mapterrain = new Array();
     const app = new PIXI.Application();
     await app.init({ width: 640, height: 360 })
@@ -122,10 +128,6 @@
                     }
                 }
             }
-            let redinfantry = PIXI.Sprite.from('redinfantry.png');         
-            redinfantry.on('click', (event) => onClickUnit(redinfantry, unittypes[0], gameunits[0]));
-            redinfantry.eventMode = 'dynamic';
-            app.stage.addChild(redinfantry);
         }
     })
 
@@ -140,6 +142,9 @@
         } else {
             gametitle.textContent=body.rows[0].title;
             gamedata = body.rows[0];
+            income = gamedata["starter_income"];
+            funds = gamedata["p1_funds"]; 
+            economyInfo.textContent = "income: " + income + "\nfunds: " + funds;
             console.log(body.rows[0]);
         }
 
@@ -168,21 +173,35 @@
                     console.log(unitType['title']);
                     let buybutton = document.createElement('button');
                     buybutton.addEventListener('click', () => buyUnit(unitType, x, y, terrain.x, terrain.y));
+                    buybutton.textContent = "buy";
                     printRow.append(buybutton);
                     unitproductionmenu.append(printRow);
                 }
             }
         }
+        selectedUnit = null; 
     }
 
     function buyUnit(unitType, gamex, gamey, mapx, mapy){
-        if (unitType['id'] == 1){
-            let infantry = PIXI.Sprite.from('blueinfantry.png'); 
-            infantry.on('click', (event) => onClickUnit(infantry, unittypes[0], gameunits[0]));
-            infantry.eventMode = 'dynamic';
-            infantry.x = mapx;
-            infantry.y = mapy;
-            app.stage.addChild(infantry);
+        let unitSpriteName = 'red' + unitType['title'] + '.png'
+        if (funds >= unitType['cost']){
+            funds = funds - unitType['cost'];
+            let stats = {'type_id': unitType['id'], 'game_id': gamedata['id'], 'player_id': 1, 'pos_x': gamex, 'pos_y': gamey, 'cur_hp': 10, 'capturing': false, 'capture_prog': 0}; 
+            gameunits.push(stats);
+            let newsprite = PIXI.Sprite.from(unitSpriteName);
+            newsprite.on('click', (event) => onClickUnit(newsprite, unitType, stats));
+            newsprite.eventMode = 'dynamic';
+            newsprite.x = mapx;
+            newsprite.y = mapy;
+            app.stage.addChild(newsprite); 
+            economyInfo.textContent = "income: " + income + "\nfunds: " + funds;
+        } else {
+            console.log('Insufficient funds!');
+        }
+        let j = unitproductionmenu.children.length - 1; 
+        while (j >= 0){
+            unitproductionmenu.children[j].remove();
+            j = j - 1;
         }
     }
 

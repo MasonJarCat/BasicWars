@@ -16,7 +16,10 @@ CREATE TABLE games(
 	p2_id INTEGER,
 	map_id INTEGER,
 	p1_units INTEGER[],
-	p2_units INTEGER[]
+	p2_units INTEGER[],
+	starter_income INTEGER,
+	p1_funds INTEGER,
+	p2_funds INTEGER
 );
 
 CREATE TABLE unitTypes(
@@ -82,7 +85,7 @@ VALUES('plains', 1, 1, 'false', 'true', 'true', 'false', 'false', 'false', '{}')
 INSERT INTO maps (title, width, height, terrain, cellOwner) VALUES('testmap1', 3, 3, '{{1, 2, 3},{3, 3, 3},{3, 2, 1}}', '{{1, 1, 0},{0, 0, 0},{0, 2, 2}}');
 INSERT INTO users (username, pword, email) VALUES('jfitz', 'pword1234', 'jf879@drexel.edu');
 INSERT INTO users (username, pword, email) VALUES('mason', '4321drowp', 'mcm542@drexel.edu');
-INSERT INTO games (title, p1_id, p2_id, map_id, p1_units, p2_units) VALUES('testgame1', 1, 2, 1, '{}', '{}');
+INSERT INTO games (title, p1_id, p2_id, map_id, p1_units, p2_units, starter_income, p1_funds, p2_funds) VALUES('testgame1', 1, 2, 1, '{}', '{}', 10, 10, 10);
 INSERT INTO units(type_id, game_id, player_id, pos_x, pos_y, cur_hp, capturing, capture_prog) VALUES (1, 1, 1, 0, 0, 10, 'false', 0);
 
 
