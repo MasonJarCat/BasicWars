@@ -5,7 +5,7 @@ const path = require('path');
 const app = express();
 
 // Use environment variables for port and hostname
-/*const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 const hostname = process.env.HOST || '0.0.0.0';
 
 // Configure database connection using environment variables
@@ -19,9 +19,9 @@ const pool = new pg.Pool({
 
 pool.connect()
   .then(() => console.log(`Connected to database ${process.env.DB_NAME}`))
-  .catch(err => console.error('Database connection error:', err));*/
+  .catch(err => console.error('Database connection error:', err));
   
-const port = 3000;
+/*const port = 3000;
 const hostname = "localhost";
 
 const env = require("../env.json");
@@ -29,7 +29,7 @@ const Pool = pg.Pool;
 const pool = new Pool(env);
 pool.connect().then(function () {
   console.log(`Connected to database ${env.database}`);
-});
+});*/
 
 // Middleware to parse JSON bodies
 app.use(express.json());
