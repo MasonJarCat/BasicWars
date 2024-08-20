@@ -42,6 +42,7 @@
     let selectedUnitMovableTiles;
     let income; 
     let funds; 
+    let movingselectedunit = false;; 
 
     let mapterrain = new Array();
     const app = new PIXI.Application();
@@ -124,7 +125,7 @@
                         spriteName = typeData['title'] + '.png';
                     }
                     let sprite = PIXI.Sprite.from(spriteName);
-                    terrainBuilder(sprite, x, y, i, j, typeData);
+                    terrainBuilder(sprite, x, y, j, i, typeData);
                 }
             }
         }
@@ -149,8 +150,10 @@
 
     });
 
+    endturnbutton.addEventListener('click', () => endTurn())
+
     function onClickTerrain(terrain, x, y, type){
-        if (selectedUnit != null && selectedUnit != undefined){
+        if (selectedUnit != null && selectedUnit != undefined && movingselectedunit){
             let goalCell = selectedUnitMovableTiles.find(c => c['pos_x'] == x && c['pos_y'] == y);
             console.log(goalCell);
             if (goalCell != undefined){
@@ -158,6 +161,7 @@
                 selectedUnit.sprite.y = terrain.y;
                 selectedUnit.stats.pos_x = x;
                 selectedUnit.stats.pos_y = y;
+                selectedUnit['stats']['can_move_this_turn'] = false; 
             } else {
                 console.log('Out of range');
             }
@@ -179,13 +183,16 @@
             }
         }
         selectedUnit = null; 
+        movingselectedunit = false;
+        clearUnitMenu();
     }
 
     function buyUnit(unitType, gamex, gamey, mapx, mapy){
         let unitSpriteName = 'red' + unitType['title'] + '.png'
         if (funds >= unitType['cost']){
             funds = funds - unitType['cost'];
-            let stats = {'type_id': unitType['id'], 'game_id': gamedata['id'], 'player_id': 1, 'pos_x': gamex, 'pos_y': gamey, 'cur_hp': 10, 'capturing': false, 'capture_prog': 0}; 
+            let stats = {'type_id': unitType['id'], 'game_id': gamedata['id'], 'player_id': 1, 'pos_x': gamex, 'pos_y': gamey, 'cur_hp': 10, 
+            'capturing': false, 'capture_prog': 0, 'can_move_this_turn': false, 'can_attack_this_turn': false, 'can_capture_this_turn': false}; 
             gameunits.push(stats);
             let newsprite = PIXI.Sprite.from(unitSpriteName);
             newsprite.on('click', (event) => onClickUnit(newsprite, unitType, stats));
@@ -210,28 +217,108 @@
         sprite.on('click', (event) => onClickTerrain(sprite, posx, posy, type));
         sprite.eventMode = 'dynamic';
         mapterrain.push({'sprite': sprite, 'type': type, 'pos_x': posx, 'pos_y': posy})
+        sprite.zIndex = -1;
         app.stage.addChild(sprite);
     }
 
     function onClickUnit(sprite, type, stats){
+        clearUnitMenu();
+        let movebutton; 
+        let attackbutton;
+        let capturebutton;
+        let statblock; 
+        console.log(stats['pos_x']);
+        console.log(stats['pos_y']);
         selectedUnit = {'sprite': sprite, 'type': type, 'stats': stats};
-        console.log(type);
         selectedUnitMovableTiles = new Array();
-        for (let i = 0; i < mapterrain.length; i++){
-            let dx = mapterrain[i]['pos_x'] - stats['pos_x'];
-            let dy = mapterrain[i]['pos_y'] - stats['pos_y'];
-            if (dx < 0){
-                dx = dx * -1;
+
+        statblock = document.createElement('p'); 
+        statblock.textContent = 'unit type: ' + type['title'] +', hp: ' + stats['cur_hp']
+        selectedunitmenu.append(statblock);
+        let occupiedTile = mapterrain.find(c => c['pos_x'] == stats['pos_x'] && c['pos_y'] == stats['pos_y']);
+        let occupiedTileOwner = gamedata['tile_owners'][stats['pos_y']][stats['pos_x']];
+        console.log(occupiedTile); 
+        console.log(occupiedTileOwner);
+
+        if (stats['can_move_this_turn']){
+            let movebutton = document.createElement('button');
+            movebutton.textContent = 'Move';
+            for (let i = 0; i < mapterrain.length; i++){
+                let dx = mapterrain[i]['pos_x'] - stats['pos_x'];
+                let dy = mapterrain[i]['pos_y'] - stats['pos_y'];
+                if (dx < 0){
+                    dx = dx * -1;
+                }
+                if (dy < 0){
+                    dy = dy * -1;
+                }
+                let distance = dx + dy;
+                if (distance <= selectedUnit.type.speed){
+                    selectedUnitMovableTiles.push(mapterrain[i]);
+                }
             }
-            if (dy < 0){
-                dy = dy * -1;
-            }
-            let distance = dx + dy;
-            if (distance <= selectedUnit.type.speed){
-                selectedUnitMovableTiles.push(mapterrain[i]);
-            }
+            movebutton.addEventListener('click', () => moveUnit(sprite, type, stats));            
+            selectedunitmenu.append(movebutton);
+        }
+        if (stats['can_capture_this_turn'] && occupiedTile['type']['capturable'] && (occupiedTileOwner != 1)){
+            capturebutton = document.createElement('button');
+            capturebutton.textContent = 'Capture';
+            capturebutton.addEventListener('click', () => captureTile(occupiedTile, stats['pos_x'], stats['pos_y'])); 
+            selectedunitmenu.append(capturebutton);
         }
         console.log(selectedUnitMovableTiles);
+    }
+
+    function moveUnit(){
+        movingselectedunit = true;
+        stats['capture_prog'] = 0;
+        stats['capturing'] = false;
+    }
+
+    function captureTile(tile, x, y){
+        let stats = selectedUnit['stats'];
+        stats['capturing'] = true;
+        stats['capture_prog'] = stats['capture_prog'] + stats['cur_hp']; 
+        console.log(stats['capture_prog']);
+        if (stats['capture_prog'] >= 20){
+            let spritex = tile.sprite.x; 
+            let spritey = tile.sprite.y; 
+            tile.sprite.parent.removeChild(tile.sprite);
+            let newspritename = 'red' + tile['type']['title'] + '.png'
+            let newsprite = PIXI.Sprite.from(newspritename);
+            let oldTileIndex = mapterrain.findIndex(c => c['pos_x'] == x && c['pos_y'] == y); 
+            mapterrain.splice(oldTileIndex, 1);
+            terrainBuilder(newsprite, spritex, spritey, x, y, tile['type']);
+            gamedata['tile_owners'][y][x] = 1;
+            if (tile['type']['id'] == 4){
+                income = income + 10;
+                economyInfo.textContent = "income: " + income + ", funds: " + funds;
+            }
+            stats['capture_prog'] = 0;
+            stats['capturing'] = false;
+        }
+        stats['can_move_this_turn'] = false;
+        stats['can_attack_this_turn'] = false;
+        clearUnitMenu();
+    }
+
+    function clearUnitMenu(){
+        let i = selectedunitmenu.children.length - 1; 
+        while (i >= 0){
+            selectedunitmenu.children[i].remove();
+            i = i - 1;
+        }
+    }
+
+    function endTurn(){
+        for (let i = 0; i < gameunits.length; i++){
+            gameunits[i]['can_move_this_turn'] = true;
+            gameunits[i]['can_attack_this_turn'] = true;
+            gameunits[i]['can_capture_this_turn'] = true;
+        }
+        funds = funds + income; 
+        economyInfo.textContent = "income: " + income + ", funds: " + funds;
+        clearUnitMenu();
     }
 </script>
 

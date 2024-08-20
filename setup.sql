@@ -21,7 +21,8 @@ CREATE TABLE games(
 	p1_funds INTEGER,
 	p2_funds INTEGER,
 	p1_income INTEGER,
-	p2_income INTEGER
+	p2_income INTEGER,
+	tile_owners INTEGER[][]
 );
 
 CREATE TABLE unitTypes(
@@ -49,7 +50,10 @@ CREATE TABLE units(
 	pos_y INTEGER,
 	cur_hp INTEGER,
 	capturing BOOLEAN,
-	capture_prog INTEGER
+	capture_prog INTEGER,
+	can_move_this_turn BOOLEAN,
+	can_attack_this_turn BOOLEAN,
+	can_capture_this_turn BOOLEAN
 );
 
 CREATE TABLE terrainTypes(
@@ -86,14 +90,16 @@ INSERT INTO terrainTypes (title, cover, moveCost, capturable, vehicleAccess, gro
 VALUES('plains', 1, 1, 'false', 'true', 'true', 'false', 'false', 'false', '{}');
 INSERT INTO terrainTypes (title, cover, moveCost, capturable, vehicleAccess, groundAccess, seaAccess, hiding, canPrintUnits, unitPrintList)
 VALUES('settlement', 3, 1, 'true', 'true', 'true', 'false', 'false', 'false', '{}');
-INSERT INTO maps (title, width, height, terrain, cellOwner) VALUES('testmap1', 3, 3, '{{1, 2, 3},{3, 3, 3},{3, 2, 1}}', '{{1, 1, 0},{0, 0, 0},{0, 2, 2}}');
-INSERT INTO maps (title, width, height, terrain, cellOwner) VALUES('testmap2', 5, 5, '{{1, 2, 3, 3, 3},{3, 3, 3, 3, 3},{4, 3, 4, 3, 4},{3, 3, 3, 3, 3},{3, 3, 3, 2, 1}}', '{{1, 1, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 2, 2}}');
+INSERT INTO maps (title, width, height, terrain, cellOwner) 
+VALUES('testmap1', 3, 3, '{{1, 2, 3},{3, 3, 3},{3, 2, 1}}', '{{1, 1, 0},{0, 0, 0},{0, 2, 2}}');
+INSERT INTO maps (title, width, height, terrain, cellOwner) 
+VALUES('testmap2', 5, 5, '{{1, 2, 3, 3, 3},{3, 3, 3, 3, 3},{4, 3, 4, 3, 4},{3, 3, 3, 3, 3},{3, 3, 3, 2, 1}}', '{{1, 1, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 2, 2}}');
 INSERT INTO users (username, pword, email) VALUES('jfitz', 'pword1234', 'jf879@drexel.edu');
 INSERT INTO users (username, pword, email) VALUES('mason', '4321drowp', 'mcm542@drexel.edu');
-INSERT INTO games (title, p1_id, p2_id, map_id, p1_units, p2_units, starter_income, p1_funds, p2_funds, p1_income, p2_income) 
-VALUES('testgame1', 1, 2, 1, '{}', '{}', 10, 10, 10, 10, 10);
-INSERT INTO games (title, p1_id, p2_id, map_id, p1_units, p2_units, starter_income, p1_funds, p2_funds, p1_income, p2_income) 
-VALUES('testgame2', 1, 2, 2, '{}', '{}', 10, 10, 10, 10, 10);
+INSERT INTO games (title, p1_id, p2_id, map_id, p1_units, p2_units, starter_income, p1_funds, p2_funds, p1_income, p2_income, tile_owners) 
+VALUES('testgame1', 1, 2, 1, '{}', '{}', 10, 10, 10, 10, 10, '{{1, 1, 0},{0, 0, 0},{0, 2, 2}}');
+INSERT INTO games (title, p1_id, p2_id, map_id, p1_units, p2_units, starter_income, p1_funds, p2_funds, p1_income, p2_income, tile_owners) 
+VALUES('testgame2', 1, 2, 2, '{}', '{}', 10, 10, 10, 10, 10, '{{1, 1, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 2, 2}}');
 
 
 
