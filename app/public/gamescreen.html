@@ -112,7 +112,7 @@
                 for (let j = 0; j < row.length; j++){
                     let x = j * 16;
                     let type = row[j];
-                    let typeData = terraintypes[type];
+                    let typeData = terraintypes[type - 1];
                     let owner = ownerRow[j];
                     let spriteName; 
                     if (typeData['capturable']){
