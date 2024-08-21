@@ -40,9 +40,12 @@
     let querystring = window.location.href.slice(window.location.href.indexOf('?'));
     let selectedUnit;
     let selectedUnitMovableTiles;
+    let selectedUnitAttackableTiles;
     let income; 
     let funds; 
-    let movingselectedunit = false;; 
+    let movingselectedunit = false;
+    let attackWithUnit = false;
+    let attacking_unit;
 
     let mapterrain = new Array();
     const app = new PIXI.Application();
@@ -153,7 +156,7 @@
     endturnbutton.addEventListener('click', () => endTurn())
 
     function onClickTerrain(terrain, x, y, type){
-        if (selectedUnit != null && selectedUnit != undefined && movingselectedunit){
+        if (selectedUnit != null && selectedUnit != undefined &&movingselectedunit){
             let goalCell = selectedUnitMovableTiles.find(c => c['pos_x'] == x && c['pos_y'] == y);
             console.log(goalCell);
             if (goalCell != undefined){
@@ -230,8 +233,16 @@
         console.log(stats['pos_x']);
         console.log(stats['pos_y']);
         selectedUnit = {'sprite': sprite, 'type': type, 'stats': stats};
+        if(attackWithUnit){
+            let goalCell = selectedUnitAttackableTiles.find(stats['pos_x'] == x && stats['pos_y'] == y);
+            if (goalCell != undefined){
+                attacking_unit['stats']['can_attack_this_turn'] = false; 
+            } else {
+                console.log('Out of range');
+            }
+        }
         selectedUnitMovableTiles = new Array();
-
+        selectedUnitAttackableTiles = new Array();
         statblock = document.createElement('p'); 
         statblock.textContent = 'unit type: ' + type['title'] +', hp: ' + stats['cur_hp']
         selectedunitmenu.append(statblock);
@@ -256,6 +267,9 @@
                 if (distance <= selectedUnit.type.speed){
                     selectedUnitMovableTiles.push(mapterrain[i]);
                 }
+                if (distance >= selectedUnit.type.minrange && distance <= selectedUnit.type.maxrange){
+                    selectedUnitAttackableTiles.push(mapterrain[i]);
+                }
             }
             movebutton.addEventListener('click', () => moveUnit(sprite, type, stats));            
             selectedunitmenu.append(movebutton);
@@ -266,7 +280,18 @@
             capturebutton.addEventListener('click', () => captureTile(occupiedTile, stats['pos_x'], stats['pos_y'])); 
             selectedunitmenu.append(capturebutton);
         }
+        if (stats['can_attack_this_turn']){
+            attackButton = document.createElement('button');
+            attackButton.textContent = 'Attack';
+            attackButton.addEventListener('click', () => setAttack(sprite, type, stats)); 
+            selectedunitmenu.append(attackButton);
+        }
         console.log(selectedUnitMovableTiles);
+    }
+
+    function setAttack(sprite, type, stats){
+        attacking_unit = sprite;
+        attackWithUnit = true;
     }
 
     function moveUnit(){
