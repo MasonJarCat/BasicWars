@@ -112,8 +112,10 @@
                 for (let j = 0; j < row.length; j++){
                     let x = j * 16;
                     let type = row[j];
+                    console.log(type);
                     let typeData = terraintypes[type - 1];
-                    console.log("type data: " + typeData);
+                    console.log("type data: ");
+                    console.log(typeData);
                     let owner = ownerRow[j];
                     let spriteName; 
                     if (typeData['capturable']){
