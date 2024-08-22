@@ -236,12 +236,10 @@
         console.log(stats['pos_y']);
         selectedUnit = {'sprite': sprite, 'type': type, 'stats': stats};
         if(attackWithUnit){
-            let goalCell = selectedUnitAttackableTiles.find(stats['pos_x'] == x && stats['pos_y'] == y);
-            if (goalCell != undefined){
-                attacking_unit['stats']['can_attack_this_turn'] = false; 
-            } else {
-                console.log('Out of range');
-            }
+
+        // If the player chooses to attack
+            attackUnit(attacking_unit, { sprite, type, stats });
+
         }
         selectedUnitMovableTiles = new Array();
         selectedUnitAttackableTiles = new Array();
@@ -295,6 +293,84 @@
         attacking_unit = sprite;
         attackWithUnit = true;
     }
+
+
+    function calculateDamage(unit1, unit2) {
+        // Simple damage formula: damage = attack_power - armor
+        const damageToUnit1 = Math.max(unit2.attack_power - unit1.armor, 0);
+        const damageToUnit2 = Math.max(unit1.attack_power - unit2.armor, 0);
+    
+        return { damageToUnit1, damageToUnit2 };
+    }
+
+    function attackUnit(attackingUnit, targetUnit) {
+        // Ensure both units exist
+        if (!attackingUnit || !targetUnit) {
+            console.log('One or both units not found.');
+            return;
+        }
+        if (!isTargetInRange(attackingUnit, targetUnit)) {
+        console.log('Target is out of range.');
+        return;
+        }
+
+        attackWithUnit = false;
+        attacking_unit['stats']['can_attack_this_turn'] = false; 
+        // Calculate damage for both units
+        const { damageToUnit1, damageToUnit2 } = calculateDamage(attackingUnit.stats, targetUnit.stats);
+    
+        // Apply damage
+        attackingUnit.stats.cur_hp -= damageToUnit1;
+        targetUnit.stats.cur_hp -= damageToUnit2;
+    
+        // Check if units are destroyed
+        if (attackingUnit.stats.cur_hp <= 0) {
+            console.log(`${attackingUnit.type.title} has been destroyed!`);
+            // Remove attacking unit from game
+            removeUnitFromGame(attackingUnit);
+        }
+    
+        if (targetUnit.stats.cur_hp <= 0) {
+            console.log(`${targetUnit.type.title} has been destroyed!`);
+            // Remove target unit from game
+            removeUnitFromGame(targetUnit);
+        }
+    
+        // Update the game UI and state
+        updateUnitStats(attackingUnit);
+        updateUnitStats(targetUnit);
+    }
+
+
+    function removeUnitFromGame(unit) {
+        // Remove unit sprite from the game
+        unit.sprite.parent.removeChild(unit.sprite);
+    
+        // Remove unit from the game units array
+        const index = gameunits.indexOf(unit.stats);
+        if (index !== -1) {
+            gameunits.splice(index, 1);
+        }
+    
+        clearUnitMenu(); // Optionally clear any selected unit menu
+    }
+    
+    function updateUnitStats(unit) {
+        // Update the UI with the current stats of the unit
+        console.log(`Updated ${unit.type.title} HP: ${unit.stats.cur_hp}`);
+
+    }
+    
+    function isTargetInRange(attackingUnit, targetUnit) {
+        const dx = Math.abs(attackingUnit.stats.pos_x - targetUnit.stats.pos_x);
+        const dy = Math.abs(attackingUnit.stats.pos_y - targetUnit.stats.pos_y);
+        const distance = dx + dy;
+
+        return distance >= attackingUnit.type.minrange && distance <= attackingUnit.type.maxrange;
+    }
+
+
+
 
     function moveUnit(){
         movingselectedunit = true;
