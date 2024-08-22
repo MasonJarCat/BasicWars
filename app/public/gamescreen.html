@@ -99,7 +99,6 @@
         console.log("map fetched");
         return response.json();
     }).then(body => {
-        console.log(terraintypes);
         if (body.rows.length <= 0){
             console.log("No game found")
         } else {
@@ -113,7 +112,10 @@
                 for (let j = 0; j < row.length; j++){
                     let x = j * 16;
                     let type = row[j];
+                    console.log(type);
                     let typeData = terraintypes[type - 1];
+                    console.log("type data: ");
+                    console.log(typeData);
                     let owner = ownerRow[j];
                     let spriteName; 
                     if (typeData['capturable']){
@@ -234,9 +236,10 @@
         console.log(stats['pos_y']);
         selectedUnit = {'sprite': sprite, 'type': type, 'stats': stats};
         if(attackWithUnit){
+
         // If the player chooses to attack
             attackUnit(attacking_unit, { sprite, type, stats });
-            attackWithUnit = false;
+
         }
         selectedUnitMovableTiles = new Array();
         selectedUnitAttackableTiles = new Array();
@@ -291,6 +294,7 @@
         attackWithUnit = true;
     }
 
+
     function calculateDamage(unit1, unit2) {
         // Simple damage formula: damage = attack_power - armor
         const damageToUnit1 = Math.max(unit2.attack_power - unit1.armor, 0);
@@ -305,7 +309,13 @@
             console.log('One or both units not found.');
             return;
         }
-    
+        if (!isTargetInRange(attackingUnit, targetUnit)) {
+        console.log('Target is out of range.');
+        return;
+        }
+
+        attackWithUnit = false;
+        attacking_unit['stats']['can_attack_this_turn'] = false; 
         // Calculate damage for both units
         const { damageToUnit1, damageToUnit2 } = calculateDamage(attackingUnit.stats, targetUnit.stats);
     
@@ -351,6 +361,14 @@
 
     }
     
+    function isTargetInRange(attackingUnit, targetUnit) {
+        const dx = Math.abs(attackingUnit.stats.pos_x - targetUnit.stats.pos_x);
+        const dy = Math.abs(attackingUnit.stats.pos_y - targetUnit.stats.pos_y);
+        const distance = dx + dy;
+
+        return distance >= attackingUnit.type.minrange && distance <= attackingUnit.type.maxrange;
+    }
+
 
 
 
