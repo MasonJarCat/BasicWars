@@ -46,6 +46,9 @@
     let movingselectedunit = false;
     let attackWithUnit = false;
     let attacking_unit;
+    let fogEnabled;
+    let fogLayer; 
+    let visibleTiles;
 
     let mapterrain = new Array();
     const app = new PIXI.Application();
@@ -53,17 +56,18 @@
     document.body.appendChild(app.canvas);
     console.log(querystring);
     await PIXI.Assets.load('neutralfactory.png');
-    await PIXI.Assets.load('neutralHQ.png');
+    await PIXI.Assets.load('neutralhq.png');
     await PIXI.Assets.load('redfactory.png');
-    await PIXI.Assets.load('redHQ.png');
+    await PIXI.Assets.load('redhq.png');
     await PIXI.Assets.load('bluefactory.png');
-    await PIXI.Assets.load('blueHQ.png');
+    await PIXI.Assets.load('bluehq.png');
     await PIXI.Assets.load('plains.png');
     await PIXI.Assets.load('neutralsettlement.png');
     await PIXI.Assets.load('redsettlement.png');
     await PIXI.Assets.load('bluesettlement.png');
     await PIXI.Assets.load('redinfantry.png');
     await PIXI.Assets.load('blueinfantry.png');
+    await PIXI.Assets.load('fog.png');
 
     fetch("/terraintypes", {
         method: "GET"
@@ -112,10 +116,10 @@
                 for (let j = 0; j < row.length; j++){
                     let x = j * 16;
                     let type = row[j];
-                    console.log(type);
+                    //console.log(type);
                     let typeData = terraintypes[type - 1];
-                    console.log("type data: ");
-                    console.log(typeData);
+                    //console.log("type data: ");
+                    //console.log(typeData);
                     let owner = ownerRow[j];
                     let spriteName; 
                     if (typeData['capturable']){
@@ -145,17 +149,75 @@
     if (body.rows.length <= 0){
             console.log("No game found")
         } else {
+            fogLayer = new Array();
             gametitle.textContent=body.rows[0].title;
             gamedata = body.rows[0];
             income = gamedata["starter_income"];
             funds = gamedata["p1_funds"]; 
+            fogEnabled = gamedata['fog'];
             economyInfo.textContent = "income: " + income + "\nfunds: " + funds;
             console.log(body.rows[0]);
+            if (fogEnabled){
+                drawFog();
+            }
         }
 
     });
 
     endturnbutton.addEventListener('click', () => endTurn())
+
+    function drawFog(){
+        let fogSprite = PIXI.Sprite.from('fog.png');
+        let visibleTiles = new Array(); 
+        for (let i = 0; i < gamedata['tile_owners'].length; i++){
+            let ownerRow = gamedata['tile_owners'][i];
+            for (let j = 0; j < ownerRow.length; j++){
+                if (ownerRow[j] == 1){
+                    visibleTiles.push({'x': j, 'y': i});
+                }
+            }
+        }
+        for (let k = 0; k < gameunits.length; k++){
+            let unit = gameunits[k];
+            let unitStats = unittypes[unit['type_id'] - 1]; 
+            for (let i = 0; i < mapterrain.length; i++){
+                let dx = mapterrain[i]['pos_x'] - unit['pos_x'];
+                let dy = mapterrain[i]['pos_y'] - unit['pos_y'];
+                if (dx < 0){
+                    dx = dx * -1;
+                }
+                if (dy < 0){
+                    dy = dy * -1;
+                }
+                let distance = dx + dy;
+                if (distance <= unitStats['sightrange']){
+                    let extantTile = visibleTiles.find(c => c['x'] == mapterrain[i]['pos_x'] && c['y'] == mapterrain[i]['pos_y']);
+                    if (extantTile == undefined){
+                        visibleTiles.push({'x': mapterrain[i]['pos_x'], 'y': mapterrain[i]['pos_y']});
+                    }
+                }
+            }
+        }
+        for (let b = 0; b < fogLayer.length; b++){
+            fogLayer[b].parent.removeChild(fogLayer[b]);
+        }
+        fogLayer = new Array();
+        for (let a = 0; a < mapterrain.length; a++){
+            let mapTile = mapterrain[a]; 
+            let visibleTile = visibleTiles.find(c => c['x'] == mapTile['pos_x'] && c['y'] == mapTile['pos_y']);
+            if (visibleTile == undefined){
+                let fogSprite = PIXI.Sprite.from('fog.png'); 
+                fogSprite.x = mapTile['pos_x'] * 16;
+                fogSprite.y = mapTile['pos_y'] * 16;
+                fogSprite.zIndex = 2;
+                app.stage.addChild(fogSprite);
+                fogLayer.push(fogSprite);
+            }
+        }
+
+        console.log("Visibe Tiles:");
+        console.log(visibleTiles); 
+    }
 
     function onClickTerrain(terrain, x, y, type){
         if (selectedUnit != null && selectedUnit != undefined &&movingselectedunit){
@@ -167,6 +229,9 @@
                 selectedUnit.stats.pos_x = x;
                 selectedUnit.stats.pos_y = y;
                 selectedUnit['stats']['can_move_this_turn'] = false; 
+                if (fogEnabled){
+                    drawFog();
+                }
             } else {
                 console.log('Out of range');
             }
@@ -213,6 +278,9 @@
         while (j >= 0){
             unitproductionmenu.children[j].remove();
             j = j - 1;
+        }
+        if (fogEnabled){
+            drawFog();
         }
     }
 
