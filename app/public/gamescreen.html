@@ -149,15 +149,17 @@
             fogLayer = new Array();
             gametitle.textContent = body.rows[0].title;
             gamedata = body.rows[0];
-            income = gamedata["starter_income"];
-            funds = gamedata["p1_funds"]; 
-            fogEnabled = gamedata['fog'];
-            economyInfo.textContent = "income: " + income + "\nfunds: " + funds;
-            if(gamedata["turn"] % 2 == 0){
+            if(gamedata["turn"] % 2 === 1){
                 isPlayer1Turn = true;
+                income = gamedata.p1_income;
+                funds = gamedata.p1_funds;
             } else {
                 isPlayer1Turn = false;
+                income = gamedata.p2_income;
+                funds = gamedata.p2_funds;
             }
+            fogEnabled = gamedata['fog'];
+            economyInfo.textContent = "income: " + income + "\nfunds: " + funds;
             console.log(body.rows[0]);
             if (fogEnabled){
                 drawFog();
@@ -173,28 +175,24 @@
         for (let i = 0; i < gamedata['tile_owners'].length; i++){
             let ownerRow = gamedata['tile_owners'][i];
             for (let j = 0; j < ownerRow.length; j++){
-                if (ownerRow[j] == 1){
+                if ((isPlayer1Turn && ownerRow[j] === 1) || (!isPlayer1Turn && ownerRow[j] === 2)) {
                     visibleTiles.push({'x': j, 'y': i});
                 }
             }
         }
         for (let k = 0; k < gameunits.length; k++){
             let unit = gameunits[k];
-            let unitStats = unittypes[unit['type_id'] - 1]; 
-            for (let i = 0; i < mapterrain.length; i++){
-                let dx = mapterrain[i]['pos_x'] - unit['pos_x'];
-                let dy = mapterrain[i]['pos_y'] - unit['pos_y'];
-                if (dx < 0){
-                    dx = dx * -1;
-                }
-                if (dy < 0){
-                    dy = dy * -1;
-                }
-                let distance = dx + dy;
-                if (distance <= unitStats['sightrange']){
-                    let extantTile = visibleTiles.find(c => c['x'] == mapterrain[i]['pos_x'] && c['y'] == mapterrain[i]['pos_y']);
-                    if (extantTile == undefined){
-                        visibleTiles.push({'x': mapterrain[i]['pos_x'], 'y': mapterrain[i]['pos_y']});
+            if ((isPlayer1Turn && unit.player_id === gamedata.p1_id) || (!isPlayer1Turn && unit.player_id === gamedata.p2_id)) {
+                let unitStats = unittypes[unit['type_id'] - 1]; 
+                for (let i = 0; i < mapterrain.length; i++){
+                    let dx = mapterrain[i]['pos_x'] - unit['pos_x'];
+                    let dy = mapterrain[i]['pos_y'] - unit['pos_y'];
+                    let distance = Math.abs(dx) + Math.abs(dy);
+                    if (distance <= unitStats['sightrange']){
+                        let extantTile = visibleTiles.find(c => c['x'] == mapterrain[i]['pos_x'] && c['y'] == mapterrain[i]['pos_y']);
+                        if (extantTile === undefined){
+                            visibleTiles.push({'x': mapterrain[i]['pos_x'], 'y': mapterrain[i]['pos_y']});
+                        }
                     }
                 }
             }
@@ -206,7 +204,7 @@
         for (let a = 0; a < mapterrain.length; a++){
             let mapTile = mapterrain[a]; 
             let visibleTile = visibleTiles.find(c => c['x'] == mapTile['pos_x'] && c['y'] == mapTile['pos_y']);
-            if (visibleTile == undefined){
+            if (visibleTile === undefined){
                 let fogSprite = PIXI.Sprite.from('fog.png'); 
                 fogSprite.x = mapTile['pos_x'] * 16;
                 fogSprite.y = mapTile['pos_y'] * 16;
@@ -258,14 +256,14 @@
     }
 
     function buyUnit(unitType, gamex, gamey, mapx, mapy) {
-        let unitSpriteName = 'red' + unitType['title'] + '.png';
+        let unitSpriteName = (isPlayer1Turn ? 'red' : 'blue') + unitType['title'] + '.png';
     
         if (funds >= unitType['cost']) {
             // Deduct the cost from the current player's funds
             funds = funds - unitType['cost'];
     
             // Update gamedata to reflect the new funds
-            if (gamedata.turn % 2 === 1) {
+            if (isPlayer1Turn) {
                 gamedata.p1_funds = funds;
             } else {
                 gamedata.p2_funds = funds;
@@ -275,10 +273,10 @@
             let unitData = {
                 type_id: unitType['id'],
                 game_id: gamedata['id'],
-                player_id: (gamedata.turn % 2 === 1) ? gamedata.p1_id : gamedata.p2_id,
+                player_id: isPlayer1Turn ? gamedata.p1_id : gamedata.p2_id,
                 pos_x: gamex,
                 pos_y: gamey,
-                isP1: gamedata.turn % 2 === 1
+                isP1: isPlayer1Turn
             };
     
             // Make a POST request to add the unit to the server
@@ -341,6 +339,7 @@
             drawFog();
         }
     }
+    
     function terrainBuilder(sprite, spritex, spritey, posx, posy, type){
         sprite.y = spritey;
         sprite.x = spritex;
@@ -382,13 +381,7 @@
             for (let i = 0; i < mapterrain.length; i++){
                 let dx = mapterrain[i]['pos_x'] - stats['pos_x'];
                 let dy = mapterrain[i]['pos_y'] - stats['pos_y'];
-                if (dx < 0){
-                    dx = dx * -1;
-                }
-                if (dy < 0){
-                    dy = dy * -1;
-                }
-                let distance = dx + dy;
+                let distance = Math.abs(dx) + Math.abs(dy);
                 if (distance <= selectedUnit.type.speed){
                     selectedUnitMovableTiles.push(mapterrain[i]);
                 }
@@ -399,7 +392,7 @@
             movebutton.addEventListener('click', () => moveUnit(sprite, type, stats));            
             selectedunitmenu.append(movebutton);
         }
-        if (stats['can_capture_this_turn'] && occupiedTile['type']['capturable'] && (occupiedTileOwner != 1)){
+        if (stats['can_capture_this_turn'] && occupiedTile['type']['capturable'] && (occupiedTileOwner != (isPlayer1Turn ? 1 : 2))){
             capturebutton = document.createElement('button');
             capturebutton.textContent = 'Capture';
             capturebutton.addEventListener('click', () => captureTile(occupiedTile, stats['pos_x'], stats['pos_y'])); 
@@ -515,12 +508,12 @@
             let spritex = tile.sprite.x; 
             let spritey = tile.sprite.y; 
             tile.sprite.parent.removeChild(tile.sprite);
-            let newspritename = 'red' + tile['type']['title'] + '.png'
+            let newspritename = (isPlayer1Turn ? 'red' : 'blue') + tile['type']['title'] + '.png'
             let newsprite = PIXI.Sprite.from(newspritename);
             let oldTileIndex = mapterrain.findIndex(c => c['pos_x'] == x && c['pos_y'] == y); 
             mapterrain.splice(oldTileIndex, 1);
             terrainBuilder(newsprite, spritex, spritey, x, y, tile['type']);
-            gamedata['tile_owners'][y][x] = 1;
+            gamedata['tile_owners'][y][x] = isPlayer1Turn ? 1 : 2;
             if (tile['type']['id'] == 4){
                 income = income + 10;
                 economyInfo.textContent = "income: " + income + ", funds: " + funds;
@@ -542,9 +535,6 @@
     }
 
     function updateGame() {
-        // Determine which player's data to update based on the current turn
-        
-    
         // Construct the game state update data
         const gameStateUpdate = {
             p1_units: isPlayer1Turn ? gameunits.map(unit => unit.id) : gamedata.p1_units,
@@ -577,7 +567,6 @@
             console.error("Error updating game state:", error);
         });
     }
-    
 
     function endTurn(){
         for (let i = 0; i < gameunits.length; i++){
