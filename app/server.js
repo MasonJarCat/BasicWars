@@ -109,27 +109,42 @@ app.post("/add/game", (req, res) => {
 });
 
 app.post("/add/unit", (req, res) => {
-    let { type_id, game_id, player_id, pos_x, pos_y, isP1 } = req.body;
-  
+  let { type_id, game_id, player_id, pos_x, pos_y, isP1 } = req.body;
+
+  // Basic validation check
   if (!type_id || !game_id || !player_id || pos_x === undefined || pos_y === undefined) {
-    return res.sendStatus(400);
+      console.error("Missing required parameters.");
+      return res.sendStatus(400);
   }
 
-  let text = "INSERT INTO unit(type_id, game_id, player_id, pos_x, pos_y, cur_hp, capturing, capture_prog) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id";
-  let values = [parseInt(type_id), parseInt(game_id), parseInt(player_id), pos_x, pos_y, 100, false, 20];
-  
+  // Insert unit into the unit table
+  let text = `
+      INSERT INTO unit(type_id, game_id, player_id, pos_x, pos_y, cur_hp, capturing, capture_prog) 
+      VALUES($1, $2, $3, $4, $5, $6, $7, $8) 
+      RETURNING id
+  `;
+  let values = [parseInt(type_id), parseInt(game_id), parseInt(player_id), parseInt(pos_x), parseInt(pos_y), 100, false, 20];
+
+  console.log("Executing query:", text, values);
+
   pool.query(text, values).then(result => {
-    let unit_id = result.rows[0].id;
-    
-    let unitsQuery = isP1 ? 
-      `UPDATE games SET p1_units = array_append(p1_units, $1) WHERE id = $2` : 
-      `UPDATE games SET p2_units = array_append(p2_units, $1) WHERE id = $2`;
-    console.log(unitsQuery);
-    return pool.query(unitsQuery, [unit_id, game_id]).then(() => {
-      res.setHeader('Content-Type', 'application/json');
-      return res.json({ unit_id });
-    });
-  }).catch(err => res.status(500).json({ error: err.message }));
+      let unit_id = result.rows[0].id;
+      console.log("Unit created with ID:", unit_id);
+
+      let unitsQuery = isP1 ? 
+          `UPDATE games SET p1_units = array_append(p1_units, $1) WHERE id = $2` : 
+          `UPDATE games SET p2_units = array_append(p2_units, $1) WHERE id = $2`;
+
+      console.log("Updating games table with query:", unitsQuery);
+
+      return pool.query(unitsQuery, [unit_id, game_id]).then(() => {
+          res.setHeader('Content-Type', 'application/json');
+          return res.json({ unit_id });
+      });
+  }).catch(err => {
+      console.error("Error executing query:", err.message);
+      return res.status(500).json({ error: err.message });
+  });
 });
 
 app.post("/add/map", (req, res) => {
@@ -195,9 +210,7 @@ app.get("/games", (req, res) => {
 
 // Get a specific game by ID
 app.get("/game", (req, res) => {
-  console.log(req.body);
   let gameid = req.query.gameid;
-  console.log(gameid);
   if (!gameid) {
     return res.status(400).json({ error: 'Missing game ID' });
   }
