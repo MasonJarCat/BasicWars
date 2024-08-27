@@ -124,7 +124,7 @@ app.post("/add/unit", (req, res) => {
     let unitsQuery = isP1 ? 
       `UPDATE games SET p1_units = array_append(p1_units, $1) WHERE id = $2` : 
       `UPDATE games SET p2_units = array_append(p2_units, $1) WHERE id = $2`;
-
+    console.log(unitsQuery);
     return pool.query(unitsQuery, [unit_id, game_id]).then(() => {
       res.setHeader('Content-Type', 'application/json');
       return res.json({ unit_id });
