@@ -19,7 +19,6 @@
 
     <div id="unitproductionmenu"></div>
 
-
 </body>
 
 <script src="https://pixijs.download/release/pixi.js"></script>
@@ -49,10 +48,11 @@
     let fogEnabled;
     let fogLayer; 
     let visibleTiles;
+    let isPlayer1Turn;
 
     let mapterrain = new Array();
     const app = new PIXI.Application();
-    await app.init({ width: 640, height: 360 })
+    await app.init({ width: 640, height: 360 });
     document.body.appendChild(app.canvas);
     console.log(querystring);
     await PIXI.Assets.load('neutralfactory.png');
@@ -104,9 +104,9 @@
         return response.json();
     }).then(body => {
         if (body.rows.length <= 0){
-            console.log("No game found")
+            console.log("No game found");
         } else {
-            mapdata = body.rows[0]
+            mapdata = body.rows[0];
             maptitle.textContent = mapdata.title;
             for (let i = 0; i < mapdata.terrain.length; i++){
                 let row = mapdata.terrain[i];
@@ -116,10 +116,7 @@
                 for (let j = 0; j < row.length; j++){
                     let x = j * 16;
                     let type = row[j];
-                    //console.log(type);
                     let typeData = terraintypes[type - 1];
-                    //console.log("type data: ");
-                    //console.log(typeData);
                     let owner = ownerRow[j];
                     let spriteName; 
                     if (typeData['capturable']){
@@ -146,22 +143,26 @@
         console.log("game fetched");
         return response.json();
     }).then(body => {
-    if (body.rows.length <= 0){
-            console.log("No game found")
+        if (body.rows.length <= 0){
+            console.log("No game found");
         } else {
             fogLayer = new Array();
-            gametitle.textContent=body.rows[0].title;
+            gametitle.textContent = body.rows[0].title;
             gamedata = body.rows[0];
             income = gamedata["starter_income"];
             funds = gamedata["p1_funds"]; 
             fogEnabled = gamedata['fog'];
             economyInfo.textContent = "income: " + income + "\nfunds: " + funds;
+            if(gamedata["turn"] % 2 == 0){
+                isPlayer1Turn = true;
+            } else {
+                isPlayer1Turn = false;
+            }
             console.log(body.rows[0]);
             if (fogEnabled){
                 drawFog();
             }
         }
-
     });
 
     endturnbutton.addEventListener('click', () => endTurn())
@@ -214,13 +215,12 @@
                 fogLayer.push(fogSprite);
             }
         }
-
-        console.log("Visibe Tiles:");
+        console.log("Visible Tiles:");
         console.log(visibleTiles); 
     }
 
     function onClickTerrain(terrain, x, y, type){
-        if (selectedUnit != null && selectedUnit != undefined &&movingselectedunit){
+        if (selectedUnit != null && selectedUnit != undefined && movingselectedunit){
             let goalCell = selectedUnitMovableTiles.find(c => c['pos_x'] == x && c['pos_y'] == y);
             console.log(goalCell);
             if (goalCell != undefined){
@@ -365,8 +365,11 @@
 
     function calculateDamage(unit1, unit2) {
         // Simple damage formula: damage = attack_power - armor
-        const damageToUnit1 = Math.max(unit2.attack_power - unit1.armor, 0);
-        const damageToUnit2 = Math.max(unit1.attack_power - unit2.armor, 0);
+        // add damage scaling with health
+        const healthFactor1 = unit1.cur_hp / 10;
+        const healthFactor2 = unit2.cur_hp / 10;
+        const damageToUnit1 = Math.max((unit2.attack_power * healthFactor2) - unit1.armor, 0);
+        const damageToUnit2 = Math.max((unit1.attack_power * healthFactor1) - unit2.armor, 0);
     
         return { damageToUnit1, damageToUnit2 };
     }
@@ -378,10 +381,14 @@
             return;
         }
         if (!isTargetInRange(attackingUnit, targetUnit)) {
-        console.log('Target is out of range.');
-        return;
+            console.log('Target is out of range.');
+            return;
         }
-
+        // Check for valid unit and team (placeholder logic)
+        if (attackingUnit.stats.player_id === targetUnit.stats.player_id) {
+            console.log('Cannot attack units of the same team.');
+            return;
+        }
         attackWithUnit = false;
         attacking_unit['stats']['can_attack_this_turn'] = false; 
         // Calculate damage for both units
@@ -408,7 +415,6 @@
         updateUnitStats(attackingUnit);
         updateUnitStats(targetUnit);
     }
-
 
     function removeUnitFromGame(unit) {
         // Remove unit sprite from the game
@@ -437,10 +443,7 @@
         return distance >= attackingUnit.type.minrange && distance <= attackingUnit.type.maxrange;
     }
 
-
-
-
-    function moveUnit(){
+    function moveUnit(sprite, type, stats) {
         movingselectedunit = true;
         stats['capture_prog'] = 0;
         stats['capturing'] = false;
@@ -481,6 +484,44 @@
         }
     }
 
+    function updateGame() {
+        // Determine which player's data to update based on the current turn
+        
+    
+        // Construct the game state update data
+        const gameStateUpdate = {
+            p1_units: isPlayer1Turn ? gameunits.map(unit => unit.id) : gamedata.p1_units,
+            p2_units: !isPlayer1Turn ? gameunits.map(unit => unit.id) : gamedata.p2_units,
+            p1_funds: isPlayer1Turn ? funds : gamedata.p1_funds,
+            p2_funds: !isPlayer1Turn ? funds : gamedata.p2_funds,
+            p1_income: isPlayer1Turn ? income : gamedata.p1_income,
+            p2_income: !isPlayer1Turn ? income : gamedata.p2_income,
+            tile_owners: gamedata.tile_owners,
+            fog: fogEnabled,
+            turn: gamedata.turn + 1 // Increment the turn
+        };
+    
+        // Send the game state update to the server via POST request
+        fetch("/updateGameState" + querystring, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(gameStateUpdate)
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log("Game state updated successfully.");
+            } else {
+                console.log("Failed to update game state.");
+            }
+        })
+        .catch(error => {
+            console.error("Error updating game state:", error);
+        });
+    }
+    
+
     function endTurn(){
         for (let i = 0; i < gameunits.length; i++){
             gameunits[i]['can_move_this_turn'] = true;
@@ -490,11 +531,8 @@
         funds = funds + income; 
         economyInfo.textContent = "income: " + income + ", funds: " + funds;
         clearUnitMenu();
+        updateGame();
     }
 </script>
 
-<script>
-    
-    
-  </script>
 </html>
