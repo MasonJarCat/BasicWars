@@ -116,7 +116,7 @@
                 for (let j = 0; j < row.length; j++){
                     let x = j * 16;
                     let type = row[j];
-                    let typeData = terraintypes[type - 1];
+                    let typeData = terraintypes[type];
                     let owner = ownerRow[j];
                     let spriteName; 
                     if (typeData['capturable']){
@@ -257,33 +257,90 @@
         clearUnitMenu();
     }
 
-    function buyUnit(unitType, gamex, gamey, mapx, mapy){
-        let unitSpriteName = 'red' + unitType['title'] + '.png'
-        if (funds >= unitType['cost']){
+    function buyUnit(unitType, gamex, gamey, mapx, mapy) {
+        let unitSpriteName = 'red' + unitType['title'] + '.png';
+    
+        if (funds >= unitType['cost']) {
+            // Deduct the cost from the current player's funds
             funds = funds - unitType['cost'];
-            let stats = {'type_id': unitType['id'], 'game_id': gamedata['id'], 'player_id': 1, 'pos_x': gamex, 'pos_y': gamey, 'cur_hp': 10, 
-            'capturing': false, 'capture_prog': 0, 'can_move_this_turn': false, 'can_attack_this_turn': false, 'can_capture_this_turn': false}; 
-            gameunits.push(stats);
-            let newsprite = PIXI.Sprite.from(unitSpriteName);
-            newsprite.on('click', (event) => onClickUnit(newsprite, unitType, stats));
-            newsprite.eventMode = 'dynamic';
-            newsprite.x = mapx;
-            newsprite.y = mapy;
-            app.stage.addChild(newsprite); 
-            economyInfo.textContent = "income: " + income + "\nfunds: " + funds;
+    
+            // Update gamedata to reflect the new funds
+            if (gamedata.turn % 2 === 1) {
+                gamedata.p1_funds = funds;
+            } else {
+                gamedata.p2_funds = funds;
+            }
+    
+            // Prepare the data to send to the server
+            let unitData = {
+                type_id: unitType['id'],
+                game_id: gamedata['id'],
+                player_id: (gamedata.turn % 2 === 1) ? gamedata.p1_id : gamedata.p2_id,
+                pos_x: gamex,
+                pos_y: gamey,
+                isP1: gamedata.turn % 2 === 1
+            };
+    
+            // Make a POST request to add the unit to the server
+            fetch("/add/unit", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(unitData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.unit_id) {
+                    // If the unit was successfully added, create the sprite
+                    let stats = {
+                        id: data.unit_id,
+                        type_id: unitType['id'],
+                        game_id: gamedata['id'],
+                        player_id: unitData.player_id,
+                        pos_x: gamex,
+                        pos_y: gamey,
+                        cur_hp: 10,
+                        capturing: false,
+                        capture_prog: 0,
+                        can_move_this_turn: false,
+                        can_attack_this_turn: false,
+                        can_capture_this_turn: false
+                    };
+                    gameunits.push(stats);
+    
+                    let newsprite = PIXI.Sprite.from(unitSpriteName);
+                    newsprite.on('click', (event) => onClickUnit(newsprite, unitType, stats));
+                    newsprite.eventMode = 'dynamic';
+                    newsprite.x = mapx;
+                    newsprite.y = mapy;
+                    app.stage.addChild(newsprite);
+    
+                    // Update the economy information displayed
+                    economyInfo.textContent = "income: " + income + "\nfunds: " + funds;
+                } else {
+                    console.log('Failed to add unit to the server.');
+                }
+            })
+            .catch(error => {
+                console.error("Error adding unit:", error);
+            });
         } else {
             console.log('Insufficient funds!');
         }
-        let j = unitproductionmenu.children.length - 1; 
-        while (j >= 0){
+    
+        // Clear the unit production menu
+        let j = unitproductionmenu.children.length - 1;
+        while (j >= 0) {
             unitproductionmenu.children[j].remove();
             j = j - 1;
         }
-        if (fogEnabled){
+    
+        // Redraw fog if enabled
+        if (fogEnabled) {
             drawFog();
         }
     }
-
     function terrainBuilder(sprite, spritex, spritey, posx, posy, type){
         sprite.y = spritey;
         sprite.x = spritex;
