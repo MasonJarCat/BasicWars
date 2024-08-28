@@ -54,38 +54,43 @@
     function showUserInfo() {
         const userInfoDiv = document.getElementById('user_id');
         const userId = getUserId();
-
+    
         if (userId) {
+            console.log('User ID found: ', userId); // Debugging log
             userInfoDiv.textContent = 'Logged in as User ID: ' + userId;
         } else {
+            console.log('No User ID found'); // Debugging log
             userInfoDiv.textContent = 'User not logged in';
         }
     }
-
-
-        function getUserId() {
+    
+    function getUserId() {
         // Example: Retrieve user ID from a cookie, local storage, or a server API call
         const userIdFromCookies = getCookie('userId');
+        console.log('User ID from Cookies: ', userIdFromCookies); // Debugging log
         if (userIdFromCookies) {
             return userIdFromCookies;
         }
-        console.log(userIdFromCookies);
+    
         const userIdFromLocalStorage = localStorage.getItem('userId');
-        console.log(userIdFromLocalStorage);
-
+        console.log('User ID from Local Storage: ', userIdFromLocalStorage); // Debugging log
         if (userIdFromLocalStorage) {
             return userIdFromLocalStorage;
         }
-        
-
+    
         return null; 
     }
-
+    
     // Helper function to get a cookie by name
     function getCookie(name) {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
+        if (parts.length === 2) {
+            const cookieValue = parts.pop().split(';').shift();
+            console.log('Cookie found:', name, '=', cookieValue); // Debugging log
+            return cookieValue;
+        }
+        console.log('Cookie not found:', name); // Debugging log
         return null;
     }
 
@@ -147,7 +152,6 @@
             buildMap(mapdata);
         }
 
-        // Fetch game state and determine the current player
         const gameStateResponse = await fetch("/game" + querystring, { method: "GET" });
         const gameStateBody = await gameStateResponse.json();
         if (gameStateBody.rows.length <= 0) {
@@ -190,7 +194,7 @@
         fogLayer = new Array();
         gametitle.textContent = gameState.title;
         gamedata = gameState;
-        currentPlayerId = gamedata.current_player_id; // Assuming you have a way to get the logged-in player ID
+        currentPlayerId = gamedata.current_player_id; 
         
         if (gamedata["turn"] % 2 === 1) {
             isPlayer1Turn = true;
