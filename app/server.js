@@ -387,7 +387,10 @@ app.post("/login", (req, res) => {
     })
     .catch(err => res.status(500).json({ error: err.message }));
 });
-
+app.get("/signupPage", (req, res) => {
+  // Serve the signup.html page
+  res.sendFile(path.join(__dirname, 'public', 'signup.html'));
+});
    // add logout function
 app.post("/signup", (req,res) => {
   const { username, email, password } = req.body;
