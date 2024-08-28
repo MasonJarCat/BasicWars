@@ -541,6 +541,7 @@
     }
 
     function updateGame() {
+        console.log(gamedata.turn);
         const gameStateUpdate = {
             p1_units: isPlayer1Turn ? gameunits.map(unit => unit.id) : gamedata.p1_units,
             p2_units: !isPlayer1Turn ? gameunits.map(unit => unit.id) : gamedata.p2_units,
