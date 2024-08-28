@@ -5,7 +5,7 @@
 </head>
 <body>
     <a href="/index.html">Go back to index</a>
-    <a href="/login.html">Go back to login</a>
+    <a href="/login">Go back to login</a>
     <h1>Signup</h1>
     <form id="signup">
         <label for="username">Username:</label>
@@ -21,11 +21,16 @@
     </form>
 </body>
 <script>
-    form = document.getElementById("signup");
-    form.addEventListener('submit', signup);
-    
-    function signup(event) {
+    document.getElementById("signup").addEventListener('submit', signup);
+
+    async function signup(event) {
         event.preventDefault(); // Prevent the form from submitting and reloading the page
+    
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        const hashedPassword = await hashPassword(password); // Wait for the password to be hashed
     
         fetch('/signup', {
             method: 'POST',
@@ -33,9 +38,9 @@
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                username: document.getElementById('username').value,
-                email: document.getElementById('email').value,
-                password: hashPassword(document.getElementById('password').value)
+                username: username,
+                email: email,
+                password: hashedPassword
             })
         })
         .then(response => response.json())
@@ -57,5 +62,6 @@
         let hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
         return hashHex;
     }
+    
 </script>
 </html>
