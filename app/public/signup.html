@@ -1,26 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login Page</title>
-
+    <title>Signup Page</title>
 </head>
 <body>
-    <h1>Login</h1>
-    <p>Don't have an account? <a href="/signup">Sign up</a></p>
-    <p>Go back to <a href="/index">index</a></p>
-    <form>
-        <div>
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required><br><br>
-            
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-        <input type="submit" value="Login">
+    <a href="/index.html">Go back to index</a>
+    <a href="/login.html">Go back to login</a>
+    <h1>Signup</h1>
+    <form action="/signup" method="POST">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br><br>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+        
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+        
+        <input type="submit" value="Signup">
     </form>
 </body>
 <script>
-    fetch('/login', {
+    fetch('/signup', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

@@ -81,6 +81,11 @@ CREATE TABLE maps(
 	cellOwner INTEGER[][]
 );
 
+CREATE TABLE activeUsers(
+	id SERIAL PRIMARY KEY,
+	cookie VARCHAR(25),
+	player_id INTEGER
+);
 
 INSERT INTO unitTypes(title, blurb, armor, speed, flying, infantry, vehicle, naval, minrange, maxrange, sightrange, cost)
 VALUES('infantry', 'Basic infantry unit', 0, 3, 'false', 'true', 'false', 'false', 0, 1, 2, 10);

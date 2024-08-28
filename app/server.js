@@ -1,9 +1,9 @@
 const pg = require("pg");
 const express = require("express");
 const path = require('path');
-
+let  cookieParser = require("cookie-parser");
 const app = express();
-
+const { v4: uuidv4 } = require('uuid'); // UUID package to generate unique session IDs
 // Use environment variables for port and hostname
 const port = process.env.PORT || 3000;
 const hostname = process.env.HOST || '0.0.0.0';
@@ -33,59 +33,54 @@ pool.connect().then(function () {
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+app.use(cookieParser());
+
 
 // Serve static files
 app.get('/resetTestGames', async (req, res) => {
   try {
       const resetQuery1 = `
-          INSERT INTO games (title, p1_id, p2_id, map_id, p1_units, p2_units, starter_income, p1_funds, p2_funds, p1_income, p2_income, tile_owners, fog, turn) 
-          VALUES('testgame1', 1, 2, 1, '{}', '{}', 10, 10, 10, 10, 10, '{{1, 1, 0},{0, 0, 0},{0, 2, 2}}', 'false', 1)
-          ON CONFLICT (id) DO UPDATE SET
-              title = EXCLUDED.title,
-              p1_id = EXCLUDED.p1_id,
-              p2_id = EXCLUDED.p2_id,
-              map_id = EXCLUDED.map_id,
-              p1_units = EXCLUDED.p1_units,
-              p2_units = EXCLUDED.p2_units,
-              starter_income = EXCLUDED.starter_income,
-              p1_funds = EXCLUDED.p1_funds,
-              p2_funds = EXCLUDED.p2_funds,
-              p1_income = EXCLUDED.p1_income,
-              p2_income = EXCLUDED.p2_income,
-              tile_owners = EXCLUDED.tile_owners,
-              fog = EXCLUDED.fog,
-              turn = EXCLUDED.turn;
+          UPDATE games
+          SET
+              p1_units = '{}',
+              p2_units = '{}',
+              starter_income = 10,
+              p1_funds = 10,
+              p2_funds = 10,
+              p1_income = 10,
+              p2_income = 10,
+              tile_owners = '{{1, 1, 0},{0, 0, 0},{0, 2, 2}}',
+              fog = 'false',
+              turn = 0
+          WHERE title = 'testgame1';
       `;
 
       const resetQuery2 = `
-          INSERT INTO games (title, p1_id, p2_id, map_id, p1_units, p2_units, starter_income, p1_funds, p2_funds, p1_income, p2_income, tile_owners, fog, turn) 
-          VALUES('testgame2', 1, 2, 2, '{}', '{}', 10, 10, 10, 10, 10, '{{1, 1, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 2, 2}}', 'true', 1)
-          ON CONFLICT (id) DO UPDATE SET
-              title = EXCLUDED.title,
-              p1_id = EXCLUDED.p1_id,
-              p2_id = EXCLUDED.p2_id,
-              map_id = EXCLUDED.map_id,
-              p1_units = EXCLUDED.p1_units,
-              p2_units = EXCLUDED.p2_units,
-              starter_income = EXCLUDED.starter_income,
-              p1_funds = EXCLUDED.p1_funds,
-              p2_funds = EXCLUDED.p2_funds,
-              p1_income = EXCLUDED.p1_income,
-              p2_income = EXCLUDED.p2_income,
-              tile_owners = EXCLUDED.tile_owners,
-              fog = EXCLUDED.fog,
-              turn = EXCLUDED.turn;
+          UPDATE games
+          SET
+              p1_units = '{}',
+              p2_units = '{}',
+              starter_income = 10,
+              p1_funds = 10,
+              p2_funds = 10,
+              p1_income = 10,
+              p2_income = 10,
+              tile_owners = '{{1, 1, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 2, 2}}',
+              fog = 'true',
+              turn = 1
+          WHERE title = 'testgame2';
       `;
 
       await pool.query(resetQuery1);
       await pool.query(resetQuery2);
 
-      res.status(200).json({ message: 'Test games reset successfully.' });
+      res.status(200).json({ message: 'Test games reset to their original states successfully.' });
   } catch (error) {
       console.error('Error resetting test games:', error.message);
       res.status(500).json({ error: 'Failed to reset test games.' });
   }
 });
+
 
 /* Routes */
 
@@ -331,29 +326,72 @@ app.post("/add/user", (req, res) => {
 });
 
 
+app.get("/loginPage", (req,res) => {
+  // Serve the login.html page
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+})
+
 
 app.post("/login", (req, res) => {
-    const { username, password } = req.body;
-  
-    if (!username || !password) {
-      return res.status(400).json({ error: 'Missing username or password' });
-    }
-  
-    const query = "SELECT * FROM users WHERE username = $1 AND pword = $2";
-    const values = [username, password];
-  
-    pool.query(query, values)
-      .then(result => {
-        if (result.rows.length > 0) {
-          //add cookies
-          res.status(200).json({ message: 'Login successful' });
-        } else {
-          res.status(401).json({ error: 'Invalid username or password' });
-        }
-      })
-      .catch(err => res.status(500).json({ error: err.message }));
-  });
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Missing username or password' });
+  }
+
+  const query = "SELECT * FROM users WHERE username = $1 AND pword = $2";
+  const values = [username, password];
+
+  pool.query(query, values)
+    .then(result => {
+      if (result.rows.length > 0) {
+        const user = result.rows[0];
+        const sessionId = uuidv4(); // Generate a unique session ID
+
+        // Insert the session ID into the activeUsers table
+        const insertQuery = "INSERT INTO activeUsers (cookie, player_id) VALUES ($1, $2)";
+        const insertValues = [sessionId, user.id];
+
+        pool.query(insertQuery, insertValues)
+          .then(() => {
+            // Set the session cookie in the response
+            const cookieOptions = { httpOnly: true, secure: true,sameSite: "strict", maxAge: 60 * 60 * 1000 };
+            res.cookie('session', sessionId, cookieOptions);
+            res.status(200).json({ message: 'Login successful' });
+          })
+          .catch(err => res.status(500).json({ error: 'Failed to create session' }));
+      } else {
+        res.status(401).json({ error: 'Invalid username or password' });
+      }
+    })
+    .catch(err => res.status(500).json({ error: err.message }));
+});
+
    // add logout function
+app.post("/signup", (req,res) => {
+  const { username, email, password } = req.body;
+
+  // Check if username or email already exists in the database
+  const checkQuery = "SELECT * FROM users WHERE username = $1 OR email = $2";
+  const checkValues = [username, email];
+
+  pool.query(checkQuery, checkValues)
+    .then(result => {
+      if (result.rows.length > 0) {
+        // User with the same username or email already exists
+        return res.status(409).json({ error: 'Username or email already exists' });
+      } else {
+        // Insert the new user into the database
+        const insertQuery = "INSERT INTO users(username, email, pword) VALUES($1, $2, $3) RETURNING id";
+        const insertValues = [username, email, password];
+
+        pool.query(insertQuery, insertValues)
+          .then(result => res.json({ id: result.rows[0].id }))
+          .catch(err => res.status(500).json({ error: err.message }));
+      }
+    })
+    .catch(err => res.status(500).json({ error: err.message }));
+})
 
 // Start the server
 app.listen(port, hostname, () => {
