@@ -7,7 +7,7 @@
     <a href="/index.html">Go back to index</a>
     <a href="/login.html">Go back to login</a>
     <h1>Signup</h1>
-    <form>
+    <form id="signup">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required><br><br>
         
@@ -17,10 +17,12 @@
         <label for="password">Password:</label>
         <input type="password" id="password" name="password" required><br><br>
         
-        <input type="submit" value="Signup" onclick="JavaScript:signup()">
+        <input type="submit" value="Signup">
     </form>
 </body>
 <script>
+    form = document.getElementById("signup");
+    form.addEventListener('submit', signup);
     function signup(){
     fetch('/signup', {
         method: 'POST',
