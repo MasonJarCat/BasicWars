@@ -394,7 +394,9 @@ app.get("/signupPage", (req, res) => {
    // add logout function
 app.post("/signup", (req,res) => {
   const { username, email, password } = req.body;
-
+  if (!username || !email || !password) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
   // Check if username or email already exists in the database
   const checkQuery = "SELECT * FROM users WHERE username = $1 OR email = $2";
   const checkValues = [username, email];

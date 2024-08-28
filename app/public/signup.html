@@ -29,6 +29,7 @@
         },
         body: JSON.stringify({
             username: document.getElementById('username').value,
+            email: document.getElementById('email').value,
             password: hashPassword(document.getElementById('password').value)
         })
     })
