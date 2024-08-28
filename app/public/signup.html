@@ -17,10 +17,11 @@
         <label for="password">Password:</label>
         <input type="password" id="password" name="password" required><br><br>
         
-        <input type="submit" value="Signup">
+        <input type="submit" value="Signup" onclick="JavaScript:signup()">
     </form>
 </body>
 <script>
+    function signup(){
     fetch('/signup', {
         method: 'POST',
         headers: {
@@ -40,7 +41,7 @@
             // Handle any errors that occurred during the request
             console.error(error);
         });
-
+    }
     function hashPassword(password) {
 
         let encoder = new TextEncoder();
