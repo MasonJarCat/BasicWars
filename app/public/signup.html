@@ -23,18 +23,21 @@
 <script>
     form = document.getElementById("signup");
     form.addEventListener('submit', signup);
-    function signup(){
-    fetch('/signup', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            username: document.getElementById('username').value,
-            email: document.getElementById('email').value,
-            password: hashPassword(document.getElementById('password').value)
+    
+    function signup(event) {
+        event.preventDefault(); // Prevent the form from submitting and reloading the page
+    
+        fetch('/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                password: hashPassword(document.getElementById('password').value)
+            })
         })
-    })
         .then(response => response.json())
         .then(data => {
             // Handle the response from the server
@@ -45,11 +48,11 @@
             console.error(error);
         });
     }
-    function hashPassword(password) {
-
+    
+    async function hashPassword(password) {
         let encoder = new TextEncoder();
         let data = encoder.encode(password);
-        let hashBuffer = crypto.subtle.digest('SHA-256', data);
+        let hashBuffer = await crypto.subtle.digest('SHA-256', data);
         let hashArray = Array.from(new Uint8Array(hashBuffer));
         let hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
         return hashHex;

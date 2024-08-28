@@ -20,37 +20,41 @@
     </form>
 </body>
 <script>
-    form = getElementById("login");
-    form.addEventListener('submit', login);
-    function login(){
-    fetch('/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            username: document.getElementById('username').value,
-            password: hashPassword(document.getElementById('password').value)
-        })
-    })
-        .then(response => response.json())
-        .then(data => {
-            // Handle the response from the server
-            console.log(data);
-        })
-        .catch(error => {
-            // Handle any errors that occurred during the request
-            console.error(error);
+    document.getElementById("login").addEventListener('submit', login);
+
+    function login(event) {
+        event.preventDefault(); // Prevent the form from submitting and reloading the page
+        
+        hashPassword(document.getElementById('password').value).then(hashedPassword => {
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: document.getElementById('username').value,
+                    password: hashedPassword
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response from the server
+                console.log(data);
+            })
+            .catch(error => {
+                // Handle any errors that occurred during the request
+                console.error(error);
+            });
         });
     }
-    function hashPassword(password) {
 
+    async function hashPassword(password) {
         let encoder = new TextEncoder();
         let data = encoder.encode(password);
-        let hashBuffer = crypto.subtle.digest('SHA-256', data);
+        let hashBuffer = await crypto.subtle.digest('SHA-256', data);
         let hashArray = Array.from(new Uint8Array(hashBuffer));
         let hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
         return hashHex;
-    }
+    }    
 </script>
 </html>
