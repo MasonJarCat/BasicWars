@@ -49,12 +49,15 @@
     let fogLayer; 
     let visibleTiles;
     let isPlayer1Turn;
+    let currentPlayerId;
 
     let mapterrain = new Array();
     const app = new PIXI.Application();
     await app.init({ width: 640, height: 360 });
     document.body.appendChild(app.canvas);
     console.log(querystring);
+
+    // Load assets
     await PIXI.Assets.load('neutralfactory.png');
     await PIXI.Assets.load('neutralHQ.png');
     await PIXI.Assets.load('redfactory.png');
@@ -69,38 +72,37 @@
     await PIXI.Assets.load('blueinfantry.png');
     await PIXI.Assets.load('fog.png');
 
+    // Fetch terrain types
     fetch("/terraintypes", {
         method: "GET"
     }).then(response => {
-        console.log("terrain types fetched");
         return response.json();
     }).then(body => {
         terraintypes = body.rows;
-        console.log(terraintypes);
     })
 
+    // Fetch unit types
     fetch("/unittypes", {
         method: "GET"
     }).then(response => {
-        console.log("unit types fetched");
         return response.json();
     }).then(body => {
         unittypes = body.rows;
     });
 
+    // Fetch game units
     fetch("/gameunits" + querystring, {
         method: "GET"
     }).then(response => {
-        console.log("game units fetched");
         return response.json();
     }).then(body => {
         gameunits = body.rows;
     })
 
+    // Fetch map data
     fetch("/map" + querystring, {
         method: "GET"
     }).then(response => {
-        console.log("map fetched");
         return response.json();
     }).then(body => {
         if (body.rows.length <= 0){
@@ -111,12 +113,11 @@
             for (let i = 0; i < mapdata.terrain.length; i++){
                 let row = mapdata.terrain[i];
                 let ownerRow = mapdata.cellowner[i];
-                console.log(row);
                 let y = i * 16;
                 for (let j = 0; j < row.length; j++){
                     let x = j * 16;
                     let type = row[j];
-                    let typeData = terraintypes[type -1 ];
+                    let typeData = terraintypes[type - 1];
                     let owner = ownerRow[j];
                     let spriteName; 
                     if (typeData['capturable']){
@@ -137,10 +138,10 @@
         }
     })
 
+    // Fetch game state and determine the current player
     fetch("/game" + querystring, {
         method: "GET"
     }).then(response => {
-        console.log("game fetched");
         return response.json();
     }).then(body => {
         if (body.rows.length <= 0){
@@ -149,6 +150,8 @@
             fogLayer = new Array();
             gametitle.textContent = body.rows[0].title;
             gamedata = body.rows[0];
+            currentPlayerId = gamedata.current_player_id; // Assuming you have a way to get the logged-in player ID
+            
             if(gamedata["turn"] % 2 === 1){
                 isPlayer1Turn = true;
                 income = gamedata.p1_income;
@@ -160,17 +163,30 @@
             }
             fogEnabled = gamedata['fog'];
             economyInfo.textContent = "income: " + income + "\nfunds: " + funds;
-            console.log(body.rows[0]);
+
+            // If it's not the player's turn, disable actions
+            if ((isPlayer1Turn && currentPlayerId !== gamedata.p1_id) || (!isPlayer1Turn && currentPlayerId !== gamedata.p2_id)) {
+                endturnbutton.style.display = 'none';  // Hide the "End Turn" button
+                disableActions();  // Disable unit selection, movement, etc.
+            }
+
             if (fogEnabled){
                 drawFog();
             }
         }
     });
 
-    endturnbutton.addEventListener('click', () => endTurn())
+    function disableActions() {
+        // Disable unit selection, movement, and attacks
+        document.querySelectorAll('button').forEach(button => {
+            button.disabled = true;
+        });
+        document.querySelectorAll('canvas').forEach(canvas => {
+            canvas.style.pointerEvents = 'none';
+        });
+    }
 
     function drawFog(){
-        let fogSprite = PIXI.Sprite.from('fog.png');
         let visibleTiles = new Array(); 
         for (let i = 0; i < gamedata['tile_owners'].length; i++){
             let ownerRow = gamedata['tile_owners'][i];
@@ -197,12 +213,9 @@
                 }
             }
         }
-        for (let b = 0; b < fogLayer.length; b++){
-            fogLayer[b].parent.removeChild(fogLayer[b]);
-        }
+        fogLayer.forEach(sprite => sprite.parent.removeChild(sprite));
         fogLayer = new Array();
-        for (let a = 0; a < mapterrain.length; a++){
-            let mapTile = mapterrain[a]; 
+        mapterrain.forEach(mapTile => {
             let visibleTile = visibleTiles.find(c => c['x'] == mapTile['pos_x'] && c['y'] == mapTile['pos_y']);
             if (visibleTile === undefined){
                 let fogSprite = PIXI.Sprite.from('fog.png'); 
@@ -212,16 +225,13 @@
                 app.stage.addChild(fogSprite);
                 fogLayer.push(fogSprite);
             }
-        }
-        console.log("Visible Tiles:");
-        console.log(visibleTiles); 
+        });
     }
 
     function onClickTerrain(terrain, x, y, type){
-        if (selectedUnit != null && selectedUnit != undefined && movingselectedunit){
+        if (selectedUnit && movingselectedunit){
             let goalCell = selectedUnitMovableTiles.find(c => c['pos_x'] == x && c['pos_y'] == y);
-            console.log(goalCell);
-            if (goalCell != undefined){
+            if (goalCell){
                 selectedUnit.sprite.x = terrain.x;
                 selectedUnit.sprite.y = terrain.y;
                 selectedUnit.stats.pos_x = x;
@@ -234,20 +244,17 @@
                 console.log('Out of range');
             }
         } else {
-            console.log(type)
             if (type['canprintunits']){
-                for (let i = 0; i < type['unitprintlist'].length; i++){
-                    let unitTypeID = type['unitprintlist'][i];
+                type['unitprintlist'].forEach(unitTypeID => {
                     let unitType = unittypes.find(c => c['id'] == unitTypeID);
                     let printRow = document.createElement('div'); 
                     printRow.textContent = unitType['title'] + ", " + unitType['cost']; 
-                    console.log(unitType['title']);
                     let buybutton = document.createElement('button');
                     buybutton.addEventListener('click', () => buyUnit(unitType, x, y, terrain.x, terrain.y));
                     buybutton.textContent = "buy";
                     printRow.append(buybutton);
                     unitproductionmenu.append(printRow);
-                }
+                });
             }
         }
         selectedUnit = null; 
@@ -259,17 +266,13 @@
         let unitSpriteName = (isPlayer1Turn ? 'red' : 'blue') + unitType['title'] + '.png';
     
         if (funds >= unitType['cost']) {
-            // Deduct the cost from the current player's funds
-            funds = funds - unitType['cost'];
-    
-            // Update gamedata to reflect the new funds
+            funds -= unitType['cost'];
             if (isPlayer1Turn) {
                 gamedata.p1_funds = funds;
             } else {
                 gamedata.p2_funds = funds;
             }
     
-            // Prepare the data to send to the server
             let unitData = {
                 type_id: unitType['id'],
                 game_id: gamedata['id'],
@@ -279,18 +282,14 @@
                 isP1: isPlayer1Turn
             };
     
-            // Make a POST request to add the unit to the server
             fetch("/add/unit", {
                 method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(unitData)
             })
             .then(response => response.json())
             .then(data => {
                 if (data.unit_id) {
-                    // If the unit was successfully added, create the sprite
                     let stats = {
                         id: data.unit_id,
                         type_id: unitType['id'],
@@ -314,7 +313,6 @@
                     newsprite.y = mapy;
                     app.stage.addChild(newsprite);
     
-                    // Update the economy information displayed
                     economyInfo.textContent = "income: " + income + "\nfunds: " + funds;
                 } else {
                     console.log('Failed to add unit to the server.');
@@ -327,19 +325,17 @@
             console.log('Insufficient funds!');
         }
     
-        // Clear the unit production menu
         let j = unitproductionmenu.children.length - 1;
         while (j >= 0) {
             unitproductionmenu.children[j].remove();
-            j = j - 1;
+            j--;
         }
     
-        // Redraw fog if enabled
         if (fogEnabled) {
             drawFog();
         }
     }
-    
+
     function terrainBuilder(sprite, spritex, spritey, posx, posy, type){
         sprite.y = spritey;
         sprite.x = spritex;
@@ -352,29 +348,19 @@
 
     function onClickUnit(sprite, type, stats){
         clearUnitMenu();
-        let movebutton; 
-        let attackButton;
-        let capturebutton;
-        let statblock; 
-        console.log(stats['pos_x']);
-        console.log(stats['pos_y']);
         selectedUnit = {'sprite': sprite, 'type': type, 'stats': stats};
-        if(attackWithUnit){
-
-        // If the player chooses to attack
+        if (attackWithUnit) {
             attackUnit(attacking_unit, { sprite, type, stats });
-
         }
+
         selectedUnitMovableTiles = new Array();
         selectedUnitAttackableTiles = new Array();
-        statblock = document.createElement('p'); 
-        statblock.textContent = 'unit type: ' + type['title'] +', hp: ' + stats['cur_hp']
+        let statblock = document.createElement('p'); 
+        statblock.textContent = 'unit type: ' + type['title'] +', hp: ' + stats['cur_hp'];
         selectedunitmenu.append(statblock);
+        
         let occupiedTile = mapterrain.find(c => c['pos_x'] == stats['pos_x'] && c['pos_y'] == stats['pos_y']);
         let occupiedTileOwner = gamedata['tile_owners'][stats['pos_y']][stats['pos_x']];
-        console.log(occupiedTile); 
-        console.log(occupiedTileOwner);
-
         if (stats['can_move_this_turn']){
             let movebutton = document.createElement('button');
             movebutton.textContent = 'Move';
@@ -393,18 +379,17 @@
             selectedunitmenu.append(movebutton);
         }
         if (stats['can_capture_this_turn'] && occupiedTile['type']['capturable'] && (occupiedTileOwner != (isPlayer1Turn ? 1 : 2))){
-            capturebutton = document.createElement('button');
+            let capturebutton = document.createElement('button');
             capturebutton.textContent = 'Capture';
             capturebutton.addEventListener('click', () => captureTile(occupiedTile, stats['pos_x'], stats['pos_y'])); 
             selectedunitmenu.append(capturebutton);
         }
         if (stats['can_attack_this_turn']){
-            attackButton = document.createElement('button');
+            let attackButton = document.createElement('button');
             attackButton.textContent = 'Attack';
             attackButton.addEventListener('click', () => setAttack(sprite, type, stats)); 
             selectedunitmenu.append(attackButton);
         }
-        console.log(selectedUnitMovableTiles);
     }
 
     function setAttack(sprite, type, stats){
@@ -412,10 +397,7 @@
         attackWithUnit = true;
     }
 
-
     function calculateDamage(unit1, unit2) {
-        // Simple damage formula: damage = attack_power - armor
-        // add damage scaling with health
         const healthFactor1 = unit1.cur_hp / 10;
         const healthFactor2 = unit2.cur_hp / 10;
         const damageToUnit1 = Math.max((unit2.attack_power * healthFactor2) - unit1.armor, 0);
@@ -425,7 +407,6 @@
     }
 
     function attackUnit(attackingUnit, targetUnit) {
-        // Ensure both units exist
         if (!attackingUnit || !targetUnit) {
             console.log('One or both units not found.');
             return;
@@ -434,55 +415,42 @@
             console.log('Target is out of range.');
             return;
         }
-        // Check for valid unit and team (placeholder logic)
         if (attackingUnit.stats.player_id === targetUnit.stats.player_id) {
             console.log('Cannot attack units of the same team.');
             return;
         }
         attackWithUnit = false;
         attacking_unit['stats']['can_attack_this_turn'] = false; 
-        // Calculate damage for both units
         const { damageToUnit1, damageToUnit2 } = calculateDamage(attackingUnit.stats, targetUnit.stats);
     
-        // Apply damage
         attackingUnit.stats.cur_hp -= damageToUnit1;
         targetUnit.stats.cur_hp -= damageToUnit2;
     
-        // Check if units are destroyed
         if (attackingUnit.stats.cur_hp <= 0) {
             console.log(`${attackingUnit.type.title} has been destroyed!`);
-            // Remove attacking unit from game
             removeUnitFromGame(attackingUnit);
         }
     
         if (targetUnit.stats.cur_hp <= 0) {
             console.log(`${targetUnit.type.title} has been destroyed!`);
-            // Remove target unit from game
             removeUnitFromGame(targetUnit);
         }
     
-        // Update the game UI and state
         updateUnitStats(attackingUnit);
         updateUnitStats(targetUnit);
     }
 
     function removeUnitFromGame(unit) {
-        // Remove unit sprite from the game
         unit.sprite.parent.removeChild(unit.sprite);
-    
-        // Remove unit from the game units array
         const index = gameunits.indexOf(unit.stats);
         if (index !== -1) {
             gameunits.splice(index, 1);
         }
-    
-        clearUnitMenu(); // Optionally clear any selected unit menu
+        clearUnitMenu();
     }
     
     function updateUnitStats(unit) {
-        // Update the UI with the current stats of the unit
         console.log(`Updated ${unit.type.title} HP: ${unit.stats.cur_hp}`);
-
     }
     
     function isTargetInRange(attackingUnit, targetUnit) {
@@ -502,20 +470,17 @@
     function captureTile(tile, x, y){
         let stats = selectedUnit['stats'];
         stats['capturing'] = true;
-        stats['capture_prog'] = stats['capture_prog'] + stats['cur_hp']; 
-        console.log(stats['capture_prog']);
+        stats['capture_prog'] += stats['cur_hp']; 
         if (stats['capture_prog'] >= 20){
-            let spritex = tile.sprite.x; 
-            let spritey = tile.sprite.y; 
             tile.sprite.parent.removeChild(tile.sprite);
-            let newspritename = (isPlayer1Turn ? 'red' : 'blue') + tile['type']['title'] + '.png'
+            let newspritename = (isPlayer1Turn ? 'red' : 'blue') + tile['type']['title'] + '.png';
             let newsprite = PIXI.Sprite.from(newspritename);
             let oldTileIndex = mapterrain.findIndex(c => c['pos_x'] == x && c['pos_y'] == y); 
             mapterrain.splice(oldTileIndex, 1);
-            terrainBuilder(newsprite, spritex, spritey, x, y, tile['type']);
+            terrainBuilder(newsprite, tile.sprite.x, tile.sprite.y, x, y, tile['type']);
             gamedata['tile_owners'][y][x] = isPlayer1Turn ? 1 : 2;
             if (tile['type']['id'] == 4){
-                income = income + 10;
+                income += 10;
                 economyInfo.textContent = "income: " + income + ", funds: " + funds;
             }
             stats['capture_prog'] = 0;
@@ -527,15 +492,12 @@
     }
 
     function clearUnitMenu(){
-        let i = selectedunitmenu.children.length - 1; 
-        while (i >= 0){
-            selectedunitmenu.children[i].remove();
-            i = i - 1;
+        while (selectedunitmenu.firstChild) {
+            selectedunitmenu.removeChild(selectedunitmenu.firstChild);
         }
     }
 
     function updateGame() {
-        // Construct the game state update data
         const gameStateUpdate = {
             p1_units: isPlayer1Turn ? gameunits.map(unit => unit.id) : gamedata.p1_units,
             p2_units: !isPlayer1Turn ? gameunits.map(unit => unit.id) : gamedata.p2_units,
@@ -545,15 +507,12 @@
             p2_income: !isPlayer1Turn ? income : gamedata.p2_income,
             tile_owners: gamedata.tile_owners,
             fog: fogEnabled,
-            turn: gamedata.turn + 1 // Increment the turn
+            turn: gamedata.turn + 1
         };
     
-        // Send the game state update to the server via POST request
         fetch("/updateGameState" + querystring, {
             method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(gameStateUpdate)
         })
         .then(response => {
@@ -574,7 +533,7 @@
             gameunits[i]['can_attack_this_turn'] = true;
             gameunits[i]['can_capture_this_turn'] = true;
         }
-        funds = funds + income; 
+        funds += income; 
         economyInfo.textContent = "income: " + income + ", funds: " + funds;
         clearUnitMenu();
         updateGame();

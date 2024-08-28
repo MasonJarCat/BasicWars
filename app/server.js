@@ -37,47 +37,55 @@ app.use(cookieParser());
 
 
 // Serve static files
-app.get('/resetTestGames', async (req, res) => {
+app.get('/resetTestGames', authenticateUser, async (req, res) => {
   try {
-      const resetQuery1 = `
-          UPDATE games
-          SET
-              p1_units = '{}',
-              p2_units = '{}',
-              starter_income = 10,
-              p1_funds = 10,
-              p2_funds = 10,
-              p1_income = 10,
-              p2_income = 10,
-              tile_owners = '{{1, 1, 0},{0, 0, 0},{0, 2, 2}}',
-              fog = 'false',
-              turn = 0
-          WHERE title = 'testgame1';
-      `;
+    const currentPlayerId = req.player_id;
 
-      const resetQuery2 = `
-          UPDATE games
-          SET
-              p1_units = '{}',
-              p2_units = '{}',
-              starter_income = 10,
-              p1_funds = 10,
-              p2_funds = 10,
-              p1_income = 10,
-              p2_income = 10,
-              tile_owners = '{{1, 1, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 2, 2}}',
-              fog = 'true',
-              turn = 1
-          WHERE title = 'testgame2';
-      `;
+    // Ensure that only specific users can reset test games (optional)
+    const allowedUserIds = [1,2]; // Replace with the actual IDs of allowed users
+    if (!allowedUserIds.includes(currentPlayerId)) {
+      return res.status(403).json({ error: 'Forbidden: You are not allowed to reset test games' });
+    }
 
-      await pool.query(resetQuery1);
-      await pool.query(resetQuery2);
+    const resetQuery1 = `
+      UPDATE games
+      SET
+          p1_units = '{}',
+          p2_units = '{}',
+          starter_income = 10,
+          p1_funds = 10,
+          p2_funds = 10,
+          p1_income = 10,
+          p2_income = 10,
+          tile_owners = '{{1, 1, 0},{0, 0, 0},{0, 2, 2}}',
+          fog = 'false',
+          turn = 0
+      WHERE title = 'testgame1';
+    `;
 
-      res.status(200).json({ message: 'Test games reset to their original states successfully.' });
+    const resetQuery2 = `
+      UPDATE games
+      SET
+          p1_units = '{}',
+          p2_units = '{}',
+          starter_income = 10,
+          p1_funds = 10,
+          p2_funds = 10,
+          p1_income = 10,
+          p2_income = 10,
+          tile_owners = '{{1, 1, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 2, 2}}',
+          fog = 'true',
+          turn = 1
+      WHERE title = 'testgame2';
+    `;
+
+    await pool.query(resetQuery1);
+    await pool.query(resetQuery2);
+
+    res.status(200).json({ message: 'Test games reset to their original states successfully.' });
   } catch (error) {
-      console.error('Error resetting test games:', error.message);
-      res.status(500).json({ error: 'Failed to reset test games.' });
+    console.error('Error resetting test games:', error.message);
+    res.status(500).json({ error: 'Failed to reset test games.' });
   }
 });
 
@@ -210,63 +218,51 @@ app.post("/add/map", (req, res) => {
   }).catch(err => res.status(500).json({ error: err.message }));
 });
 
-app.post('/updateGameState', async (req, res) => {
+app.post('/updateGameState', authenticateUser, async (req, res) => {
   const { p1_units, p2_units, p1_funds, p2_funds, p1_income, p2_income, tile_owners, fog, turn } = req.body;
-  const gameId = req.query.gameid; 
-
-  console.log('Received game state update request');
-  console.log('Request body:', req.body);
-  console.log('gameId:', gameId);
+  const gameId = req.query.gameId;
 
   try {
-      // Ensure gameId is provided
-      if (!gameId) {
-          console.error('gameId is missing from the request');
-          return res.status(400).json({ error: 'Missing gameId parameter' });
-      }
+    // Fetch the game state to determine whose turn it is
+    const gameQuery = "SELECT * FROM games WHERE id = $1";
+    const gameResult = await pool.query(gameQuery, [gameId]);
 
-      // Ensure all required data is present
-      if (p1_units === undefined || p2_units === undefined || p1_funds === undefined || p2_funds === undefined || p1_income === undefined || p2_income === undefined || tile_owners === undefined || fog === undefined || turn === undefined) {
-          console.error('One or more required fields are missing');
-          return res.status(400).json({ error: 'Missing required fields' });
-      }
+    if (gameResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Game not found' });
+    }
 
-      // Log the SQL query and values before execution
-      const query = `
-          UPDATE games
-          SET
-              p1_units = $1,
-              p2_units = $2,
-              p1_funds = $3,
-              p2_funds = $4,
-              p1_income = $5,
-              p2_income = $6,
-              tile_owners = $7,
-              fog = $8,
-              turn = $9
-          WHERE id = $10
-      `;
+    const gameData = gameResult.rows[0];
+    const isPlayer1Turn = gameData.turn % 2 === 1;
+    const currentPlayerId = req.player_id;
 
-      const values = [p1_units, p2_units, p1_funds, p2_funds, p1_income, p2_income, tile_owners, fog, turn, gameId];
+    // Ensure the player is allowed to make a move
+    if ((isPlayer1Turn && currentPlayerId !== gameData.p1_id) || (!isPlayer1Turn && currentPlayerId !== gameData.p2_id)) {
+      return res.status(403).json({ error: 'Not your turn' });
+    }
 
-      console.log('Executing query:', query);
-      console.log('With values:', values);
+    // Update the game state in the database
+    const query = `
+        UPDATE games
+        SET
+            p1_units = $1,
+            p2_units = $2,
+            p1_funds = $3,
+            p2_funds = $4,
+            p1_income = $5,
+            p2_income = $6,
+            tile_owners = $7,
+            fog = $8,
+            turn = $9
+        WHERE id = $10
+    `;
 
-      const result = await pool.query(query, values);
+    const values = [p1_units, p2_units, p1_funds, p2_funds, p1_income, p2_income, tile_owners, fog, turn, gameId];
+    await pool.query(query, values);
 
-      // Check if any rows were updated
-      if (result.rowCount === 0) {
-          console.warn('No rows updated. Check if the gameId exists:', gameId);
-          return res.status(404).json({ error: 'Game not found' });
-      }
-
-      console.log('Game state updated successfully for gameId:', gameId);
-      res.status(200).json({ message: 'Game state updated successfully' });
-      // Add notification logic here if needed
-
+    res.status(200).json({ message: 'Game state updated successfully' });
   } catch (error) {
-      console.error('Error updating game state:', error.message);
-      res.status(500).json({ error: 'Failed to update game state' });
+    console.error('Error updating game state:', error.message);
+    res.status(500).json({ error: 'Failed to update game state' });
   }
 });
 
@@ -324,6 +320,31 @@ app.post("/add/user", (req, res) => {
     .then(result => res.json({ id: result.rows[0].id }))
     .catch(err => res.status(500).json({ error: err.message }));
 });
+
+const authenticateUser = async (req, res, next) => {
+  const sessionId = req.cookies.session;
+
+  if (!sessionId) {
+    return res.status(401).json({ error: 'Unauthorized: No session found' });
+  }
+
+  try {
+    const query = "SELECT * FROM activeUsers WHERE cookie = $1";
+    const values = [sessionId];
+
+    const result = await pool.query(query, values);
+
+    if (result.rows.length > 0) {
+      req.player_id = result.rows[0].player_id;
+      next();
+    } else {
+      res.status(401).json({ error: 'Unauthorized: Invalid session' });
+    }
+  } catch (error) {
+    console.error('Error validating session:', error.message);
+    res.status(500).json({ error: 'Failed to validate session' });
+  }
+};
 
 
 app.get("/loginPage", (req,res) => {
