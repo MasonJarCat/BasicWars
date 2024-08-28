@@ -35,8 +35,56 @@ pool.connect().then(function () {
 app.use(express.json());
 
 // Serve static files
-app.get("/test", (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'test.html'));
+app.get('/resetTestGames', async (req, res) => {
+  try {
+      const resetQuery1 = `
+          INSERT INTO games (title, p1_id, p2_id, map_id, p1_units, p2_units, starter_income, p1_funds, p2_funds, p1_income, p2_income, tile_owners, fog, turn) 
+          VALUES('testgame1', 1, 2, 1, '{}', '{}', 10, 10, 10, 10, 10, '{{1, 1, 0},{0, 0, 0},{0, 2, 2}}', 'false', 1)
+          ON CONFLICT (id) DO UPDATE SET
+              title = EXCLUDED.title,
+              p1_id = EXCLUDED.p1_id,
+              p2_id = EXCLUDED.p2_id,
+              map_id = EXCLUDED.map_id,
+              p1_units = EXCLUDED.p1_units,
+              p2_units = EXCLUDED.p2_units,
+              starter_income = EXCLUDED.starter_income,
+              p1_funds = EXCLUDED.p1_funds,
+              p2_funds = EXCLUDED.p2_funds,
+              p1_income = EXCLUDED.p1_income,
+              p2_income = EXCLUDED.p2_income,
+              tile_owners = EXCLUDED.tile_owners,
+              fog = EXCLUDED.fog,
+              turn = EXCLUDED.turn;
+      `;
+
+      const resetQuery2 = `
+          INSERT INTO games (title, p1_id, p2_id, map_id, p1_units, p2_units, starter_income, p1_funds, p2_funds, p1_income, p2_income, tile_owners, fog, turn) 
+          VALUES('testgame2', 1, 2, 2, '{}', '{}', 10, 10, 10, 10, 10, '{{1, 1, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 2, 2}}', 'true', 1)
+          ON CONFLICT (id) DO UPDATE SET
+              title = EXCLUDED.title,
+              p1_id = EXCLUDED.p1_id,
+              p2_id = EXCLUDED.p2_id,
+              map_id = EXCLUDED.map_id,
+              p1_units = EXCLUDED.p1_units,
+              p2_units = EXCLUDED.p2_units,
+              starter_income = EXCLUDED.starter_income,
+              p1_funds = EXCLUDED.p1_funds,
+              p2_funds = EXCLUDED.p2_funds,
+              p1_income = EXCLUDED.p1_income,
+              p2_income = EXCLUDED.p2_income,
+              tile_owners = EXCLUDED.tile_owners,
+              fog = EXCLUDED.fog,
+              turn = EXCLUDED.turn;
+      `;
+
+      await pool.query(resetQuery1);
+      await pool.query(resetQuery2);
+
+      res.status(200).json({ message: 'Test games reset successfully.' });
+  } catch (error) {
+      console.error('Error resetting test games:', error.message);
+      res.status(500).json({ error: 'Failed to reset test games.' });
+  }
 });
 
 /* Routes */
@@ -169,7 +217,7 @@ app.post("/add/map", (req, res) => {
 
 app.post('/updateGameState', async (req, res) => {
   const { p1_units, p2_units, p1_funds, p2_funds, p1_income, p2_income, tile_owners, fog, turn } = req.body;
-  const gameId = req.query.gameId; // Assuming gameId is passed as a query parameter
+  const gameId = req.query.gameid; 
 
   console.log('Received game state update request');
   console.log('Request body:', req.body);
