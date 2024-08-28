@@ -24,12 +24,17 @@
 <script src="https://pixijs.download/release/pixi.js"></script>
 
 <script type="module">   
+    document.addEventListener('DOMContentLoaded', () => {
+        initGame(); // Start game initialization after the DOM is loaded
+    });
+    
+    let app = new PIXI.Application();
     let gametitle = document.getElementById("gametitle");
     let unitproductionmenu = document.getElementById("unitproductionmenu");
     let economyInfo = document.getElementById("economyInfo");
     let selectedunitmenu = document.getElementById("selectedunitmenu");
     let endturnbutton = document.getElementById("endturnbutton");
-
+    
     let gamedata;
     let unittypes;
     let terraintypes;
@@ -49,35 +54,34 @@
     let visibleTiles;
     let isPlayer1Turn;
     let currentPlayerId;
-    let app = new PIXI.Application();
     let mapterrain = new Array();
+    
     function showUserInfo() {
         const userInfoDiv = document.getElementById('user_id');
         const userId = getUserId();
-
+    
         if (userId) {
             userInfoDiv.textContent = 'Logged in as User ID: ' + userId;
         } else {
             userInfoDiv.textContent = 'User not logged in';
         }
     }
-
-
-        function getUserId() {
+    
+    function getUserId() {
         // Example: Retrieve user ID from a cookie, local storage, or a server API call
         const userIdFromCookies = getCookie('userId');
         if (userIdFromCookies) {
             return userIdFromCookies;
         }
-
+    
         const userIdFromLocalStorage = localStorage.getItem('userId');
         if (userIdFromLocalStorage) {
             return userIdFromLocalStorage;
         }
-
+    
         return null; 
     }
-
+    
     // Helper function to get a cookie by name
     function getCookie(name) {
         const value = `; ${document.cookie}`;
@@ -87,12 +91,11 @@
     }
     
     async function initGame() {
-        // Initialize PIXI app without passing options directly
-        
         await app.init({ width: 640, height: 360 });
     
-        // Append the canvas to the body using `canvas` instead of `view`
         document.body.appendChild(app.canvas);
+    
+        showUserInfo();  // Call showUserInfo early in initGame to display the user immediately
     
         console.log(querystring);
     
@@ -115,24 +118,21 @@
     
         await Promise.all(assetPromises);
     
-        // The rest of your initialization and fetch logic remains the same
-        // Function to display the current user's information
-
         // Fetch terrain types
         const terrainResponse = await fetch("/terraintypes", { method: "GET" });
         const terrainBody = await terrainResponse.json();
         terraintypes = terrainBody.rows;
-
+    
         // Fetch unit types
         const unitResponse = await fetch("/unittypes", { method: "GET" });
         const unitBody = await unitResponse.json();
         unittypes = unitBody.rows;
-
+    
         // Fetch game units
         const gameUnitsResponse = await fetch("/gameunits" + querystring, { method: "GET" });
         const gameUnitsBody = await gameUnitsResponse.json();
         gameunits = gameUnitsBody.rows;
-
+    
         // Fetch map data
         const mapResponse = await fetch("/map" + querystring, { method: "GET" });
         const mapBody = await mapResponse.json();
@@ -143,7 +143,7 @@
             maptitle.textContent = mapdata.title;
             buildMap(mapdata);
         }
-
+    
         // Fetch game state and determine the current player
         const gameStateResponse = await fetch("/game" + querystring, { method: "GET" });
         const gameStateBody = await gameStateResponse.json();
@@ -151,10 +151,9 @@
             console.log("No game found");
         } else {
             initializeGameState(gameStateBody.rows[0], app);
-            showUserInfo();
         }
     }
-
+    
     function buildMap(mapdata) {
         for (let i = 0; i < mapdata.terrain.length; i++) {
             let row = mapdata.terrain[i];
@@ -182,13 +181,13 @@
             }
         }
     }
-
+    
     function initializeGameState(gameState, app) {
         fogLayer = new Array();
         gametitle.textContent = gameState.title;
         gamedata = gameState;
         currentPlayerId = gamedata.current_player_id; // Assuming you have a way to get the logged-in player ID
-        
+    
         if (gamedata["turn"] % 2 === 1) {
             isPlayer1Turn = true;
             income = gamedata.p1_income;
@@ -200,18 +199,17 @@
         }
         fogEnabled = gamedata['fog'];
         economyInfo.textContent = "income: " + income + "\nfunds: " + funds;
-
+    
         // If it's not the player's turn, disable actions
         if ((isPlayer1Turn && currentPlayerId !== gamedata.p1_id) || (!isPlayer1Turn && currentPlayerId !== gamedata.p2_id)) {
             endturnbutton.style.display = 'none';  // Hide the "End Turn" button
             disableActions();  // Disable unit selection, movement, etc.
         }
-
+    
         if (fogEnabled) {
             drawFog(app);
         }
     }
-
     initGame();
     function disableActions() {
         // Disable unit selection, movement, and attacks
