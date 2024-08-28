@@ -580,7 +580,7 @@
         economyInfo.textContent = "income: " + income + ", funds: " + funds;
         clearUnitMenu();
         updateGame();
-        if(gamedata["turn"] % 2 === 1){
+        if(gamedata["turn"] % 2 === 0){
             isPlayer1Turn = true;
             income = gamedata.p1_income;
             funds = gamedata.p1_funds;
