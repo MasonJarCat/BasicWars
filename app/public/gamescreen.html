@@ -207,7 +207,8 @@
         }
         fogEnabled = gamedata['fog'];
         economyInfo.textContent = "income: " + income + "\nfunds: " + funds;
-
+        console.log(currentPlayerId !== gamedata.p1_id);
+        console.log(parseInt(currentPlayerId) !== parseInt(gamedata.p1_id));
         // If it's not the player's turn, disable actions
         if ((isPlayer1Turn && currentPlayerId !== gamedata.p1_id) || (!isPlayer1Turn && currentPlayerId !== gamedata.p2_id)) {
             endturnbutton.style.display = 'none';  // Hide the "End Turn" button
