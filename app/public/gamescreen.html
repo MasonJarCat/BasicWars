@@ -53,12 +53,15 @@
     let mapterrain = new Array();
 
     async function initGame() {
-        // Initialize PIXI app
-        const app = new PIXI.Application({ width: 640, height: 360 });
-        document.body.appendChild(app.view);
-
+        // Initialize PIXI app without passing options directly
+        const app = new PIXI.Application();
+        await app.init({ width: 640, height: 360 });
+    
+        // Append the canvas to the body using `canvas` instead of `view`
+        document.body.appendChild(app.canvas);
+    
         console.log(querystring);
-
+    
         // Load assets
         const assetPromises = [
             PIXI.Assets.load('neutralfactory.png'),
@@ -75,8 +78,11 @@
             PIXI.Assets.load('blueinfantry.png'),
             PIXI.Assets.load('fog.png')
         ];
-
+    
         await Promise.all(assetPromises);
+    
+        // The rest of your initialization and fetch logic remains the same
+    
 
         // Fetch terrain types
         const terrainResponse = await fetch("/terraintypes", { method: "GET" });
@@ -543,6 +549,7 @@
             funds = gamedata.p2_funds;
         }
     }
+    
 </script>
 
 </html>
