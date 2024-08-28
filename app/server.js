@@ -171,8 +171,24 @@ app.post('/updateGameState', async (req, res) => {
   const { p1_units, p2_units, p1_funds, p2_funds, p1_income, p2_income, tile_owners, fog, turn } = req.body;
   const gameId = req.query.gameId; // Assuming gameId is passed as a query parameter
 
+  console.log('Received game state update request');
+  console.log('Request body:', req.body);
+  console.log('gameId:', gameId);
+
   try {
-      // Update the game state in the database
+      // Ensure gameId is provided
+      if (!gameId) {
+          console.error('gameId is missing from the request');
+          return res.status(400).json({ error: 'Missing gameId parameter' });
+      }
+
+      // Ensure all required data is present
+      if (p1_units === undefined || p2_units === undefined || p1_funds === undefined || p2_funds === undefined || p1_income === undefined || p2_income === undefined || tile_owners === undefined || fog === undefined || turn === undefined) {
+          console.error('One or more required fields are missing');
+          return res.status(400).json({ error: 'Missing required fields' });
+      }
+
+      // Log the SQL query and values before execution
       const query = `
           UPDATE games
           SET
@@ -190,15 +206,27 @@ app.post('/updateGameState', async (req, res) => {
 
       const values = [p1_units, p2_units, p1_funds, p2_funds, p1_income, p2_income, tile_owners, fog, turn, gameId];
 
-      await pool.query(query, values);
+      console.log('Executing query:', query);
+      console.log('With values:', values);
 
+      const result = await pool.query(query, values);
+
+      // Check if any rows were updated
+      if (result.rowCount === 0) {
+          console.warn('No rows updated. Check if the gameId exists:', gameId);
+          return res.status(404).json({ error: 'Game not found' });
+      }
+
+      console.log('Game state updated successfully for gameId:', gameId);
       res.status(200).json({ message: 'Game state updated successfully' });
-      //add notification?
+      // Add notification logic here if needed
+
   } catch (error) {
-      console.error('Error updating game state:', error);
+      console.error('Error updating game state:', error.message);
       res.status(500).json({ error: 'Failed to update game state' });
   }
 });
+
 // Get all games
 app.get("/games", (req, res) => {
   const query = "SELECT * FROM games";
