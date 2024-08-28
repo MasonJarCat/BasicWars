@@ -49,12 +49,12 @@
     let visibleTiles;
     let isPlayer1Turn;
     let currentPlayerId;
-
+    let app = new PIXI.Application();
     let mapterrain = new Array();
 
     async function initGame() {
         // Initialize PIXI app without passing options directly
-        const app = new PIXI.Application();
+        
         await app.init({ width: 640, height: 360 });
     
         // Append the canvas to the body using `canvas` instead of `view`
