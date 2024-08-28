@@ -378,6 +378,7 @@ app.post("/login", (req, res) => {
             // Set the session cookie in the response
             const cookieOptions = { httpOnly: true, secure: true,sameSite: "strict", maxAge: 60 * 60 * 1000 };
             res.cookie('session', sessionId, cookieOptions);
+            res.cookie('userId', user.id, { httpOnly: true, secure: true, sameSite: 'strict', maxAge: 60 * 60 * 1000 });
             res.status(200).json({ message: 'Login successful' });
           })
           .catch(err => res.status(500).json({ error: 'Failed to create session' }));

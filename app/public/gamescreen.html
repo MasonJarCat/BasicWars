@@ -82,7 +82,41 @@
         await Promise.all(assetPromises);
     
         // The rest of your initialization and fetch logic remains the same
-    
+        // Function to display the current user's information
+function showUserInfo() {
+    const userInfoDiv = document.getElementById('user_id');
+    const userId = getUserId();
+
+    if (userId) {
+        userInfoDiv.textContent = 'Logged in as User ID: ' + userId;
+    } else {
+        userInfoDiv.textContent = 'User not logged in';
+    }
+}
+
+
+    function getUserId() {
+    // Example: Retrieve user ID from a cookie, local storage, or a server API call
+    const userIdFromCookies = getCookie('userId');
+    if (userIdFromCookies) {
+        return userIdFromCookies;
+    }
+
+    const userIdFromLocalStorage = localStorage.getItem('userId');
+    if (userIdFromLocalStorage) {
+        return userIdFromLocalStorage;
+    }
+
+    return null; 
+}
+
+// Helper function to get a cookie by name
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
 
         // Fetch terrain types
         const terrainResponse = await fetch("/terraintypes", { method: "GET" });
