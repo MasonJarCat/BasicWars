@@ -5,7 +5,7 @@ CREATE DATABASE basicwars;
 CREATE TABLE users(
 	id SERIAL PRIMARY KEY,
 	username VARCHAR(25),
-	pword VARCHAR(25),
+	pword VARCHAR(128),
 	email VARCHAR(256)
 );
 
@@ -83,7 +83,7 @@ CREATE TABLE maps(
 
 CREATE TABLE activeUsers(
 	id SERIAL PRIMARY KEY,
-	cookie VARCHAR(25),
+	cookie VARCHAR(128),
 	player_id INTEGER
 );
 

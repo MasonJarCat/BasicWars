@@ -12,7 +12,7 @@
 
     <p id="maptitle"></p>
     <div id="economyInfo"></div>
-
+    <div id="user_id"></div>
     <button id="endturnbutton">End Turn</button>
 
     <div id="selectedunitmenu"></div>
@@ -24,7 +24,6 @@
 <script src="https://pixijs.download/release/pixi.js"></script>
 
 <script type="module">   
-
     let gametitle = document.getElementById("gametitle");
     let unitproductionmenu = document.getElementById("unitproductionmenu");
     let economyInfo = document.getElementById("economyInfo");
@@ -52,130 +51,127 @@
     let currentPlayerId;
 
     let mapterrain = new Array();
-    const app = new PIXI.Application();
-    await app.init({ width: 640, height: 360 });
-    document.body.appendChild(app.canvas);
-    console.log(querystring);
 
-    // Load assets
-    await PIXI.Assets.load('neutralfactory.png');
-    await PIXI.Assets.load('neutralHQ.png');
-    await PIXI.Assets.load('redfactory.png');
-    await PIXI.Assets.load('redHQ.png');
-    await PIXI.Assets.load('bluefactory.png');
-    await PIXI.Assets.load('blueHQ.png');
-    await PIXI.Assets.load('plains.png');
-    await PIXI.Assets.load('neutralsettlement.png');
-    await PIXI.Assets.load('redsettlement.png');
-    await PIXI.Assets.load('bluesettlement.png');
-    await PIXI.Assets.load('redinfantry.png');
-    await PIXI.Assets.load('blueinfantry.png');
-    await PIXI.Assets.load('fog.png');
+    async function initGame() {
+        // Initialize PIXI app
+        const app = new PIXI.Application({ width: 640, height: 360 });
+        document.body.appendChild(app.view);
 
-    // Fetch terrain types
-    fetch("/terraintypes", {
-        method: "GET"
-    }).then(response => {
-        return response.json();
-    }).then(body => {
-        terraintypes = body.rows;
-    })
+        console.log(querystring);
 
-    // Fetch unit types
-    fetch("/unittypes", {
-        method: "GET"
-    }).then(response => {
-        return response.json();
-    }).then(body => {
-        unittypes = body.rows;
-    });
+        // Load assets
+        const assetPromises = [
+            PIXI.Assets.load('neutralfactory.png'),
+            PIXI.Assets.load('neutralHQ.png'),
+            PIXI.Assets.load('redfactory.png'),
+            PIXI.Assets.load('redHQ.png'),
+            PIXI.Assets.load('bluefactory.png'),
+            PIXI.Assets.load('blueHQ.png'),
+            PIXI.Assets.load('plains.png'),
+            PIXI.Assets.load('neutralsettlement.png'),
+            PIXI.Assets.load('redsettlement.png'),
+            PIXI.Assets.load('bluesettlement.png'),
+            PIXI.Assets.load('redinfantry.png'),
+            PIXI.Assets.load('blueinfantry.png'),
+            PIXI.Assets.load('fog.png')
+        ];
 
-    // Fetch game units
-    fetch("/gameunits" + querystring, {
-        method: "GET"
-    }).then(response => {
-        return response.json();
-    }).then(body => {
-        gameunits = body.rows;
-    })
+        await Promise.all(assetPromises);
 
-    // Fetch map data
-    fetch("/map" + querystring, {
-        method: "GET"
-    }).then(response => {
-        return response.json();
-    }).then(body => {
-        if (body.rows.length <= 0){
+        // Fetch terrain types
+        const terrainResponse = await fetch("/terraintypes", { method: "GET" });
+        const terrainBody = await terrainResponse.json();
+        terraintypes = terrainBody.rows;
+
+        // Fetch unit types
+        const unitResponse = await fetch("/unittypes", { method: "GET" });
+        const unitBody = await unitResponse.json();
+        unittypes = unitBody.rows;
+
+        // Fetch game units
+        const gameUnitsResponse = await fetch("/gameunits" + querystring, { method: "GET" });
+        const gameUnitsBody = await gameUnitsResponse.json();
+        gameunits = gameUnitsBody.rows;
+
+        // Fetch map data
+        const mapResponse = await fetch("/map" + querystring, { method: "GET" });
+        const mapBody = await mapResponse.json();
+        if (mapBody.rows.length <= 0) {
             console.log("No game found");
         } else {
-            mapdata = body.rows[0];
+            mapdata = mapBody.rows[0];
             maptitle.textContent = mapdata.title;
-            for (let i = 0; i < mapdata.terrain.length; i++){
-                let row = mapdata.terrain[i];
-                let ownerRow = mapdata.cellowner[i];
-                let y = i * 16;
-                for (let j = 0; j < row.length; j++){
-                    let x = j * 16;
-                    let type = row[j];
-                    let typeData = terraintypes[type - 1];
-                    let owner = ownerRow[j];
-                    let spriteName; 
-                    if (typeData['capturable']){
-                        if (owner == 0){
-                            spriteName = 'neutral' + typeData['title'] + '.png';
-                        } else if (owner == 1){
-                            spriteName = 'red' + typeData['title'] + '.png';
-                        } else {
-                            spriteName = 'blue' + typeData['title'] + '.png';
-                        }
-                    } else {
-                        spriteName = typeData['title'] + '.png';
-                    }
-                    let sprite = PIXI.Sprite.from(spriteName);
-                    terrainBuilder(sprite, x, y, j, i, typeData);
-                }
-            }
+            buildMap(mapdata);
         }
-    })
 
-    // Fetch game state and determine the current player
-    fetch("/game" + querystring, {
-        method: "GET"
-    }).then(response => {
-        return response.json();
-    }).then(body => {
-        if (body.rows.length <= 0){
+        // Fetch game state and determine the current player
+        const gameStateResponse = await fetch("/game" + querystring, { method: "GET" });
+        const gameStateBody = await gameStateResponse.json();
+        if (gameStateBody.rows.length <= 0) {
             console.log("No game found");
         } else {
-            fogLayer = new Array();
-            gametitle.textContent = body.rows[0].title;
-            gamedata = body.rows[0];
-            currentPlayerId = gamedata.current_player_id; // Assuming you have a way to get the logged-in player ID
-            
-            if(gamedata["turn"] % 2 === 1){
-                isPlayer1Turn = true;
-                income = gamedata.p1_income;
-                funds = gamedata.p1_funds;
-            } else {
-                isPlayer1Turn = false;
-                income = gamedata.p2_income;
-                funds = gamedata.p2_funds;
-            }
-            fogEnabled = gamedata['fog'];
-            economyInfo.textContent = "income: " + income + "\nfunds: " + funds;
+            initializeGameState(gameStateBody.rows[0], app);
+        }
+    }
 
-            // If it's not the player's turn, disable actions
-            if ((isPlayer1Turn && currentPlayerId !== gamedata.p1_id) || (!isPlayer1Turn && currentPlayerId !== gamedata.p2_id)) {
-                endturnbutton.style.display = 'none';  // Hide the "End Turn" button
-                disableActions();  // Disable unit selection, movement, etc.
-            }
-
-            if (fogEnabled){
-                drawFog();
+    function buildMap(mapdata) {
+        for (let i = 0; i < mapdata.terrain.length; i++) {
+            let row = mapdata.terrain[i];
+            let ownerRow = mapdata.cellowner[i];
+            let y = i * 16;
+            for (let j = 0; j < row.length; j++) {
+                let x = j * 16;
+                let type = row[j];
+                let typeData = terraintypes[type - 1];
+                let owner = ownerRow[j];
+                let spriteName; 
+                if (typeData['capturable']) {
+                    if (owner == 0) {
+                        spriteName = 'neutral' + typeData['title'] + '.png';
+                    } else if (owner == 1) {
+                        spriteName = 'red' + typeData['title'] + '.png';
+                    } else {
+                        spriteName = 'blue' + typeData['title'] + '.png';
+                    }
+                } else {
+                    spriteName = typeData['title'] + '.png';
+                }
+                let sprite = PIXI.Sprite.from(spriteName);
+                terrainBuilder(sprite, x, y, j, i, typeData);
             }
         }
-    });
+    }
 
+    function initializeGameState(gameState, app) {
+        fogLayer = new Array();
+        gametitle.textContent = gameState.title;
+        gamedata = gameState;
+        currentPlayerId = gamedata.current_player_id; // Assuming you have a way to get the logged-in player ID
+        
+        if (gamedata["turn"] % 2 === 1) {
+            isPlayer1Turn = true;
+            income = gamedata.p1_income;
+            funds = gamedata.p1_funds;
+        } else {
+            isPlayer1Turn = false;
+            income = gamedata.p2_income;
+            funds = gamedata.p2_funds;
+        }
+        fogEnabled = gamedata['fog'];
+        economyInfo.textContent = "income: " + income + "\nfunds: " + funds;
+
+        // If it's not the player's turn, disable actions
+        if ((isPlayer1Turn && currentPlayerId !== gamedata.p1_id) || (!isPlayer1Turn && currentPlayerId !== gamedata.p2_id)) {
+            endturnbutton.style.display = 'none';  // Hide the "End Turn" button
+            disableActions();  // Disable unit selection, movement, etc.
+        }
+
+        if (fogEnabled) {
+            drawFog(app);
+        }
+    }
+
+    initGame();
     function disableActions() {
         // Disable unit selection, movement, and attacks
         document.querySelectorAll('button').forEach(button => {
