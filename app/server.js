@@ -119,7 +119,7 @@ app.post("/add/unit", (req, res) => {
 
   // Insert unit into the unit table
   let text = `
-      INSERT INTO unit(type_id, game_id, player_id, pos_x, pos_y, cur_hp, capturing, capture_prog) 
+      INSERT INTO units(type_id, game_id, player_id, pos_x, pos_y, cur_hp, capturing, capture_prog) 
       VALUES($1, $2, $3, $4, $5, $6, $7, $8) 
       RETURNING id
   `;
