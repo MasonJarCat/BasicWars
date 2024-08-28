@@ -35,7 +35,30 @@ pool.connect().then(function () {
 app.use(express.json());
 app.use(cookieParser());
 
+const authenticateUser = async (req, res, next) => {
+  const sessionId = req.cookies.session;
 
+  if (!sessionId) {
+    return res.status(401).json({ error: 'Unauthorized: No session found' });
+  }
+
+  try {
+    const query = "SELECT * FROM activeUsers WHERE cookie = $1";
+    const values = [sessionId];
+
+    const result = await pool.query(query, values);
+
+    if (result.rows.length > 0) {
+      req.player_id = result.rows[0].player_id;
+      next();
+    } else {
+      res.status(401).json({ error: 'Unauthorized: Invalid session' });
+    }
+  } catch (error) {
+    console.error('Error validating session:', error.message);
+    res.status(500).json({ error: 'Failed to validate session' });
+  }
+};
 // Serve static files
 app.get('/resetTestGames', authenticateUser, async (req, res) => {
   try {
@@ -321,30 +344,7 @@ app.post("/add/user", (req, res) => {
     .catch(err => res.status(500).json({ error: err.message }));
 });
 
-const authenticateUser = async (req, res, next) => {
-  const sessionId = req.cookies.session;
 
-  if (!sessionId) {
-    return res.status(401).json({ error: 'Unauthorized: No session found' });
-  }
-
-  try {
-    const query = "SELECT * FROM activeUsers WHERE cookie = $1";
-    const values = [sessionId];
-
-    const result = await pool.query(query, values);
-
-    if (result.rows.length > 0) {
-      req.player_id = result.rows[0].player_id;
-      next();
-    } else {
-      res.status(401).json({ error: 'Unauthorized: Invalid session' });
-    }
-  } catch (error) {
-    console.error('Error validating session:', error.message);
-    res.status(500).json({ error: 'Failed to validate session' });
-  }
-};
 
 
 app.get("/loginPage", (req,res) => {
