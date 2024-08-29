@@ -570,7 +570,7 @@
             console.error("Error updating game state:", error);
         });
     }
-
+    endturnbutton.addEventListener("click", endTurn);
     function endTurn(){
         for (let i = 0; i < gameunits.length; i++){
             gameunits[i]['can_move_this_turn'] = true;
