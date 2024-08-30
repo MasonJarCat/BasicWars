@@ -23,7 +23,8 @@
 
 <script src="https://pixijs.download/release/pixi.js"></script>
 
-<script type="module">   
+<script type="module">  
+    //todo add gameunit rendering from past game state. //rest the unit table. drop all units created in a game when  the game is over(do this server side ) 
     let gametitle = document.getElementById("gametitle");
     let unitproductionmenu = document.getElementById("unitproductionmenu");
     let economyInfo = document.getElementById("economyInfo");
@@ -189,7 +190,33 @@
             }
         }
     }
-
+    function drawUnits() {
+        // Loop through all game units and place them on the map
+        for (let i = 0; i < gameunits.length; i++) {
+            let unit = gameunits[i];
+            let unitType = unittypes.find(type => type.id === unit.type_id);
+            
+            // Determine the sprite name based on the player's color (red or blue)
+            let spriteName = (unit.player_id === gamedata.p1_id ? 'red' : 'blue') + unitType.title + '.png';
+            
+            // Create the sprite for the unit
+            let unitSprite = PIXI.Sprite.from(spriteName);
+            
+            // Position the sprite on the map
+            unitSprite.x = unit.pos_x * 16; // Assuming each tile is 16x16 pixels
+            unitSprite.y = unit.pos_y * 16;
+            
+            // Set event handler for clicking the unit
+            unitSprite.on('click', (event) => onClickUnit(unitSprite, unitType, unit));
+            unitSprite.eventMode = 'dynamic';
+            
+            // Add the sprite to the PIXI application stage
+            app.stage.addChild(unitSprite);
+            
+            // Store the sprite in the unit data for future reference (e.g., moving the unit)
+            unit.sprite = unitSprite;
+        }
+    }
     function initializeGameState(gameState, app) {
         fogLayer = new Array();
         gametitle.textContent = gameState.title;
