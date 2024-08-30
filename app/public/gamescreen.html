@@ -571,27 +571,49 @@
         });
     }
     endturnbutton.addEventListener("click", endTurn);
-    function endTurn(){
-        for (let i = 0; i < gameunits.length; i++){
+    function endTurn() {
+        // Disable the End Turn button to prevent multiple submissions
+        endturnbutton.disabled = true;
+    
+        // Reset unit actions for the next turn
+        for (let i = 0; i < gameunits.length; i++) {
             gameunits[i]['can_move_this_turn'] = true;
             gameunits[i]['can_attack_this_turn'] = true;
             gameunits[i]['can_capture_this_turn'] = true;
         }
-        funds += income; 
+    
+        // Update funds and display the updated economy info
+        funds += income;
         economyInfo.textContent = "income: " + income + ", funds: " + funds;
+    
+        // Clear the selected unit menu
         clearUnitMenu();
+    
+        // Update the game state on the server
         updateGame();
-        if(gamedata["turn"] % 2 === 0){
+    
+        // Determine whose turn is next and update the visuals accordingly
+        if (gamedata["turn"] % 2 === 0) {
             isPlayer1Turn = true;
             income = gamedata.p1_income;
             funds = gamedata.p1_funds;
+            gametitle.textContent = "Player 1's Turn";
         } else {
             isPlayer1Turn = false;
             income = gamedata.p2_income;
             funds = gamedata.p2_funds;
+            gametitle.textContent = "Player 2's Turn";
+        }
+    
+        // Check if it's the current player's turn; if not, hide the End Turn button
+        if ((isPlayer1Turn && parseInt(currentPlayerId) !== gamedata.p1_id) || (!isPlayer1Turn && currentPlayerId !== gamedata.p2_id)) {
+            endturnbutton.style.display = 'none'; // Hide the "End Turn" button
+            disableActions();  // Disable unit selection, movement, etc.
+        } else {
+            endturnbutton.style.display = 'inline-block'; // Show the "End Turn" button
+            endturnbutton.disabled = false; // Enable the "End Turn" button for the new turn
         }
     }
-    
 </script>
 
 </html>
