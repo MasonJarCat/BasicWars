@@ -209,10 +209,11 @@
         economyInfo.textContent = "income: " + income + "\nfunds: " + funds;
         // If it's not the player's turn, disable actions
         endturnbutton.style.display = 'block';
-        if ((isPlayer1Turn && parseInt(currentPlayerId) !== gamedata.p1_id) || (!isPlayer1Turn && currentPlayerId !== gamedata.p2_id)) {
+        if ((isPlayer1Turn && parseInt(currentPlayerId) !== gamedata.p1_id) || (!isPlayer1Turn && parseInt(currentPlayerId) !== gamedata.p2_id)) {
             endturnbutton.style.display = 'none';  // Hide the "End Turn" button
             console.log(isPlayer1Turn);
-            console.log(gamedata.p2_id)
+            console.log(gamedata.p2_id);
+            console.log(currentPlayerId);
             disableActions();  // Disable unit selection, movement, etc.
         }
 
