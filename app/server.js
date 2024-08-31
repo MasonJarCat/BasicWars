@@ -261,7 +261,13 @@ app.post('/updateGameState', authenticateUser, async (req, res) => {
     if ((isPlayer1Turn && currentPlayerId !== gameData.p1_id) || (!isPlayer1Turn && currentPlayerId !== gameData.p2_id)) {
       return res.status(403).json({ error: 'Not your turn' });
     }
+    const updateUnitsQuery = `
+      UPDATE units
+      SET can_capture_this_turn = true, can_move_this_turn = true, can_attack_this_turn = true
+      WHERE game_id = $1
+    `;
 
+    await pool.query(updateUnitsQuery, [gameId]);
     // Update the game state in the database
     const query = `
         UPDATE games
