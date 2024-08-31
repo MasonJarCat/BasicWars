@@ -248,7 +248,34 @@ app.post("/add/map", (req, res) => {
     return res.json(result.rows[0]);
   }).catch(err => res.status(500).json({ error: err.message }));
 });
+app.post("/update/unit", (req, res) => {
+  const { unit_id, cur_hp, capturing, capture_prog, can_capture_this_turn, can_move_this_turn, can_attack_this_turn, pos_x, pos_y } = req.body;
 
+  // Basic validation check
+  if (!unit_id || cur_hp === undefined || capturing === undefined || capture_prog === undefined || can_capture_this_turn === undefined || can_move_this_turn === undefined || can_attack_this_turn === undefined || pos_x === undefined || pos_y === undefined) {
+    console.error("Missing required parameters.");
+    return res.sendStatus(400);
+  }
+
+  // Update unit stats and position in the unit table
+  const text = `
+    UPDATE units
+    SET cur_hp = $1, capturing = $2, capture_prog = $3, can_capture_this_turn = $4, can_move_this_turn = $5, can_attack_this_turn = $6, pos_x = $7, pos_y = $8
+    WHERE id = $9
+  `;
+  const values = [cur_hp, capturing, capture_prog, can_capture_this_turn, can_move_this_turn, can_attack_this_turn, pos_x, pos_y, unit_id];
+
+  console.log("Executing query:", text, values);
+
+  pool.query(text, values)
+    .then(() => {
+      res.status(200).json({ message: 'Unit stats and position updated successfully' });
+    })
+    .catch(err => {
+      console.error("Error executing query:", err.message);
+      res.status(500).json({ error: err.message });
+    });
+});
 app.post('/updateGameState', authenticateUser, async (req, res) => {
   const { p1_units, p2_units, p1_funds, p2_funds, p1_income, p2_income, tile_owners, fog, turn } = req.body;
   const gameId = req.query.gameid;

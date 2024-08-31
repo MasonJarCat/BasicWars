@@ -314,6 +314,7 @@
                 if (fogEnabled){
                     drawFog();
                 }
+                updateUnitStats(selectedUnit);
             } else {
                 console.log('Out of range');
             }
@@ -524,8 +525,25 @@
     }
     
     function updateUnitStats(unit) {
-        console.log(`Updated ${unit.type.title} HP: ${unit.stats.cur_hp}`);
+        console.log(`Updated ${unit.type.title} HP: ${unit.stats.cur_hp}`);        
+        fetch("/update/unit", {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(unit.stats)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log("Unit stats updated successfully");
+            } else {
+                console.log("Failed to update unit stats");
+            }
+        })
+        .catch(error => {
+            console.error("Error updating unit stats:", error);
+        });
     }
+
     
     function isTargetInRange(attackingUnit, targetUnit) {
         const dx = Math.abs(attackingUnit.stats.pos_x - targetUnit.stats.pos_x);
@@ -539,6 +557,7 @@
         movingselectedunit = true;
         stats['capture_prog'] = 0;
         stats['capturing'] = false;
+
     }
 
     function captureTile(tile, x, y){
