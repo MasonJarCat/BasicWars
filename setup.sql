@@ -89,24 +89,119 @@ CREATE TABLE activeUsers(
 
 INSERT INTO unitTypes(title, blurb, armor, speed, flying, infantry, vehicle, naval, minrange, maxrange, sightrange, cost)
 VALUES('infantry', 'Basic infantry unit', 0, 3, 'false', 'true', 'false', 'false', 0, 1, 2, 10);
+INSERT INTO unitTypes(title, blurb, armor, speed, flying, infantry, vehicle, naval, minrange, maxrange, sightrange, cost)
+VALUES('mechinfantry', 'Heavier infantry unit with rocket launchers', 1, 3, 'false', 'true', 'false', 'false', 0, 1, 2, 30);
+INSERT INTO unitTypes(title, blurb, armor, speed, flying, infantry, vehicle, naval, minrange, maxrange, sightrange, cost)
+VALUES('recon', 'Light recon vehicle', 1, 7, 'false', 'false', 'true', 'false', 0, 1, 5, 50);
+INSERT INTO unitTypes(title, blurb, armor, speed, flying, infantry, vehicle, naval, minrange, maxrange, sightrange, cost)
+VALUES('lighttank', 'light tank', 3, 5, 'false', 'false', 'true', 'false', 0, 1, 2, 70);
+INSERT INTO unitTypes(title, blurb, armor, speed, flying, infantry, vehicle, naval, minrange, maxrange, sightrange, cost)
+VALUES('heavytank', 'heavy tank that kills things real good', 6, 5, 'false', 'false', 'true', 'false', 0, 1, 1, 150);
+INSERT INTO unitTypes(title, blurb, armor, speed, flying, infantry, vehicle, naval, minrange, maxrange, sightrange, cost)
+VALUES('artillery', 'ranged artillery, cannot engage at melee range', 1, 4, 'false', 'false', 'true', 'false', 1, 3, 1, 60);
+INSERT INTO unitTypes(title, blurb, armor, speed, flying, infantry, vehicle, naval, minrange, maxrange, sightrange, cost)
+VALUES('rocketarty', 'rocket artillery with even further range', 1, 4, 'false', 'false', 'true', 'false', 2, 5, 1, 120);
+INSERT INTO unitTypes(title, blurb, armor, speed, flying, infantry, vehicle, naval, minrange, maxrange, sightrange, cost)
+VALUES('antiair', 'dedicated anti-aircraft gun', 1, 5, 'false', 'false', 'true', 'false', 0, 1, 3, 70);
+INSERT INTO unitTypes(title, blurb, armor, speed, flying, infantry, vehicle, naval, minrange, maxrange, sightrange, cost)
+VALUES('helicopter', 'attack helicopter', 2, 5, 'true', 'false', 'false', 'false', 0, 1, 4, 90);
+INSERT INTO unitTypes(title, blurb, armor, speed, flying, infantry, vehicle, naval, minrange, maxrange, sightrange, cost)
+VALUES('fighter', 'A fighter jet, great against other aircraft', 2, 9, 'true', 'false', 'false', 'false', 0, 1, 3, 180);
+INSERT INTO unitTypes(title, blurb, armor, speed, flying, infantry, vehicle, naval, minrange, maxrange, sightrange, cost)
+VALUES('bomber', 'bomber aircraft that can devastate ground units', 2, 7, 'true', 'false', 'false', 'false', 0, 1, 1, 200);
 INSERT INTO terrainTypes (title, cover, moveCost, capturable, vehicleAccess, groundAccess, seaAccess, hiding, canPrintUnits, unitPrintList)
 VALUES('hq', 4, 1, 'true', 'true', 'true', 'true', 'true', 'false', '{}');
 INSERT INTO terrainTypes (title, cover, moveCost, capturable, vehicleAccess, groundAccess, seaAccess, hiding, canPrintUnits, unitPrintList)
-VALUES('factory', 4, 1, 'true', 'true', 'true', 'true', 'true', 'true', '{1}');
+VALUES('factory', 4, 1, 'true', 'true', 'true', 'true', 'true', 'true', '{1, 2, 3, 4, 5, 6, 7, 8}');
 INSERT INTO terrainTypes (title, cover, moveCost, capturable, vehicleAccess, groundAccess, seaAccess, hiding, canPrintUnits, unitPrintList)
 VALUES('plains', 1, 1, 'false', 'true', 'true', 'false', 'false', 'false', '{}');
 INSERT INTO terrainTypes (title, cover, moveCost, capturable, vehicleAccess, groundAccess, seaAccess, hiding, canPrintUnits, unitPrintList)
 VALUES('settlement', 3, 1, 'true', 'true', 'true', 'false', 'false', 'false', '{}');
+INSERT INTO terrainTypes (title, cover, moveCost, capturable, vehicleAccess, groundAccess, seaAccess, hiding, canPrintUnits, unitPrintList)
+VALUES('airport', 3, 1, 'true', 'true', 'true', 'false', 'false', 'true', '{9, 10, 11}');
+INSERT INTO terrainTypes (title, cover, moveCost, capturable, vehicleAccess, groundAccess, seaAccess, hiding, canPrintUnits, unitPrintList)
+VALUES('mountain', 4, 1, 'false', 'false', 'true', 'false', 'false', 'false', '{}');
+INSERT INTO terrainTypes (title, cover, moveCost, capturable, vehicleAccess, groundAccess, seaAccess, hiding, canPrintUnits, unitPrintList)
+VALUES('forest', 2, 1, 'false', 'true', 'true', 'false', 'false', 'false', '{}');
 INSERT INTO maps (title, width, height, terrain, cellOwner) 
 VALUES('testmap1', 3, 3, '{{1, 2, 3},{3, 3, 3},{3, 2, 1}}', '{{1, 1, 0},{0, 0, 0},{0, 2, 2}}');
 INSERT INTO maps (title, width, height, terrain, cellOwner) 
 VALUES('testmap2', 5, 5, '{{1, 2, 3, 3, 3},{3, 3, 3, 3, 3},{4, 3, 4, 3, 4},{3, 3, 3, 3, 3},{3, 3, 3, 2, 1}}', '{{1, 1, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 2, 2}}');
+INSERT INTO maps (title, width, height, terrain, cellOwner) 
+VALUES('bigmap', 25, 20, '{{1, 2, 3, 3, 4, 5, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 3, 4},
+{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 3},
+{3, 2, 3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 4, 3, 4},
+{3, 3, 3, 3, 6, 3, 3, 3, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3},
+{3, 3, 3, 6, 4, 3, 3, 7, 4, 7, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3},
+{3, 3, 3, 3, 3, 3, 3, 3, 7, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3},
+{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3},
+{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3},
+{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3},
+{6, 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 6, 6},
+{7, 7, 6, 3, 3, 3, 4, 3, 3, 3, 3, 6, 2, 6, 3, 3, 3, 3, 4, 3, 3, 3, 6, 7, 7},
+{6, 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 6, 6},
+{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 7, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3},
+{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3},
+{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3},
+{3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 7, 3, 3, 3, 3, 3, 3, 3, 3},
+{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 7, 4, 7, 3, 3, 4, 6, 3, 3, 3},
+{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 7, 3, 3, 3, 6, 3, 3, 3, 3},
+{4, 3, 4, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 3, 2, 3},
+{3, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3},
+{4, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 5, 4, 3, 3, 2, 1}}', 
+'{{1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1}}');
+INSERT INTO maps (title, width, height, terrain, cellOwner) 
+VALUES('longsrevenge', 12, 12, 
+'{{6, 2, 4, 3, 4, 3, 3, 7, 3, 4, 3, 4},
+{2, 5, 3, 6, 3, 3, 3, 3, 3, 3, 7, 3},
+{4, 3, 4, 3, 3, 7, 3, 3, 3, 4, 3, 4},
+{3, 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3},
+{4, 3, 3, 3, 1, 3, 3, 4, 3, 3, 3, 7},
+{3, 3, 7, 3, 3, 2, 6, 3, 3, 3, 3, 3},
+{3, 3, 3, 3, 3, 6, 2, 3, 3, 7, 3, 3},
+{7, 3, 3, 3, 4, 3, 3, 1, 3, 3, 3, 4},
+{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 6, 3},
+{4, 3, 4, 3, 3, 3, 7, 3, 3, 4, 3, 4},
+{3, 7, 3, 3, 3, 3, 3, 3, 6, 3, 5, 2},
+{4, 3, 4, 3, 7, 3, 3, 4, 3, 4, 2, 6}}', 
+'{{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0}}');
 INSERT INTO users (username, pword, email) VALUES('jfitz', 'pword1234', 'jf879@drexel.edu');
 INSERT INTO users (username, pword, email) VALUES('mason', '4321drowp', 'mcm542@drexel.edu');
 INSERT INTO games (title, p1_id, p2_id, map_id, p1_units, p2_units, starter_income, p1_funds, p2_funds, p1_income, p2_income, tile_owners, fog) 
-VALUES('testgame1', 1, 2, 1, '{}', '{}', 10, 10, 10, 10, 10, '{{1, 1, 0},{0, 0, 0},{0, 2, 2}}', 'false',0);
+VALUES('testgame1', 1, 2, 1, '{}', '{}', 10, 10, 10, 10, 10, '{{1, 1, 0},{0, 0, 0},{0, 2, 2}}', 'false');
 INSERT INTO games (title, p1_id, p2_id, map_id, p1_units, p2_units, starter_income, p1_funds, p2_funds, p1_income, p2_income, tile_owners, fog) 
-VALUES('testgame2', 1, 2, 2, '{}', '{}', 10, 10, 10, 10, 10, '{{1, 1, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 2, 2}}', 'true',1);
+VALUES('testgame2', 1, 2, 2, '{}', '{}', 10, 10, 10, 10, 10, '{{1, 1, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 0, 0},{0, 0, 0, 2, 2}}', 'true');
 
 
 
