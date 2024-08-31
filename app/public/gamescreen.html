@@ -265,7 +265,7 @@
         for (let i = 0; i < gamedata['tile_owners'].length; i++){
             let ownerRow = gamedata['tile_owners'][i];
             for (let j = 0; j < ownerRow.length; j++){
-                if ((currentPlayerId === gamedata.p1_id && ownerRow[j] === 1) || (currentPlayerId === gamedata.p2_id && ownerRow[j] === 2)) {
+                if ((parseInt(currentPlayerId) === gamedata.p1_id && ownerRow[j] === 1) || (parseInt(currentPlayerId) === gamedata.p2_id && ownerRow[j] === 2)) {
                     visibleTiles.push({'x': j, 'y': i});
                 }
             }
