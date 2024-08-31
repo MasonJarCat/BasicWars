@@ -69,7 +69,15 @@ app.get('/resetTestGames', authenticateUser, async (req, res) => {
     if (!allowedUserIds.includes(currentPlayerId)) {
       return res.status(403).json({ error: 'Forbidden: You are not allowed to reset test games' });
     }
+    const deleteUnitsQuery = `
+      DELETE FROM units
+      WHERE game_id IN (
+      SELECT id FROM games
+      WHERE title IN ('testgame1', 'testgame2')
+      )
+    `;
 
+    await pool.query(deleteUnitsQuery);
     const resetQuery1 = `
       UPDATE games
       SET
