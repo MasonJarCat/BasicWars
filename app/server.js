@@ -291,7 +291,7 @@ app.post('/updateGameState', authenticateUser, async (req, res) => {
     const gameData = gameResult.rows[0];
     const isPlayer1Turn = gameData.turn % 2 === 1;
     const currentPlayerId = req.player_id;
-
+    console.log(`player id ${currentPlayerId}`);
     // Ensure the player is allowed to make a move
     if ((isPlayer1Turn && currentPlayerId !== gameData.p1_id) || (!isPlayer1Turn && currentPlayerId !== gameData.p2_id)) {
       return res.status(403).json({ error: 'Not your turn' });

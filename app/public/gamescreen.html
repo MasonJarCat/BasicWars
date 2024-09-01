@@ -525,11 +525,24 @@
     }
     
     function updateUnitStats(unit) {
-        console.log(`Updated ${unit.type.title} HP: ${unit.stats.cur_hp}`);        
+        console.log(`Updated ${unit.type.title} HP: ${unit.stats.cur_hp}`);
+    
+        // Create an object with only the relevant stats
+        const relevantStats = {
+            cur_hp: unit.stats.cur_hp,
+            capturing: unit.stats.capturing,
+            capture_prog: unit.stats.capture_prog,
+            can_capture_this_turn: unit.stats.can_capture_this_turn,
+            can_move_this_turn: unit.stats.can_move_this_turn,
+            can_attack_this_turn: unit.stats.can_attack_this_turn,
+            pos_x: unit.stats.pos_x,
+            pos_y: unit.stats.pos_y
+        };
+    
         fetch("/update/unit", {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(unit.stats)
+            body: JSON.stringify(relevantStats)
         })
         .then(response => response.json())
         .then(data => {
