@@ -179,7 +179,6 @@ app.get("/maps", (req, res) => {
   
   pool.query(query)
     .then(result => {
-      console.log(result.rows);
       res.json({ rows: result.rows });}
   )
     .catch(err => res.status(500).json({ error: err.message }));
