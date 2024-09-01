@@ -301,7 +301,7 @@ app.post('/updateGameState', authenticateUser, async (req, res) => {
       SET can_capture_this_turn = true, can_move_this_turn = true, can_attack_this_turn = true
       WHERE game_id = $1
     `;
-
+    console.log(`p1 units ${p1_units},p2 units ${p2_units}`)
     await pool.query(updateUnitsQuery, [gameId]);
     // Update the game state in the database
     const query = `
