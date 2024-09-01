@@ -82,6 +82,7 @@ let opponent = document.getElementById("opponent");
 let maps;
 
 let gamedata; 
+let opponentslist;
 
 fetch("/maps", {
     method: "GET"
@@ -99,6 +100,25 @@ fetch("/maps", {
         mapOption.textContent = name;
         mapOption.value = id; 
         map.appendChild(mapOption);
+    }
+});
+
+fetch("/userssafely", {
+    method: "GET"
+}).then(response =>{
+    console.log(response.status);
+    return response.json();
+}).then(body =>{
+    opponentslist = body.rows;
+    console.log(opponentslist);
+    for (let i = 0; i < opponentslist.length; i++){
+        let curop = opponentslist[i];
+        let id = curop["id"];
+        let name = curop["username"];
+        let opOption = document.createElement("option");
+        opOption.textContent = name;
+        opOption.value = id; 
+        opponent.appendChild(opOption);
     }
 });
 

@@ -172,10 +172,24 @@ app.get("/gameunits", (req, res) => {
   }).catch(err => res.status(500).json({ error: err.message }));
 });
 
+//Fitz's create game queries start here
+
 app.get("/maps", (req, res) => {
   res.setHeader('Content-Type', 'application/json');
 
   const query = "SELECT * FROM maps";
+  
+  pool.query(query)
+    .then(result => {
+      res.json({ rows: result.rows });}
+  )
+    .catch(err => res.status(500).json({ error: err.message }));
+})
+
+app.get("/userssafely", (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+
+  const query = "SELECT id, username FROM users";
   
   pool.query(query)
     .then(result => {
