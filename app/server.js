@@ -172,6 +172,15 @@ app.get("/gameunits", (req, res) => {
   }).catch(err => res.status(500).json({ error: err.message }));
 });
 
+app.get("/maps", (req, res) => {
+
+  const query = "SELECT * FROM maps";
+  
+  pool.query(query)
+    .then(result => res.json({ rows: result.rows }))
+    .catch(err => res.status(500).json({ error: err.message }));
+})
+
 app.post("/add/game", (req, res) => {
   let { title, p1_id, p2_id, map_id } = req.body;
   

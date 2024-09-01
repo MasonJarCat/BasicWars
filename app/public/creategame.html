@@ -25,7 +25,7 @@
         <div>
             <label for="map">Select Map:</label>
             <select id="map" name="map">
-                <option value="">Please select opponent</option>
+                <option value="">Please select a map</option>
                 <option value="scifi">Science Fiction</option>
                 <option value="romance">Romance</option>
                 <option value="adventure">Choose Your Own Adventure</option>
@@ -47,7 +47,7 @@
         </div>
 
         <div>
-            <label>Enable Fog of War</label>
+            <label>Enable Fog of War:</label>
             <input type="radio" name="fogofwar" value="yes">
             <label>Yes</label>
             <input type="radio" name="fogofwar" value="no">
@@ -55,10 +55,27 @@
         </div>
     </div>
 
+    <button id="submit">Create Game</button>
+
 
 </body>
 
 <script>
+
+let submit = document.getElementById("submit");
+let startincome = document.getElementById("startincome");
+let map = document.getElementById("map");
+let opponent = document.getElementById("opponent");
+
+let gamedata; 
+
+fetch("/maps", {
+    method: "GET"
+}).then(response =>{
+    console.log(response.status);
+}).then(body =>{
+    console.log(body.rows);
+});
 
 </script>
 </html>
