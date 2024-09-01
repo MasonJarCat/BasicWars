@@ -26,15 +26,13 @@
             <label for="map">Select Map:</label>
             <select id="map" name="map">
                 <option value="">Please select a map</option>
-                <option value="scifi">Science Fiction</option>
-                <option value="romance">Romance</option>
-                <option value="adventure">Choose Your Own Adventure</option>
             </select>
         </div>
 
         <div>
             <label for="startincome">Select starter income:</label>
             <select id="startincome" name="startincome">
+                <option value="10">10</option>
                 <option value="10">10</option>
                 <option value="20">20</option>
                 <option value="30">30</option>
@@ -43,6 +41,21 @@
                 <option value="100">100</option>
                 <option value="150">150</option>
                 <option value="200">200</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="funds">Select starter funds:</label>
+            <select id="funds" name="funds">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="40">40</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="150">150</option>
+                <option value="200">200</option>
+                <option value="500">500</option>
             </select>
         </div>
 
@@ -78,6 +91,15 @@ fetch("/maps", {
 }).then(body =>{
     maps = body.rows;
     console.log(maps);
+    for (let i = 0; i < maps.length; i++){
+        let curmap = maps[i];
+        let id = curmap["id"];
+        let name = curmap["title"];
+        let mapOption = document.createElement("option");
+        mapOption.textContent = name;
+        mapOption.value = id; 
+        map.appendChild(mapOption);
+    }
 });
 
 </script>
