@@ -139,6 +139,10 @@ app.get("/gamescreen", (req, res) =>{
   res.sendFile(path.join(__dirname, 'public', 'gamescreen.html'));
 });
 
+app.get("/creategame", (req, res) =>{
+  res.sendFile(path.join(__dirname, 'public', 'creategame.html'));
+});
+
 app.get("/gamescreen/:spritename", (req, res) =>{
   res.sendFile(path.join(__dirname, 'public', 'sprites', req.params.spritename));
 });
