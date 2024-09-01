@@ -173,6 +173,7 @@ app.get("/gameunits", (req, res) => {
 });
 
 app.get("/maps", (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
 
   const query = "SELECT * FROM maps";
   
