@@ -606,9 +606,13 @@
 
     function updateGame() {
         console.log(gamedata.turn);
+    
+        const player1Units = gameunits.filter(unit => unit.player_id === 1).map(unit => unit.id);
+        const player2Units = gameunits.filter(unit => unit.player_id === 2).map(unit => unit.id);
+    
         const gameStateUpdate = {
-            p1_units: isPlayer1Turn ? gameunits.map(unit => unit.id) : gamedata.p1_units,
-            p2_units: !isPlayer1Turn ? gameunits.map(unit => unit.id) : gamedata.p2_units,
+            p1_units: isPlayer1Turn ? player1Units : gamedata.p1_units,
+            p2_units: !isPlayer1Turn ? player2Units : gamedata.p2_units,
             p1_funds: isPlayer1Turn ? funds : gamedata.p1_funds,
             p2_funds: !isPlayer1Turn ? funds : gamedata.p2_funds,
             p1_income: isPlayer1Turn ? income : gamedata.p1_income,
@@ -634,6 +638,7 @@
             console.error("Error updating game state:", error);
         });
     }
+    
     endturnbutton.addEventListener("click", endTurn);
     function endTurn() {
         // Disable the End Turn button to prevent multiple submissions
