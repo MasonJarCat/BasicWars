@@ -66,6 +66,7 @@
     </div>
 
     <button id="submit">Create Game</button>
+    <div id="notloggedin"></div>
 
 
 </body>
@@ -76,48 +77,77 @@ let submit = document.getElementById("submit");
 let startincome = document.getElementById("startincome");
 let map = document.getElementById("map");
 let opponent = document.getElementById("opponent");
+let mainform = document.getElementById("creategameform");
+let notloggedin = document.getElementById("notloggedin");
 let maps;
+
+const userId = getUserId();
 
 let gamedata; 
 let opponentslist;
 
-fetch("/maps", {
-    method: "GET"
-}).then(response =>{
-    console.log(response.status);
-    return response.json();
-}).then(body =>{
-    maps = body.rows;
-    console.log(maps);
-    for (let i = 0; i < maps.length; i++){
-        let curmap = maps[i];
-        let id = curmap["id"];
-        let name = curmap["title"];
-        let mapOption = document.createElement("option");
-        mapOption.textContent = name;
-        mapOption.value = id; 
-        map.appendChild(mapOption);
-    }
-});
+if (userId == null){
+    console.log("User not logged in!");
+    document.removeChild(mainform);
+    document.removeChild(submit);
+    notloggedin.textContent = "Error: You must be logged in to create a game.";
+} else {
 
-fetch("/userssafely", {
-    method: "GET"
-}).then(response =>{
-    console.log(response.status);
-    return response.json();
-}).then(body => {
-    opponentslist = body.rows;
-    console.log(opponentslist);
-    for (let i = 0; i < opponentslist.length; i++){
-        let curop = opponentslist[i];
-        let id = curop["id"];
-        let name = curop["username"];
-        let opOption = document.createElement("option");
-        opOption.textContent = name;
-        opOption.value = id; 
-        opponent.appendChild(opOption);
+    fetch("/maps", {
+        method: "GET"
+    }).then(response =>{
+        console.log(response.status);
+        return response.json();
+    }).then(body =>{
+        maps = body.rows;
+        console.log(maps);
+        for (let i = 0; i < maps.length; i++){
+            let curmap = maps[i];
+            let id = curmap["id"];
+            let name = curmap["title"];
+            let mapOption = document.createElement("option");
+            mapOption.textContent = name;
+            mapOption.value = id; 
+            map.appendChild(mapOption);
+        }
+    });
+
+    fetch("/userssafely", {
+        method: "GET"
+    }).then(response =>{
+        console.log(response.status);
+        return response.json();
+    }).then(body => {
+        opponentslist = body.rows;
+        console.log(opponentslist);
+        for (let i = 0; i < opponentslist.length; i++){
+            let curop = opponentslist[i];
+            let id = curop["id"];
+            let name = curop["username"];
+            let opOption = document.createElement("option");
+            opOption.textContent = name;
+            opOption.value = id; 
+            opponent.appendChild(opOption);
+        }
+    });
+}
+
+function getUserId() {
+        // Example: Retrieve user ID from a cookie, local storage, or a server API call
+        const userIdFromCookies = getCookie('userId');
+        console.log('User ID from Cookies: ', userIdFromCookies); // Debugging log
+        if (userIdFromCookies) {
+            return userIdFromCookies;
+        }
+    
+        const userIdFromLocalStorage = localStorage.getItem('userId');
+        console.log('User ID from Local Storage: ', userIdFromLocalStorage); // Debugging log
+        if (userIdFromLocalStorage) {
+            return userIdFromLocalStorage;
+        }
+    
+        return null; 
     }
-});
 
 </script>
 </html>
