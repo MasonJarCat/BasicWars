@@ -16,9 +16,6 @@
             <label for="opponent">Select Your Opponent:</label>
             <select id="opponent" name="opponent">
                 <option value="">Please select your opponent</option>
-                <option value="scifi">Science Fiction</option>
-                <option value="romance">Romance</option>
-                <option value="adventure">Choose Your Own Adventure</option>
             </select>
         </div>       
 
@@ -108,7 +105,7 @@ fetch("/userssafely", {
 }).then(response =>{
     console.log(response.status);
     return response.json();
-}).then(body =>{
+}).then(body => {
     opponentslist = body.rows;
     console.log(opponentslist);
     for (let i = 0; i < opponentslist.length; i++){
