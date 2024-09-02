@@ -88,8 +88,8 @@ let opponentslist;
 
 if (userId == null){
     console.log("User not logged in!");
-    document.removeChild(mainform);
-    document.removeChild(submit);
+    mainform.remove();
+    submit.remove();
     notloggedin.textContent = "Error: You must be logged in to create a game.";
 } else {
 
