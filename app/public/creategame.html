@@ -67,6 +67,7 @@
 
     <button id="submit">Create Game</button>
     <div id="notloggedin"></div>
+    <div id="allfieldsrequired"></div>
 
 
 </body>
@@ -80,6 +81,7 @@ let map = document.getElementById("map");
 let opponent = document.getElementById("opponent");
 let mainform = document.getElementById("creategameform");
 let notloggedin = document.getElementById("notloggedin");
+let allfieldsrequired = document.getElementById("allfieldsrequired");
 let maps;
 
 const userId = getUserId();
@@ -134,7 +136,7 @@ if (userId == null){
         }
     });
 
-    submit.addEventListener(() => {
+    submit.addEventListener("click", () => {
         let fog = document.querySelector('input[name="fogofwar"]:checked').value;
         let mapid = map.value;
         let selectedMap = maps.fetch(c => c.id == mapid);
@@ -147,6 +149,11 @@ if (userId == null){
         console.log(selectedOp);
         console.log(selectedIncome);
         console.log(selectedFunds);
+        if (fog == undefined || mapid == "" || selectedOp == "" || selectedIncome == "" || selectedFunds == ""){
+            allfieldsrequired.textContent = "Error: Please fill out all fields";
+        } else {
+            allfieldsrequired.textContent
+        }
     })
 }
 
