@@ -137,9 +137,14 @@ if (userId == null){
     });
 
     submit.addEventListener("click", () => {
-        let fog = document.querySelector('input[name="fogofwar"]:checked').value;
+        try{
+            let fog = document.querySelector('input[name="fogofwar"]:checked').value;
+        } catch {
+            allfieldsrequired.textContent = "Error: Please fill out all fields";
+            return;
+        }
         let mapid = map.value;
-        let selectedMap = maps.fetch(c => c.id == mapid);
+        let selectedMap = maps.find(c => c.id == mapid);
         let selectedOp = opponent.value; 
         let selectedIncome = income.value;
         let selectedFunds = funds.value; 
@@ -152,7 +157,7 @@ if (userId == null){
         if (fog == undefined || mapid == "" || selectedOp == "" || selectedIncome == "" || selectedFunds == ""){
             allfieldsrequired.textContent = "Error: Please fill out all fields";
         } else {
-            allfieldsrequired.textContent
+            allfieldsrequired.textContent = "";
         }
     })
 }
