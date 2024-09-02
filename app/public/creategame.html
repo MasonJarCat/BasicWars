@@ -133,21 +133,34 @@ if (userId == null){
 }
 
 function getUserId() {
-        // Example: Retrieve user ID from a cookie, local storage, or a server API call
-        const userIdFromCookies = getCookie('userId');
-        console.log('User ID from Cookies: ', userIdFromCookies); // Debugging log
-        if (userIdFromCookies) {
-            return userIdFromCookies;
-        }
-    
-        const userIdFromLocalStorage = localStorage.getItem('userId');
-        console.log('User ID from Local Storage: ', userIdFromLocalStorage); // Debugging log
-        if (userIdFromLocalStorage) {
-            return userIdFromLocalStorage;
-        }
-    
-        return null; 
+    // Example: Retrieve user ID from a cookie, local storage, or a server API call
+    const userIdFromCookies = getCookie('userId');
+    console.log('User ID from Cookies: ', userIdFromCookies); // Debugging log
+    if (userIdFromCookies) {
+        return userIdFromCookies;
     }
+
+    const userIdFromLocalStorage = localStorage.getItem('userId');
+    console.log('User ID from Local Storage: ', userIdFromLocalStorage); // Debugging log
+    if (userIdFromLocalStorage) {
+        return userIdFromLocalStorage;
+    }
+
+    return null; 
+}
+
+ // Helper function to get a cookie by name
+ function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+        const cookieValue = parts.pop().split(';').shift();
+        console.log('Cookie found:', name, '=', cookieValue); // Debugging log
+        return cookieValue;
+    }
+    console.log('Cookie not found:', name); // Debugging log
+    return null;
+}
 
 </script>
 </html>
