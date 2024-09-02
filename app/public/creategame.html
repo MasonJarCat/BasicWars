@@ -166,7 +166,7 @@ if (userId == null){
                 fetch("/add/game", {
                     method: "POST",
                     headers : {"Content-Type": "application/json"},
-                    body: JSON.stringify({"title": title, "p1_id": userId, "p2_id": selectedOp, "map_id": map_id, "starter_income": selectedIncome, "starter_funds": selectedFunds, "tile_owners": selectedMap.cellowner, "fog": fog})
+                    body: JSON.stringify({"title": title, "p1_id": userId, "p2_id": selectedOp, "map_id": mapid, "starter_income": selectedIncome, "starter_funds": selectedFunds, "tile_owners": selectedMap.cellowner, "fog": fog})
                 }).then(response => {
                     console.log(response.status);
                     if (response.status == 200){
