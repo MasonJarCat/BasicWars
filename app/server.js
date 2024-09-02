@@ -199,6 +199,7 @@ app.get("/userssafely", (req, res) => {
 })
 
 app.post("/add/game", (req, res) => {
+  console.log(req.body);
   let { title, p1_id, p2_id, map_id, starter_income, starter_funds, tile_owners, fog } = req.body;
   
   if (!title || !p1_id || !p2_id || !map_id || !starter_income || !starter_funds || !tile_owners || (fog == undefined)) {
