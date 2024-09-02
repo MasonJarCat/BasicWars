@@ -199,16 +199,20 @@ app.get("/userssafely", (req, res) => {
 })
 
 app.post("/add/game", (req, res) => {
-  let { title, p1_id, p2_id, map_id } = req.body;
+  let { title, p1_id, p2_id, map_id, starter_income, starter_funds, tile_owners, fog } = req.body;
   
-  if (!title || !p1_id || !p2_id || !map_id) {
+  if (!title || !p1_id || !p2_id || !map_id || !starter_income || !starter_funds || !tile_owners || (fog == undefined)) {
     return res.sendStatus(400);
   }
 
   let p1_units = [];
   let p2_units = [];
-  let text = "INSERT INTO games(title, p1_id, p2_id, map_id, p1_units, p2_units) VALUES($1, $2, $3, $4, $5, $6) RETURNING id";
-  let values = [title, parseInt(p1_id), parseInt(p2_id), parseInt(map_id), p1_units, p2_units];
+  let p1_income = parseInt(starter_income);
+  let p2_income = parseInt(starter_income);
+  let p1_funds = parseInt(starter_funds);
+  let p2_funds = parseInt(starter_funds);
+  let text = "INSERT INTO games(title, p1_id, p2_id, map_id, p1_units, p2_units, starter_income, p1_funds, p2_funds, p1_income, p2_income, tile_owners, fog, turn) VALUES($1, $2, $3, $4, $5, $6) RETURNING id";
+  let values = [title, parseInt(p1_id), parseInt(p2_id), parseInt(map_id), p1_units, p2_units, parseInt(starter_income), p1_funds, p2_funds, p1_income, p2_income, tile_owners, fog, 1];
 
   if (title.length > 25 || values.some(value => Number.isNaN(value))) {
     return res.sendStatus(400);

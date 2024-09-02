@@ -27,8 +27,8 @@
         </div>
 
         <div>
-            <label for="startincome">Select starter income:</label>
-            <select id="startincome" name="startincome">
+            <label for="income">Select starter income:</label>
+            <select id="income" name="income">
                 <option value="10">10</option>
                 <option value="10">10</option>
                 <option value="20">20</option>
@@ -74,7 +74,8 @@
 <script>
 
 let submit = document.getElementById("submit");
-let startincome = document.getElementById("startincome");
+let income = document.getElementById("income");
+let funds = document.getElementById(funds);
 let map = document.getElementById("map");
 let opponent = document.getElementById("opponent");
 let mainform = document.getElementById("creategameform");
@@ -123,13 +124,30 @@ if (userId == null){
         for (let i = 0; i < opponentslist.length; i++){
             let curop = opponentslist[i];
             let id = curop["id"];
-            let name = curop["username"];
-            let opOption = document.createElement("option");
-            opOption.textContent = name;
-            opOption.value = id; 
-            opponent.appendChild(opOption);
+            if (id != userId){
+                let name = curop["username"];
+                let opOption = document.createElement("option");
+                opOption.textContent = name;
+                opOption.value = id; 
+                opponent.appendChild(opOption);
+            }
         }
     });
+
+    submit.addEventListener(() => {
+        let fog = document.querySelector('input[name="fogofwar"]:checked').value;
+        let mapid = map.value;
+        let selectedMap = maps.fetch(c => c.id == mapid);
+        let selectedOp = opponent.value; 
+        let selectedIncome = income.value;
+        let selectedFunds = funds.value; 
+        console.log(fog);
+        console.log(mapid);
+        console.log(selectedMap);
+        console.log(selectedOp);
+        console.log(selectedIncome);
+        console.log(selectedFunds);
+    })
 }
 
 function getUserId() {
