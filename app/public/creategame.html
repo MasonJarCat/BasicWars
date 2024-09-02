@@ -174,7 +174,8 @@ if (userId == null){
                     }                   
                 })
             }
-        } catch {
+        } catch (error) {
+            console.log(error);
             allfieldsrequired.textContent = "Error: Please fill out all fields";
             return;
         }
