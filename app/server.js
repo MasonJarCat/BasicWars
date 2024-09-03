@@ -222,7 +222,9 @@ app.post("/add/game", (req, res) => {
   pool.query(text, values).then(result => {
     res.setHeader('Content-Type', 'application/json');
     return res.json(result.rows[0]);
-  }).catch(err => res.status(500).json({ error: err.message }));
+  }).catch(err => {
+    console.log(err);
+    res.status(500).json({ error: err.message });});
 });
 
 app.post("/add/unit", (req, res) => {
