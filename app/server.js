@@ -143,6 +143,10 @@ app.get("/creategame", (req, res) =>{
   res.sendFile(path.join(__dirname, 'public', 'creategame.html'));
 });
 
+app.get("/lobby", (req, res) =>{
+  res.sendFile(path.join(__dirname, 'public', 'lobby.html'));
+});
+
 app.get("/gamescreen/:spritename", (req, res) =>{
   res.sendFile(path.join(__dirname, 'public', 'sprites', req.params.spritename));
 });
