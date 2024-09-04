@@ -76,11 +76,11 @@ async function initLobby(){
     const openGamesResponse = await fetch("/opengames?userId=" + userId, {method: "GET"});
     const openGamesBody = await openGamesResponse.json();
     games = openGamesBody.rows;
-    
+
     console.log(maps);
     console.log(users);
     console.log(games);
-    for (let i = 0; i < games.size; i++){
+    for (let i = 0; i < games.length; i++){
         console.log(games[i]);
         let title = games[i].title;
         let hostname = users.find(c => c.id == games[i].p1_id).username; 
