@@ -252,7 +252,7 @@ app.post("/joingame", (req, res) => {
     return res.sendStatus(400);
   }
 
-  const query = "UPDATE games SET p2_id = $1 WHERE id = $2";
+  const text = "UPDATE games SET p2_id = $1 WHERE id = $2";
 
   const values = [userId, gameId];
 
