@@ -152,6 +152,11 @@ if (userId == null){
             let selectedIncome = income.value;
             let selectedFunds = funds.value; 
             let title = gamename.value;
+            if (selectedOp === "null"){
+                selectedOp = null;
+            } else {
+                selectedOp = parseInt(selectedOp);
+            }
             console.log(fog);
             console.log(mapid);
             console.log(selectedMap);
