@@ -94,7 +94,7 @@ async function initLobby(){
         let joinButton = document.createElement("button");
         joinButton.textContent = "Join";
 
-        joinButton.addEventListener("click", joinGame(games[i].id));
+        joinButton.addEventListener("click", () => joinGame(games[i].id));
 
         titleDiv.textContent = "Game title: " + title;
         hostDiv.textContent = "Host: " + hostname;
