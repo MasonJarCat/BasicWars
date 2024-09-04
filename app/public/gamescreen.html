@@ -460,6 +460,7 @@
         clearUnitMenu();
         selectedUnit = {'sprite': sprite, 'type': type, 'stats': stats};
         if (attackWithUnit) {
+            console.log(`attacking unit: ${attackingUnit},stats ${attackingUnit.stats}`);
             attackUnit(attacking_unit, { sprite, type, stats });
         }
 
@@ -517,6 +518,7 @@
     }
 
     function attackUnit(attackingUnit, targetUnit) {
+        console.log(`attacking unit: ${attackingUnit},stats ${attackingUnit.stats}`);
         if (!attackingUnit || !targetUnit) {
             console.log('One or both units not found.');
             return;
