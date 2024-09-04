@@ -248,7 +248,7 @@ app.get("/opengames", (req, res) => {
 app.post("/joingame", (req, res) => {
   let userId = parseInt(req.body.userId); 
   let gameId = parseInt(req.body.gameId); 
-  if (userId.isNaN() || gameId.isNaN()){
+  if (userId == NaN || gameId == NaN){
     return res.sendStatus(400);
   }
 
