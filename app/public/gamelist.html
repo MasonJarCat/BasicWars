@@ -15,30 +15,71 @@
 
     </div>
 
+    <div id="notloggedin"></div>
+
     <div id="links">
         <a href="./index.html">Back to homepage</a>
     </div>
 
     <script>
         let games = document.getElementById("gamelist");
+        const userId = getUserId();
 
-        fetch("/games", {
-            method: "GET"
-        }).then(response => {
-            console.log("Data get");
-            return response.json();
-        }).then(body => {
-            if (body.rows.length <= 0){
-                console.log("No games found")
-            } else {
-                for (let i = 0; i < body.rows.length; i++){
-                    let gamelink = document.createElement("a");
-                    gamelink.textContent = body.rows[i].title;
-                    gamelink.href = "/gamescreen?gameid=" + body.rows[i].id + "&mapid=" + body.rows[i]["map_id"];
-                    games.append(gamelink);
+        if (userId == null){
+            notloggedin.textContent = "Error: You must be logged in to join a game."; 
+        } else {
+
+            notloggedin.textContent = ""; 
+
+            fetch("/games?userId=" + userId, {
+                method: "GET"
+            }).then(response => {
+                console.log("Data get");
+                return response.json();
+            }).then(body => {
+                if (body.rows.length <= 0){
+                    console.log("No games found")
+                } else {
+                    for (let i = 0; i < body.rows.length; i++){
+                        let gamelink = document.createElement("a");
+                        gamelink.textContent = body.rows[i].title;
+                        gamelink.href = "/gamescreen?gameid=" + body.rows[i].id + "&mapid=" + body.rows[i]["map_id"];
+                        games.append(gamelink);
+                    }
                 }
-            }
-        });
+            });
+    }
+
+
+        function getUserId() {
+        // Example: Retrieve user ID from a cookie, local storage, or a server API call
+        const userIdFromCookies = getCookie('userId');
+        console.log('User ID from Cookies: ', userIdFromCookies); // Debugging log
+        if (userIdFromCookies) {
+            return userIdFromCookies;
+        }
+
+        const userIdFromLocalStorage = localStorage.getItem('userId');
+        console.log('User ID from Local Storage: ', userIdFromLocalStorage); // Debugging log
+        if (userIdFromLocalStorage) {
+            return userIdFromLocalStorage;
+        }
+
+        return null; 
+    }
+
+    // Helper function to get a cookie by name
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) {
+            const cookieValue = parts.pop().split(';').shift();
+            console.log('Cookie found:', name, '=', cookieValue); // Debugging log
+            return cookieValue;
+        }
+        console.log('Cookie not found:', name); // Debugging log
+        return null;
+    }
     </script>
 </body>
 </html>
