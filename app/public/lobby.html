@@ -79,6 +79,9 @@ async function initLobby(){
         return response.json();
     }).then(body => {
         games = body.rows;
+        console.log(maps);
+        console.log(users);
+        console.log(games);
         for (let i = 0; i < games.size; i++){
             console.log(games[i]);
             let title = games[i].title;
