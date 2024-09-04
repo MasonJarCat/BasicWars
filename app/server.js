@@ -235,14 +235,11 @@ app.get("/opengames", (req, res) => {
 
   let userId = req.query.userId;
 
-  console.log(userId);
-
   const query = "SELECT * FROM games WHERE p2_id = $1 AND p1_id != $2";
   const values = [0, parseInt(userId)];
   
-  pool.query(query)
+  pool.query(query, values)
     .then(result => {
-      console.log(result.rows);
       res.json({ rows: result.rows });}
   )
     .catch(err => res.status(500).json({ error: err.message }));

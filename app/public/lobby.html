@@ -21,6 +21,8 @@
 let gamelist = document.getElementById("gamelist");
 let notloggedin = document.getElementById("notloggedin");
 let games;
+let maps; 
+let users;
 
 const userId = getUserId();
 
@@ -29,17 +31,7 @@ if (userId == null){
 } else {
     notloggedin.textContent = "";
 
-    fetch("/opengames?userId=" + userId, {
-        method: "GET"
-    }).then(response => {
-        return response.json();
-    }).then(body => {
-        console.log(body);
-        games = body.rows;
-        for (let i = 0; i < games.size; i++){
-            console.log(games[i]);
-        }
-    })
+    initLobby();
 }
 
 function getUserId() {
@@ -70,5 +62,56 @@ function getUserId() {
     }
     console.log('Cookie not found:', name); // Debugging log
     return null;
+}
+
+async function initLobby(){
+    const usersResponse = await fetch("/userssafely", {method: "GET"});
+    const usersBody= await usersResponse.json();
+    users = usersBody.rows;
+
+    const mapsResponse = await fetch("/maps", {method: "GET"});
+    const mapsBody = mapsResponse.json();
+    maps = body.rows; 
+
+    fetch("/opengames?userId=" + userId, {
+        method: "GET"
+    }).then(response => {
+        return response.json();
+    }).then(body => {
+        games = body.rows;
+        for (let i = 0; i < games.size; i++){
+            console.log(games[i]);
+            let title = games[i].title;
+            let hostname = users.find(c => c.id == games[i].p1_id).username; 
+            let mapname = maps.find(c => c.id == games[i].map_id).title; 
+
+            let newEntry = document.createElement("div");
+            let titleDiv = document.createElement("div");
+            let hostDiv = document.createElement("div");
+            let mapDiv = document.createElement("div");
+            let joinDiv = document.createElement("div");
+            let joinButton = document.createElement("button");
+            joinButton.textContent = "Join";
+
+            joinButton.addEventListener("click", joinGame(games[i].id));
+
+            titleDiv.textContent = "Game title: " + title;
+            hostDiv.textContent = "Host: " + hostname;
+            mapDiv.textContent = "Map: " + mapname; 
+            joinDiv.appendChild(joinButton);
+
+            newEntry.appendChild(titleDiv);
+            newEntry.appendChild(hostDiv);
+            newEntry.appendChild(mapDiv);
+            newEntry.appendChild(joinDiv);
+
+            gamelist.appendChild(newEntry);
+
+        }
+    })
+}
+
+function joinGame(gameid){
+    console.log(gameid);
 }
 </script>
