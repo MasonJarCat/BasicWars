@@ -42,6 +42,7 @@
                 } else if (body == undefined){
                     console.log("body undefined");
                 } else {
+                    console.log(body);
                     for (let i = 0; i < body.rows.length; i++){
                         let gamelink = document.createElement("a");
                         gamelink.textContent = body.rows[i].title;
