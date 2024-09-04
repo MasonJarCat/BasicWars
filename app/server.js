@@ -245,6 +245,26 @@ app.get("/opengames", (req, res) => {
     .catch(err => res.status(500).json({ error: err.message }));
 });
 
+app.post("/joingame", (req, res) => {
+  let userId = parseInt(req.body.userId); 
+  let gameId = parseInt(req.body.gameId); 
+  if (userId.isNaN() || gameId.isNaN()){
+    return res.sendStatus(400);
+  }
+
+  const query = "UPDATE games SET p2_id = $1 WHERE id = $2";
+
+  const values = [userId, gameId];
+
+  pool.query(text, values).then(result => {
+    res.setHeader('Content-Type', 'application/json');
+    return res.json(result.rows[0]);
+  }).catch(err => {
+    console.log(err);
+    res.status(500).json({ error: err.message });});
+
+});
+
 
 //Fitz's add game & lobby queries end here
 

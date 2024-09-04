@@ -15,11 +15,14 @@
 
     <div id="notloggedin"></div>
 
+    <div id="joinerror"></div>
+
 </body>
 
 <script>
 let gamelist = document.getElementById("gamelist");
 let notloggedin = document.getElementById("notloggedin");
+let joinerror = document.getElementById("joinerror");
 let games;
 let maps; 
 let users;
@@ -110,7 +113,19 @@ async function initLobby(){
     }
 }
 
-function joinGame(gameid){
-    console.log(gameid);
+function joinGame(gameId){
+    fetch("/joingame", {
+        method: "POST",
+        headers : {"Content-Type": "application/json"},
+        body: JSON.stringify({"userId": userId, "gameId": gameId})
+    }).then(response => {
+        console.log(response.status);
+        if (response.status == 200){
+            window.location.href = "https://basicwars.fly.dev/gamelist";
+        } else {
+            console.log(response);
+            joinerror.textContent = "Error: something went wrong with joining the game";
+        }                   
+    })
 }
 </script>
