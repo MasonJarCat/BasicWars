@@ -73,45 +73,41 @@ async function initLobby(){
     const mapsBody = await mapsResponse.json();
     maps = mapsBody.rows; 
 
-    fetch("/opengames?userId=" + userId, {
-        method: "GET"
-    }).then(response => {
-        return response.json();
-    }).then(body => {
-        games = body.rows;
-        console.log(maps);
-        console.log(users);
-        console.log(games);
-        for (let i = 0; i < games.size; i++){
-            console.log(games[i]);
-            let title = games[i].title;
-            let hostname = users.find(c => c.id == games[i].p1_id).username; 
-            let mapname = maps.find(c => c.id == games[i].map_id).title; 
+    const openGamesResponse = await fetch("/opengames?userId=" + userId, {method: "GET"});
+    const openGamesBody = await openGamesResponse.json();
+    games = openGamesBody.rows;
+    
+    console.log(maps);
+    console.log(users);
+    console.log(games);
+    for (let i = 0; i < games.size; i++){
+        console.log(games[i]);
+        let title = games[i].title;
+        let hostname = users.find(c => c.id == games[i].p1_id).username; 
+        let mapname = maps.find(c => c.id == games[i].map_id).title; 
 
-            let newEntry = document.createElement("div");
-            let titleDiv = document.createElement("div");
-            let hostDiv = document.createElement("div");
-            let mapDiv = document.createElement("div");
-            let joinDiv = document.createElement("div");
-            let joinButton = document.createElement("button");
-            joinButton.textContent = "Join";
+        let newEntry = document.createElement("div");
+        let titleDiv = document.createElement("div");
+        let hostDiv = document.createElement("div");
+        let mapDiv = document.createElement("div");
+        let joinDiv = document.createElement("div");
+        let joinButton = document.createElement("button");
+        joinButton.textContent = "Join";
 
-            joinButton.addEventListener("click", joinGame(games[i].id));
+        joinButton.addEventListener("click", joinGame(games[i].id));
 
-            titleDiv.textContent = "Game title: " + title;
-            hostDiv.textContent = "Host: " + hostname;
-            mapDiv.textContent = "Map: " + mapname; 
-            joinDiv.appendChild(joinButton);
+        titleDiv.textContent = "Game title: " + title;
+        hostDiv.textContent = "Host: " + hostname;
+        mapDiv.textContent = "Map: " + mapname; 
+        joinDiv.appendChild(joinButton);
 
-            newEntry.appendChild(titleDiv);
-            newEntry.appendChild(hostDiv);
-            newEntry.appendChild(mapDiv);
-            newEntry.appendChild(joinDiv);
+        newEntry.appendChild(titleDiv);
+        newEntry.appendChild(hostDiv);
+        newEntry.appendChild(mapDiv);
+        newEntry.appendChild(joinDiv);
 
-            gamelist.appendChild(newEntry);
-
-        }
-    })
+        gamelist.appendChild(newEntry);
+    }
 }
 
 function joinGame(gameid){
