@@ -209,8 +209,6 @@ app.post("/add/game", (req, res) => {
     return res.sendStatus(400);
   }
 
-  console.log(p2_id);
-
   let p1_units = [];
   let p2_units = [];
   let p1_income = parseInt(starter_income);
@@ -218,7 +216,7 @@ app.post("/add/game", (req, res) => {
   let p1_funds = parseInt(starter_funds);
   let p2_funds = parseInt(starter_funds);
   let text = "INSERT INTO games(title, p1_id, p2_id, map_id, p1_units, p2_units, starter_income, p1_funds, p2_funds, p1_income, p2_income, tile_owners, fog, turn) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id";
-  let values = [title, parseInt(p1_id), p2_id, parseInt(map_id), p1_units, p2_units, parseInt(starter_income), p1_funds, p2_funds, p1_income, p2_income, tile_owners, fog, 1];
+  let values = [title, parseInt(p1_id), pareseInt(p2_id), parseInt(map_id), p1_units, p2_units, parseInt(starter_income), p1_funds, p2_funds, p1_income, p2_income, tile_owners, fog, 1];
 
   if (title.length > 25 || values.some(value => Number.isNaN(value))) {
     return res.sendStatus(400);
@@ -237,7 +235,8 @@ app.get("/opengames", (req, res) => {
 
   let userId = req.query.userId;
 
-  const query = "SELECT * FROM games WHERE p2_id = null AND p1_id != " + userId;
+  const query = "SELECT * FROM games WHERE p2_id = $1 AND p1_id != $2";
+  const values = [0, parseInt(userId)];
   
   pool.query(query)
     .then(result => {
@@ -393,7 +392,7 @@ app.get("/games", (req, res) => {
   let userId = req.query.userId;
   console.log(userId);
   const query = "SELECT * FROM games WHERE (p1_id = $1 AND p2_id != $2) OR p2_id = $1";
-  const values = [parseInt(userId), null];
+  const values = [parseInt(userId), 0];
 
   //const query = "SELECT * FROM games";
   console.log(query);

@@ -21,7 +21,7 @@
             <label for="opponent">Select Your Opponent:</label>
             <select id="opponent" name="opponent">
                 <option value="">Please select your opponent</option>
-                <option value="null">None - posts game to the open games lobby</option>
+                <option value="0">None - posts game to the open games lobby</option>
             </select>
         </div>       
 
@@ -152,11 +152,6 @@ if (userId == null){
             let selectedIncome = income.value;
             let selectedFunds = funds.value; 
             let title = gamename.value;
-            if (selectedOp === "null"){
-                selectedOp = null;
-            } else {
-                selectedOp = parseInt(selectedOp);
-            }
             console.log(fog);
             console.log(mapid);
             console.log(selectedMap);
