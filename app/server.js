@@ -209,11 +209,7 @@ app.post("/add/game", (req, res) => {
     return res.sendStatus(400);
   }
 
-  if (p2_id == "null"){
-    p2_id = null;
-  } else {
-    p2_id = parseInt(p2_id);
-  }
+  console.log(p2_id);
 
   let p1_units = [];
   let p2_units = [];
@@ -396,11 +392,13 @@ app.post('/updateGameState', authenticateUser, async (req, res) => {
 app.get("/games", (req, res) => {
   let userId = req.query.userId;
   console.log(userId);
-  const query = "SELECT * FROM games WHERE (p1_id = $1 AND p2_id != $2) OR p2_id = $1";
-  const values = [parseInt(userId), null];
+  //const query = "SELECT * FROM games WHERE (p1_id = $1 AND p2_id != $2) OR p2_id = $1";
+  //const values = [parseInt(userId), null];
+
+  const query = "SELECT * FROM games";
   console.log(query);
 
-  pool.query(query, values)
+  pool.query(query)
     .then(result => {
       console.log(result.rows);
       res.json({ rows: result.rows });
