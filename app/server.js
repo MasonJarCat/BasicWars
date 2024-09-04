@@ -396,8 +396,8 @@ app.post('/updateGameState', authenticateUser, async (req, res) => {
 app.get("/games", (req, res) => {
   let userId = req.query.userId;
   console.log(userId);
-  const query = "SELECT * FROM games WHERE (p1_id = $1 AND p2_id != null) OR p2_id = $1";
-  const values = [parseInt(userId)];
+  const query = "SELECT * FROM games WHERE (p1_id = $1 AND p2_id != $2) OR p2_id = $1";
+  const values = [parseInt(userId), null];
   console.log(query);
 
   pool.query(query, values)
