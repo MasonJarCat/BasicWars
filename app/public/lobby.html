@@ -70,7 +70,7 @@ async function initLobby(){
     users = usersBody.rows;
 
     const mapsResponse = await fetch("/maps", {method: "GET"});
-    const mapsBody = mapsResponse.json();
+    const mapsBody = await mapsResponse.json();
     maps = mapsBody.rows; 
 
     fetch("/opengames?userId=" + userId, {
