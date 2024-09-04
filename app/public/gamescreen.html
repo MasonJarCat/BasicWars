@@ -595,7 +595,7 @@
 
     
     function isTargetInRange(attackingUnit, targetUnit) {
-        console.log(attackingUnit.stats);
+        console.log(`attacking unit: ${attackingUnit},stats ${attackingUnit.stats}`);
         const dx = Math.abs(attackingUnit.stats.pos_x - targetUnit.stats.pos_x);
         const dy = Math.abs(attackingUnit.stats.pos_y - targetUnit.stats.pos_y);
         const distance = dx + dy;
