@@ -20,6 +20,7 @@
 <script>
 let gamelist = document.getElementById("gamelist");
 let notloggedin = document.getElementById("notloggedin");
+let games;
 
 const userId = getUserId();
 
@@ -27,6 +28,18 @@ if (userId == null){
     notloggedin.textContent = "Error: You must be logged in to join a game."; 
 } else {
     notloggedin.textContent = "";
+
+    fetch("/opengames?userId=" + userId, {
+        method: "GET"
+    }).then(response => {
+        return response.json();
+
+    }).then(body => {
+        games = body.rows;
+        for (let i = 0; i < games.size; i++){
+            console.log(games[i]);
+        }
+    })
 }
 
 function getUserId() {

@@ -237,7 +237,9 @@ app.post("/add/game", (req, res) => {
 app.get("/opengames", (req, res) => {
   res.setHeader('Content-Type', 'application/json');
 
-  const query = "SELECT * FROM games WHERE p2_id = null";
+  let userId = req.query.userId;
+
+  const query = "SELECT * FROM games WHERE p2_id = null AND p1_id != " + userId;
   
   pool.query(query)
     .then(result => {
