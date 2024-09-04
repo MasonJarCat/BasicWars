@@ -235,6 +235,8 @@ app.get("/opengames", (req, res) => {
 
   let userId = req.query.userId;
 
+  console.log(userId);
+
   const query = "SELECT * FROM games WHERE p2_id = $1 AND p1_id != $2";
   const values = [0, parseInt(userId)];
   

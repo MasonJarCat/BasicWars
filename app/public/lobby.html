@@ -33,7 +33,6 @@ if (userId == null){
         method: "GET"
     }).then(response => {
         return response.json();
-
     }).then(body => {
         games = body.rows;
         for (let i = 0; i < games.size; i++){
