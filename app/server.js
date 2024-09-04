@@ -393,10 +393,15 @@ app.post('/updateGameState', authenticateUser, async (req, res) => {
 // Get all games
 app.get("/games", (req, res) => {
   let userId = req.query.userId;
-  const query = "SELECT * FROM games WHERE (p1_id = " + userId + "AND p2_id != null) OR p2_id = " + userId; ;
+  console.log(userId);
+  const query = "SELECT * FROM games WHERE (p1_id = " + userId + "AND p2_id != null) OR p2_id = " + userId;
+  console.log(query);
 
   pool.query(query)
-    .then(result => res.json({ rows: result.rows }))
+    .then(result => {
+      console.log(result.rows);
+      res.json({ rows: result.rows });
+    })
     .catch(err => res.status(500).json({ error: err.message }));
 });
 

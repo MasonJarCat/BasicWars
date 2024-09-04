@@ -39,6 +39,8 @@
             }).then(body => {
                 if (body.rows.length <= 0){
                     console.log("No games found")
+                } else if (body == undefined){
+                    console.log("body undefined");
                 } else {
                     for (let i = 0; i < body.rows.length; i++){
                         let gamelink = document.createElement("a");
