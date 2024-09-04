@@ -205,7 +205,7 @@ app.get("/userssafely", (req, res) => {
 app.post("/add/game", (req, res) => {
   let { title, p1_id, p2_id, map_id, starter_income, starter_funds, tile_owners, fog } = req.body;
   
-  if (!title || !p1_id || !p2_id || !map_id || !starter_income || !starter_funds || !tile_owners || (fog == undefined)) {
+  if (!title || !p1_id || p2_id === "" || !map_id || !starter_income || !starter_funds || !tile_owners || (fog == undefined)) {
     return res.sendStatus(400);
   }
 
@@ -390,7 +390,7 @@ app.post('/updateGameState', authenticateUser, async (req, res) => {
   }
 });
 
-// Get all games
+// Get all games according to a given user id
 app.get("/games", (req, res) => {
   let userId = req.query.userId;
   console.log(userId);
