@@ -176,7 +176,7 @@ app.get("/gameunits", (req, res) => {
   }).catch(err => res.status(500).json({ error: err.message }));
 });
 
-//Fitz's create game queries start here
+//Fitz's create game & lobby queries start here
 
 app.get("/maps", (req, res) => {
   res.setHeader('Content-Type', 'application/json');
@@ -209,6 +209,10 @@ app.post("/add/game", (req, res) => {
     return res.sendStatus(400);
   }
 
+  if (p2_id == "null"){
+    p2_id = null;
+  }
+
   let p1_units = [];
   let p2_units = [];
   let p1_income = parseInt(starter_income);
@@ -229,6 +233,21 @@ app.post("/add/game", (req, res) => {
     console.log(err);
     res.status(500).json({ error: err.message });});
 });
+
+app.get("/opengames", (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+
+  const query = "SELECT * FROM games WHERE p2_id = null";
+  
+  pool.query(query)
+    .then(result => {
+      res.json({ rows: result.rows });}
+  )
+    .catch(err => res.status(500).json({ error: err.message }));
+});
+
+
+//Fitz's add game & lobby queries end here
 
 app.post("/add/unit", (req, res) => {
   let { type_id, game_id, player_id, pos_x, pos_y, isP1 } = req.body;

@@ -21,6 +21,7 @@
             <label for="opponent">Select Your Opponent:</label>
             <select id="opponent" name="opponent">
                 <option value="">Please select your opponent</option>
+                <option value="null">None - posts game to the open games lobby</option>
             </select>
         </div>       
 
@@ -158,7 +159,7 @@ if (userId == null){
             console.log(selectedIncome);
             console.log(selectedFunds);
             console.log(title);
-            if (fog === undefined || mapid == "" || selectedOp == "" || selectedIncome == "" || selectedFunds == "" || title == ""){
+            if (fog === undefined || mapid == "" || selectedOp === "" || selectedIncome == "" || selectedFunds == "" || title == ""){
                 console.log("squnt");
                 allfieldsrequired.textContent = "Error: Please fill out all fields";
             } else {
