@@ -242,6 +242,7 @@
             unitSprite.y = unit.pos_y * 16;
             
             // Set event handler for clicking the unit
+            console.log("stats",unit,typeof unit.cur_hp)
             unitSprite.on('click', (event) => onClickUnit(unitSprite, unitType, unit));
             unitSprite.eventMode = 'dynamic';
             
@@ -541,16 +542,19 @@
         console.log('Attacking unit:', attackingUnit, 'Stats:', attackingUnit.stats);
         
         if (!attackingUnit || !targetUnit) {
+            attackWithUnit = false;
             console.log('One or both units not found.');
             return;
         }
     
         if (!isTargetInRange(attackingUnit, targetUnit)) {
+            attackWithUnit = false;
             console.log('Target is out of range.');
             return;
         }
     
         if (attackingUnit.stats.player_id === targetUnit.stats.player_id) {
+            attackWithUnit = false;
             console.log('Cannot attack units of the same team.');
             return;
         }
