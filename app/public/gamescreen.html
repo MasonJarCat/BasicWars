@@ -338,16 +338,16 @@
         });
     }
 
-    function onClickTerrain(terrain, x, y, type){
-        if (selectedUnit && movingselectedunit){
+    function onClickTerrain(terrain, x, y, type) {
+        if (selectedUnit && movingselectedunit) {
             let goalCell = selectedUnitMovableTiles.find(c => c['pos_x'] == x && c['pos_y'] == y);
-            if (goalCell){
+            if (goalCell) {
                 selectedUnit.sprite.x = terrain.x;
                 selectedUnit.sprite.y = terrain.y;
                 selectedUnit.stats.pos_x = x;
                 selectedUnit.stats.pos_y = y;
                 selectedUnit['stats']['can_move_this_turn'] = false; 
-                if (fogEnabled){
+                if (fogEnabled) {
                     drawFog();
                 }
                 updateUnitStats(selectedUnit);
@@ -355,17 +355,26 @@
                 console.log('Out of range');
             }
         } else {
-            if (type['canprintunits']){
-                type['unitprintlist'].forEach(unitTypeID => {
-                    let unitType = unittypes.find(c => c['id'] == unitTypeID);
-                    let printRow = document.createElement('div'); 
-                    printRow.textContent = unitType['title'] + ", " + unitType['cost']; 
-                    let buybutton = document.createElement('button');
-                    buybutton.addEventListener('click', () => buyUnit(unitType, x, y, terrain.x, terrain.y));
-                    buybutton.textContent = "buy";
-                    printRow.append(buybutton);
-                    unitproductionmenu.append(printRow);
-                });
+            // Check if terrain is owned by the current player
+            const terrainOwner = gamedata.tile_owners[y][x]; // Assuming tile_owners is a 2D array
+    
+            if ((isPlayer1Turn && terrainOwner === 1 && parseInt(currentPlayerId) === gamedata.p1_id) ||
+                (!isPlayer1Turn && terrainOwner === 2 && parseInt(currentPlayerId) === gamedata.p2_id)) {
+                
+                if (type['canprintunits']) {
+                    type['unitprintlist'].forEach(unitTypeID => {
+                        let unitType = unittypes.find(c => c['id'] == unitTypeID);
+                        let printRow = document.createElement('div');
+                        printRow.textContent = unitType['title'] + ", " + unitType['cost'];
+                        let buybutton = document.createElement('button');
+                        buybutton.addEventListener('click', () => buyUnit(unitType, x, y, terrain.x, terrain.y));
+                        buybutton.textContent = "buy";
+                        printRow.append(buybutton);
+                        unitproductionmenu.append(printRow);
+                    });
+                }
+            } else {
+                console.log("Terrain not owned by current player");
             }
         }
         selectedUnit = null; 
@@ -532,8 +541,8 @@
         console.log("unit1",unit2);
         const healthFactor1 = unit1.cur_hp / 10;
         const healthFactor2 = unit2.cur_hp / 10;
-        const damageToUnit1 = 1;
-        const damageToUnit2 = 1;
+        const damageToUnit1 = Math.max(4*healthFactor2 - unit1.armor, 0);
+        const damageToUnit2 = Math.max(4*healthFactor1 - unit2.armor, 0);
     
         return { damageToUnit1, damageToUnit2 };
     }
