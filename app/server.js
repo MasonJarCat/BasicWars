@@ -471,7 +471,9 @@ app.post("/add/user", (req, res) => {
     .catch(err => res.status(500).json({ error: err.message }));
 });
 
-
+app.get("/style.css", (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'style.css'));
+});
 
 
 app.get("/loginPage", (req,res) => {
