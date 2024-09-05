@@ -517,7 +517,7 @@
     
                     if (distance <= selectedUnit.type.speed) {
                         selectedUnitMovableTiles.push(mapterrain[i]); 
-                        let movehighlight = PIXI.sprite.from('movehighlight.png');
+                        let movehighlight = PIXI.Sprite.from('movehighlight.png');
                         movehighlight.zIndex = 2; 
                         movehighlight.x = mapterrain[i].sprite.x + 6;
                         movehighlight.y = mapterrain[i].sprite.x + 6;
