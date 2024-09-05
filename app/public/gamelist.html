@@ -18,7 +18,7 @@
     <div id="notloggedin"></div>
 
     <div id="links">
-        <a href="./index.html">Back to homepage</a>
+        <div><a href="./index.html">Back to homepage</a></div>
     </div>
 
     <script>
@@ -45,9 +45,11 @@
                     console.log(body);
                     for (let i = 0; i < body.rows.length; i++){
                         let gamelink = document.createElement("a");
+                        let gamelinkdiv = document.createElement("div");
                         gamelink.textContent = body.rows[i].title;
                         gamelink.href = "/gamescreen?gameid=" + body.rows[i].id + "&mapid=" + body.rows[i]["map_id"];
-                        games.append(gamelink);
+                        gamelinkdiv.append(gamelink);
+                        games.append(gamelinkdiv);
                     }
                 }
             });
