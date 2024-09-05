@@ -457,6 +457,7 @@
     }
 
     function onClickUnit(sprite, type, stats) {
+        console.log("unit", sprite, stats);
         clearUnitMenu();
         selectedUnit = { 'sprite': sprite, 'type': type, 'stats': stats };
     
