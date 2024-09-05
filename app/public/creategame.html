@@ -6,6 +6,52 @@
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Horizontal Navbar Style */
+        .navbar {
+            display: flex;
+            background-color: #333;
+            justify-content: center;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: white;
+            padding: 14px 20px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .navbar a:hover {
+            background-color: #575757;
+        }
+
+        /* Content Style */
+        .content {
+            padding: 60px 20px; /* Add padding to prevent content from going under the fixed navbar */
+        }
+    </style>
+
+    <!-- Horizontal Navbar -->
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/gamelist">Game List</a>
+        <a href="/gamescreen">Game Screen</a>
+        <a href="/creategame">Create Game</a>
+        <a href="/lobby">Lobby</a>
+    </div>
 
     <h1>Create A New Game</h1>
 
