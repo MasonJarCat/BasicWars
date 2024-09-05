@@ -539,6 +539,13 @@
     function calculateDamage(unit1, unit2) {
         console.log("unit1",unit1);
         console.log("unit2",unit2);
+        let u1stats = unit1.stats;
+        let u2stats = unit2.stats; 
+        let u1row = mapdata.terrain[u1stats.pos_y];
+        let u1tiletype = u1row[u1stats.pos_x];
+        let u1tileData = terraintypes.find(c => c.id == u1tiletype);
+        let u1cover = u1tileData.cover; 
+        
         const healthFactor1 = unit1.cur_hp / 10;
         const healthFactor2 = unit2.cur_hp / 10;
         const damageToUnit1 = 2;
@@ -571,7 +578,7 @@
         attackWithUnit = false;
         attacking_unit['stats']['can_attack_this_turn'] = false;
     
-        const { damageToUnit1, damageToUnit2 } = calculateDamage(attackingUnit.stats, targetUnit.stats);
+        const { damageToUnit1, damageToUnit2 } = calculateDamage(attackingUnit, targetUnit);
     
         attackingUnit.stats.cur_hp -= damageToUnit1;
         targetUnit.stats.cur_hp -= damageToUnit2;
