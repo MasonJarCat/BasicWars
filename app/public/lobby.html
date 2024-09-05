@@ -9,12 +9,15 @@
 
     <!-- Horizontal Navbar -->
     <div class="navbar">
+        <div class="navbar-left">
         <a href="/">Home</a>
         <a href="/gamelist">Game List</a>
         <a href="/gamescreen">Game Screen</a>
         <a href="/creategame">Create Game</a>
         <a href="/lobby">Lobby</a>
         <a href="/loginPage">login</a>
+        </div>
+        <div class="navbar-right" id="loggedinUser">Not logged in</div>
     </div>
 
     <div class="content">
@@ -138,6 +141,20 @@
                 }                   
             })
         }
+
+        function displayLoggedInUser() {
+            const loggedInUserDiv = document.getElementById("loggedinUser");
+            const loggedInUser = getLoggedInUser();
+
+            if (loggedInUser) {
+                loggedInUserDiv.textContent = loggedInUser;
+            } else {
+                loggedInUserDiv.textContent = "Not logged in";
+            }
+        }
+
+        // Call the function when the page loads
+        displayLoggedInUser();
     </script>
 </body>
 </html>
