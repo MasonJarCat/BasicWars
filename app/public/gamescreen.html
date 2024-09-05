@@ -96,9 +96,22 @@
     }
 
     async function initGame() {
+
+        // Fetch map data
+        const mapResponse = await fetch("/map" + querystring, { method: "GET" });
+        const mapBody = await mapResponse.json();
+        if (mapBody.rows.length <= 0) {
+            console.log("No game found");
+        } else {
+            mapdata = mapBody.rows[0];
+            maptitle.textContent = mapdata.title;
+        }
+
+        let canvasWidth = mapdata.width * 16;
+        let canvasHeight = mapdata.height * 16;
         // Initialize PIXI app without passing options directly
         
-        await app.init({ width: 640, height: 360 });
+        await app.init({ width: canvasWidth, height: canvasHeight});
     
         // Append the canvas to the body using `canvas` instead of `view`
         document.body.appendChild(app.canvas);
@@ -172,21 +185,12 @@
         const unitBody = await unitResponse.json();
         unittypes = unitBody.rows;
 
+        buildMap(mapdata);
+
         // Fetch game units
         const gameUnitsResponse = await fetch("/gameunits" + querystring, { method: "GET" });
         const gameUnitsBody = await gameUnitsResponse.json();
         gameunits = gameUnitsBody.rows;
-
-        // Fetch map data
-        const mapResponse = await fetch("/map" + querystring, { method: "GET" });
-        const mapBody = await mapResponse.json();
-        if (mapBody.rows.length <= 0) {
-            console.log("No game found");
-        } else {
-            mapdata = mapBody.rows[0];
-            maptitle.textContent = mapdata.title;
-            buildMap(mapdata);
-        }
 
         const gameStateResponse = await fetch("/game" + querystring, { method: "GET" });
         const gameStateBody = await gameStateResponse.json();
