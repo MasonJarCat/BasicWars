@@ -524,7 +524,7 @@
                         app.stage.addChild(movehighlight);
                         highlightLayer.push(movehighlight);
                     }
-                    if (distance >= selectedUnit.type.minrange && distance <= selectedUnit.type.maxrange) {
+                    if (distance > selectedUnit.type.minrange && distance <= selectedUnit.type.maxrange) {
                         selectedUnitAttackableTiles.push(mapterrain[i]);
                     }
                 }
@@ -603,8 +603,12 @@
             u1totalDam = u1totalDam / 2;
         }
 
-        const damageToUnit1 = Math.floor(u1totalDam) + 1;
-        const damageToUnit2 = Math.floor(u2totalDam) + 1;
+        if (!isTargetInRange(unit2, unit1)){
+            u1totalDam = 0;
+        }
+
+        const damageToUnit1 = Math.floor(u1totalDam);
+        const damageToUnit2 = Math.floor(u2totalDam);
     
         return { damageToUnit1, damageToUnit2 };
     }
@@ -716,7 +720,7 @@
         const dy = Math.abs(attackingUnit.stats.pos_y - targetUnit.stats.pos_y);
         const distance = dx + dy;
 
-        return distance >= attackingUnit.type.minrange && distance <= attackingUnit.type.maxrange;
+        return distance > attackingUnit.type.minrange && distance <= attackingUnit.type.maxrange;
     }
 
     function moveUnit(sprite, type, stats) {
