@@ -110,9 +110,9 @@
             PIXI.Assets.load('neutralfactory.png'),
             PIXI.Assets.load('neutralHQ.png'),
             PIXI.Assets.load('redfactory.png'),
-            PIXI.Assets.load('redHQ.png'),
+            PIXI.Assets.load('redhq.png'),
             PIXI.Assets.load('bluefactory.png'),
-            PIXI.Assets.load('blueHQ.png'),
+            PIXI.Assets.load('bluehq.png'),
             PIXI.Assets.load('plains.png'),
             PIXI.Assets.load('mountain.png'),
             PIXI.Assets.load('forest.png'),
@@ -539,10 +539,56 @@
     function calculateDamage(unit1, unit2) {
         console.log("unit1",unit1);
         console.log("unit2",unit2);
-        const healthFactor1 = unit1.cur_hp / 10;
-        const healthFactor2 = unit2.cur_hp / 10;
-        const damageToUnit1 = 2;
-        const damageToUnit2 = 2;
+        let u1stats = unit1.stats;
+        let u1hp = u1stats.cur_hp;
+
+        let u1dam = unit1.type['attack_power'];
+        let u1armor = unit1.type['armor'];
+        let u1ap = unit1.type['armor_pierce'];
+        let u1sa = unit1.type['strong_against'];
+        let u1wa = unit1.type['weak_against'];
+        let u1totalDam;
+        
+        let u1row = mapdata.terrain[u1stats.pos_y];
+        let u1tiletype = u1row[u1stats.pos_x];
+        let u1tileData = terraintypes.find(c => c.id == u1tiletype);
+        let u1cover = u1tileData.cover; 
+
+        let u2stats = unit2.stats; 
+        let u2hp = u2stats.cur_hp;
+
+        let u2dam = unit2.type['attack_power'];
+        let u2ap = unit2.type['armor_pierce'];
+        let u2sa = unit2.type['strong_against'];
+        let u2wa = unit2.type['weak_against'];
+        let u2totalDam;
+
+        let u2row = mapdata.terrain[u2stats.pos_y];
+        let u2tiletype = u2row[u2stats.pos_x];
+        let u2tileData = terraintypes.find(c => c.id == u2tiletype);
+        let u2cover = u1tileData.cover; 
+
+        
+        u2totalDam = (u1dam - (u2cover + u2armor - u1ap)) * (u1hp / 10);
+
+        if (u1sa.contains(unit2.type.id)){
+            u2totalDam = u2totalDam * 2; 
+        }
+        if (u1wa.contains(unit2.type.id)){
+            u2totalDam = u2totalDam / 2;
+        }
+
+        u1totalDam = (u2dam - (u1cover + u1armor - u2ap)) * ((u2hp - u2totalDam) / 10);
+
+        if (u2sa.contains(unit1.type.id)){
+            u1totalDam = u1totalDam * 2; 
+        }
+        if (u2wa.contains(unit1.type.id)){
+            u1totalDam = u1totalDam / 2;
+        }
+
+        const damageToUnit1 = Math.floor(u1totalDam) + 1;
+        const damageToUnit2 = Math.floor(u2totalDam) + 1;
     
         return { damageToUnit1, damageToUnit2 };
     }
@@ -571,7 +617,7 @@
         attackWithUnit = false;
         attacking_unit['stats']['can_attack_this_turn'] = false;
     
-        const { damageToUnit1, damageToUnit2 } = calculateDamage(attackingUnit.stats, targetUnit.stats);
+        const { damageToUnit1, damageToUnit2 } = calculateDamage(attackingUnit, targetUnit);
     
         attackingUnit.stats.cur_hp -= damageToUnit1;
         targetUnit.stats.cur_hp -= damageToUnit2;
