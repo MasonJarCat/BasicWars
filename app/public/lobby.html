@@ -141,18 +141,42 @@
                 }                   
             })
         }
-
+        function getLoggedInUserId() {
+            const userIdFromCookies = getCookie('userId');
+            if (userIdFromCookies) {
+                return userIdFromCookies;
+            }
+        
+            const userIdFromLocalStorage = localStorage.getItem('userId');
+            if (userIdFromLocalStorage) {
+                return userIdFromLocalStorage;
+            }
+        
+            return null;
+        }
         function displayLoggedInUser() {
             const loggedInUserDiv = document.getElementById("loggedinUser");
-            const loggedInUser = getLoggedInUser();
-
-            if (loggedInUser) {
-                loggedInUserDiv.textContent = loggedInUser;
+            const userId = getLoggedInUserId();
+        
+            if (userId) {
+                // Make a request to the server to get the username
+                fetch(`/username/${userId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.username) {
+                            loggedInUserDiv.textContent = `Welcome, ${data.username}`;
+                        } else {
+                            loggedInUserDiv.textContent = "Not logged in";
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching username:', error);
+                        loggedInUserDiv.textContent = "Not logged in";
+                    });
             } else {
                 loggedInUserDiv.textContent = "Not logged in";
             }
         }
-
         // Call the function when the page loads
         displayLoggedInUser();
     </script>
