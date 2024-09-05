@@ -827,6 +827,7 @@
     }
 
     function clearHighlight(){
+        console.log('clearing highlight');
         highlightLayer.forEach(sprite => sprite.parent.removeChild(sprite));
         highlightLayer = new Array();
     }
