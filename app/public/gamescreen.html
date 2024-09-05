@@ -456,52 +456,130 @@
         app.stage.addChild(sprite);
     }
 
-    function onClickUnit(sprite, type, stats){
+    function onClickUnit(sprite, type, stats) {
         clearUnitMenu();
-        selectedUnit = {'sprite': sprite, 'type': type, 'stats': stats};
+        selectedUnit = { 'sprite': sprite, 'type': type, 'stats': stats };
+    
+        // Check if the current player owns the unit
+        const currentPlayerOwnsUnit = 
+            (parseInt(currentPlayerId) === gamedata.p1_id && isPlayer1Turn && stats.player_id === gamedata.p1_id) ||
+            (parseInt(currentPlayerId) === gamedata.p2_id && !isPlayer1Turn && stats.player_id === gamedata.p2_id);
+    
+        // Only allow attack with units owned by the current player
         if (attackWithUnit) {
-            console.log(`attacking unit: ${selectedUnit},stats ${selectedUnit.stats}`);
+            console.log('Attacking unit:', selectedUnit, 'Stats:', selectedUnit.stats);
             attackUnit(attacking_unit, selectedUnit);
         }
-
-        selectedUnitMovableTiles = new Array();
-        selectedUnitAttackableTiles = new Array();
-        let statblock = document.createElement('p'); 
-        statblock.textContent = 'unit type: ' + type['title'] +', hp: ' + stats['cur_hp'];
+    
+        // Initialize movable and attackable tile arrays
+        selectedUnitMovableTiles = [];
+        selectedUnitAttackableTiles = [];
+    
+        // Display unit stats
+        let statblock = document.createElement('p');
+        statblock.textContent = 'unit type: ' + type['title'] + ', hp: ' + stats['cur_hp'];
         selectedunitmenu.append(statblock);
-        
+    
         let occupiedTile = mapterrain.find(c => c['pos_x'] == stats['pos_x'] && c['pos_y'] == stats['pos_y']);
         let occupiedTileOwner = gamedata['tile_owners'][stats['pos_y']][stats['pos_x']];
-        if (stats['can_move_this_turn']){
-            let movebutton = document.createElement('button');
-            movebutton.textContent = 'Move';
-            for (let i = 0; i < mapterrain.length; i++){
-                let dx = mapterrain[i]['pos_x'] - stats['pos_x'];
-                let dy = mapterrain[i]['pos_y'] - stats['pos_y'];
-                let distance = Math.abs(dx) + Math.abs(dy);
-                if (distance <= selectedUnit.type.speed){
-                    selectedUnitMovableTiles.push(mapterrain[i]);
+    
+        // Allow movement and capturing only if the player owns the unit
+        if (currentPlayerOwnsUnit) {
+            // Handle movement
+            if (stats['can_move_this_turn']) {
+                let movebutton = document.createElement('button');
+                movebutton.textContent = 'Move';
+    
+                for (let i = 0; i < mapterrain.length; i++) {
+                    let dx = mapterrain[i]['pos_x'] - stats['pos_x'];
+                    let dy = mapterrain[i]['pos_y'] - stats['pos_y'];
+                    let distance = Math.abs(dx) + Math.abs(dy);
+    
+                    if (distance <= selectedUnit.type.speed) {
+                        selectedUnitMovableTiles.push(mapterrain[i]);
+                    }
+                    if (distance >= selectedUnit.type.minrange && distance <= selectedUnit.type.maxrange) {
+                        selectedUnitAttackableTiles.push(mapterrain[i]);
+                    }
                 }
-                if (distance >= selectedUnit.type.minrange && distance <= selectedUnit.type.maxrange){
-                    selectedUnitAttackableTiles.push(mapterrain[i]);
-                }
+    
+                movebutton.addEventListener('click', () => moveUnit(sprite, type, stats));
+                selectedunitmenu.append(movebutton);
             }
-            movebutton.addEventListener('click', () => moveUnit(sprite, type, stats));            
-            selectedunitmenu.append(movebutton);
-        }
-        if (stats['can_capture_this_turn'] && occupiedTile['type']['capturable'] && (occupiedTileOwner != (isPlayer1Turn ? 1 : 2))){
-            let capturebutton = document.createElement('button');
-            capturebutton.textContent = 'Capture';
-            capturebutton.addEventListener('click', () => captureTile(occupiedTile, stats['pos_x'], stats['pos_y'])); 
-            selectedunitmenu.append(capturebutton);
-        }
-        if (stats['can_attack_this_turn']){
-            let attackButton = document.createElement('button');
-            attackButton.textContent = 'Attack';
-            attackButton.addEventListener('click', () => setAttack(sprite, type, stats)); 
-            selectedunitmenu.append(attackButton);
+    
+            // Handle capturing
+            if (stats['can_capture_this_turn'] && occupiedTile['type']['capturable'] && (occupiedTileOwner != (isPlayer1Turn ? 1 : 2))) {
+                let capturebutton = document.createElement('button');
+                capturebutton.textContent = 'Capture';
+                capturebutton.addEventListener('click', () => captureTile(occupiedTile, stats['pos_x'], stats['pos_y']));
+                selectedunitmenu.append(capturebutton);
+            }
+        
+            // Allow attacking if the unit belongs to the player and has attack abilities
+            if (stats['can_attack_this_turn']) {
+                let attackButton = document.createElement('button');
+                attackButton.textContent = 'Attack';
+                attackButton.addEventListener('click', () => setAttack(sprite, type, stats));
+                selectedunitmenu.append(attackButton);
+            }
         }
     }
+    
+    
+    function setAttack(sprite, type, stats) {
+        attacking_unit = { 'sprite': sprite, 'type': type, 'stats': stats };
+        attackWithUnit = true;
+    }
+    
+    function calculateDamage(unit1, unit2) {
+        const healthFactor1 = unit1.cur_hp / 10;
+        const healthFactor2 = unit2.cur_hp / 10;
+        const damageToUnit1 = Math.max((unit2.attack_power * healthFactor2) - unit1.armor, 0);
+        const damageToUnit2 = Math.max((unit1.attack_power * healthFactor1) - unit2.armor, 0);
+    
+        return { damageToUnit1, damageToUnit2 };
+    }
+    
+    function attackUnit(attackingUnit, targetUnit) {
+        console.log('Attacking unit:', attackingUnit, 'Stats:', attackingUnit.stats);
+        
+        if (!attackingUnit || !targetUnit) {
+            console.log('One or both units not found.');
+            return;
+        }
+    
+        if (!isTargetInRange(attackingUnit, targetUnit)) {
+            console.log('Target is out of range.');
+            return;
+        }
+    
+        if (attackingUnit.stats.player_id === targetUnit.stats.player_id) {
+            console.log('Cannot attack units of the same team.');
+            return;
+        }
+    
+        attackWithUnit = false;
+        attacking_unit['stats']['can_attack_this_turn'] = false;
+    
+        const { damageToUnit1, damageToUnit2 } = calculateDamage(attackingUnit.stats, targetUnit.stats);
+    
+        attackingUnit.stats.cur_hp -= damageToUnit1;
+        targetUnit.stats.cur_hp -= damageToUnit2;
+    
+        if (attackingUnit.stats.cur_hp <= 0) {
+            console.log(`${attackingUnit.type.title} has been destroyed!`);
+            removeUnitFromGame(attackingUnit);
+        }
+    
+        if (targetUnit.stats.cur_hp <= 0) {
+            console.log(`${targetUnit.type.title} has been destroyed!`);
+            removeUnitFromGame(targetUnit);
+        }
+    
+        updateUnitStats(attackingUnit);
+        updateUnitStats(targetUnit);
+    }
+    
 
     function setAttack(sprite, type, stats){
         attacking_unit = {'sprite': sprite, 'type': type, 'stats': stats};
