@@ -532,8 +532,8 @@
         console.log("unit1",unit2);
         const healthFactor1 = unit1.cur_hp / 10;
         const healthFactor2 = unit2.cur_hp / 10;
-        const damageToUnit1 = Math.max((unit2.attack_power * healthFactor2) - unit1.armor, 0);
-        const damageToUnit2 = Math.max((unit1.attack_power * healthFactor1) - unit2.armor, 0);
+        const damageToUnit1 = 1;
+        const damageToUnit2 = 1;
     
         return { damageToUnit1, damageToUnit2 };
     }
@@ -621,11 +621,7 @@
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
                 console.log("Unit stats updated successfully");
-            } else {
-                console.log("Failed to update unit stats", data);
-            }
         })
         .catch(error => {
             console.error("Error updating unit stats:", error);
