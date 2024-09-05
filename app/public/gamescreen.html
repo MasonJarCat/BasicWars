@@ -580,49 +580,6 @@
         attackWithUnit = true;
     }
 
-    function calculateDamage(unit1, unit2) {
-        const healthFactor1 = unit1.cur_hp / 10;
-        const healthFactor2 = unit2.cur_hp / 10;
-        const damageToUnit1 = Math.max((unit2.attack_power * healthFactor2) - unit1.armor, 0);
-        const damageToUnit2 = Math.max((unit1.attack_power * healthFactor1) - unit2.armor, 0);
-    
-        return { damageToUnit1, damageToUnit2 };
-    }
-
-    function attackUnit(attackingUnit, targetUnit) {
-        console.log(`attacking unit: ${attackingUnit},stats ${attackingUnit.stats}`);
-        if (!attackingUnit || !targetUnit) {
-            console.log('One or both units not found.');
-            return;
-        }
-        if (!isTargetInRange(attackingUnit, targetUnit)) {
-            console.log('Target is out of range.');
-            return;
-        }
-        if (attackingUnit.stats.player_id === targetUnit.stats.player_id) {
-            console.log('Cannot attack units of the same team.');
-            return;
-        }
-        attackWithUnit = false;
-        attacking_unit['stats']['can_attack_this_turn'] = false; 
-        const { damageToUnit1, damageToUnit2 } = calculateDamage(attackingUnit.stats, targetUnit.stats);
-    
-        attackingUnit.stats.cur_hp -= damageToUnit1;
-        targetUnit.stats.cur_hp -= damageToUnit2;
-    
-        if (attackingUnit.stats.cur_hp <= 0) {
-            console.log(`${attackingUnit.type.title} has been destroyed!`);
-            removeUnitFromGame(attackingUnit);
-        }
-    
-        if (targetUnit.stats.cur_hp <= 0) {
-            console.log(`${targetUnit.type.title} has been destroyed!`);
-            removeUnitFromGame(targetUnit);
-        }
-    
-        updateUnitStats(attackingUnit);
-        updateUnitStats(targetUnit);
-    }
 
     function removeUnitFromGame(unit) {
         unit.sprite.parent.removeChild(unit.sprite);
