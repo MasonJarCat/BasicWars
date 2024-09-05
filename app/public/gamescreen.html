@@ -460,7 +460,7 @@
         clearUnitMenu();
         selectedUnit = {'sprite': sprite, 'type': type, 'stats': stats};
         if (attackWithUnit) {
-            console.log(`attacking unit: ${attackingUnit},stats ${attackingUnit.stats}`);
+            console.log(`attacking unit: ${selectedUnit},stats ${selectedUnit.stats}`);
             attackUnit(attacking_unit, { sprite, type, stats });
         }
 
