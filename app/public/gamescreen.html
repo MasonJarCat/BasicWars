@@ -52,6 +52,7 @@
     let currentPlayerId;
     let app = new PIXI.Application();
     let mapterrain = new Array();
+    let highlightLayer = new Array();
     function showUserInfo() {
         const userInfoDiv = document.getElementById('user_id');
         const userId = getUserId();
@@ -167,7 +168,9 @@
             PIXI.Assets.load('bluerocketarty.png'),
             PIXI.Assets.load('redrocketarty.png'),
             PIXI.Assets.load('neutralrocketarty.png'),
-            PIXI.Assets.load('fog.png')
+            PIXI.Assets.load('fog.png'),
+            PIXI.Assets.load('movehighlight.png'),
+            PIXI.Assets.load('attackhighlight.png')
         ];
     
         await Promise.all(assetPromises);
@@ -343,6 +346,7 @@
     }
 
     function onClickTerrain(terrain, x, y, type) {
+        clearHighlight();
         if (selectedUnit && movingselectedunit) {
             let goalCell = selectedUnitMovableTiles.find(c => c['pos_x'] == x && c['pos_y'] == y);
             if (goalCell) {
@@ -471,6 +475,7 @@
     }
 
     function onClickUnit(sprite, type, stats) {
+        clearHighlight();
         console.log("unit", sprite, stats);
         clearUnitMenu();
         selectedUnit = { 'sprite': sprite, 'type': type, 'stats': stats };
@@ -511,7 +516,12 @@
                     let distance = Math.abs(dx) + Math.abs(dy);
     
                     if (distance <= selectedUnit.type.speed) {
-                        selectedUnitMovableTiles.push(mapterrain[i]);
+                        selectedUnitMovableTiles.push(mapterrain[i]); 
+                        let movehighlight = PIXI.sprite.from('movehighlight.png');
+                        movehighlight.zIndex = 2; 
+                        movehighlight.x = mapterrain[i].sprite.x + 6;
+                        movehighlight.y = mapterrain[i].sprite.x + 6;
+                        app.stage.addChild(movehighlight);
                     }
                     if (distance >= selectedUnit.type.minrange && distance <= selectedUnit.type.maxrange) {
                         selectedUnitAttackableTiles.push(mapterrain[i]);
@@ -814,6 +824,11 @@
             endturnbutton.style.display = 'inline-block'; // Show the "End Turn" button
             endturnbutton.disabled = false; // Enable the "End Turn" button for the new turn
         }
+    }
+
+    function clearHighlight(){
+        highlightLayer.forEach(sprite => sprite.parent.removeChild(sprite));
+        highlightLayer = new Array();
     }
 </script>
 
