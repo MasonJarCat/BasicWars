@@ -11,6 +11,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #f4f4f4;
         }
 
         /* Horizontal Navbar Style */
@@ -40,15 +41,74 @@
 
         /* Content Style */
         .content {
-            padding: 60px 20px; /* Add padding to prevent content from going under the fixed navbar */
+            margin-top: 60px; /* Add margin to avoid overlap with navbar */
+            padding: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
         }
+
+        h1 {
+            text-align: center;
+        }
+
+        .form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="radio"], select {
+            padding: 8px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #allfieldsrequired, #notloggedin {
+            color: red;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+        }
+
     </style>
+
 
     <!-- Horizontal Navbar -->
     <div class="navbar">
         <a href="/">Home</a>
         <a href="/gamelist">Game List</a>
-        <a href="/gamescreen">Game Screen</a>
         <a href="/creategame">Create Game</a>
         <a href="/lobby">Lobby</a>
     </div>
