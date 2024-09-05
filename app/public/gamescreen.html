@@ -525,12 +525,6 @@
         }
     }
     
-    
-    function setAttack(sprite, type, stats) {
-        attacking_unit = { 'sprite': sprite, 'type': type, 'stats': stats };
-        attackWithUnit = true;
-    }
-    
     function calculateDamage(unit1, unit2) {
         const healthFactor1 = unit1.cur_hp / 10;
         const healthFactor2 = unit2.cur_hp / 10;
