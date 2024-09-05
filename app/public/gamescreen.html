@@ -526,6 +526,8 @@
     }
     
     function calculateDamage(unit1, unit2) {
+        console.log("unit1",unit1);
+        console.log("unit1",unit2);
         const healthFactor1 = unit1.cur_hp / 10;
         const healthFactor2 = unit2.cur_hp / 10;
         const damageToUnit1 = Math.max((unit2.attack_power * healthFactor2) - unit1.armor, 0);
@@ -559,7 +561,7 @@
     
         attackingUnit.stats.cur_hp -= damageToUnit1;
         targetUnit.stats.cur_hp -= damageToUnit2;
-    
+        console.log("health ", attackingUnit.stats.cur_hp , targetUnit.stats.cur_hp)
         if (attackingUnit.stats.cur_hp <= 0) {
             console.log(`${attackingUnit.type.title} has been destroyed!`);
             removeUnitFromGame(attackingUnit);
@@ -591,7 +593,7 @@
     }
     
     function updateUnitStats(unit) {
-        console.log(`Updated ${unit.type.title} HP: ${unit.stats.cur_hp}`);
+        console.log(`Updated:`,unit.type.title, "HP:", unit.stats.cur_hp);
     
         // Create an object with only the relevant stats
         const relevantStats = {
@@ -626,7 +628,7 @@
 
     
     function isTargetInRange(attackingUnit, targetUnit) {
-        console.log(`attacking unit: ${attackingUnit},stats ${attackingUnit.stats}`);
+        console.log('Attacking unit:', attackingUnit, 'Stats:', attackingUnit.stats);
         const dx = Math.abs(attackingUnit.stats.pos_x - targetUnit.stats.pos_x);
         const dy = Math.abs(attackingUnit.stats.pos_y - targetUnit.stats.pos_y);
         const distance = dx + dy;
