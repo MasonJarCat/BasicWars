@@ -478,7 +478,7 @@ app.get("/style.css", (req, res) => {
 app.get("/username:id", (req,res) => {
   id = req.params['id'];
   const query = "SELECT username FROM users WHERE id = $1";
-  const values = [id];
+  const values = [parseInt(id)];
 
   pool.query(query, values)
     .then(result => {
