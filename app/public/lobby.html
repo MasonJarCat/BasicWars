@@ -2,130 +2,219 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>lobby</title>
+    <title>Lobby</title>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        /* Horizontal Navbar Style */
+        .navbar {
+            display: flex;
+            background-color: #333;
+            justify-content: center;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: white;
+            padding: 14px 20px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .navbar a:hover {
+            background-color: #575757;
+        }
+
+        /* Content Style */
+        .content {
+            margin-top: 60px; /* Add margin to avoid overlap with navbar */
+            padding: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #gamelist div {
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        #joinerror, #notloggedin {
+            color: red;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            font-size: 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
 
-    <h1>Welcome to the Lobby</h1>
+    <!-- Horizontal Navbar -->
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/gamelist">Game List</a>
+        <a href="/gamescreen">Game Screen</a>
+        <a href="/creategame">Create Game</a>
+        <a href="/lobby">Lobby</a>
+    </div>
 
-    <p> Games available to join:</p>
+    <div class="content">
+        <h1>Welcome to the Lobby</h1>
 
-    <div id="gamelist"></div>
+        <p>Games available to join:</p>
 
-    <div id="notloggedin"></div>
+        <div id="gamelist"></div>
 
-    <div id="joinerror"></div>
+        <div id="notloggedin"></div>
 
-</body>
+        <div id="joinerror"></div>
+    </div>
 
-<script>
-let gamelist = document.getElementById("gamelist");
-let notloggedin = document.getElementById("notloggedin");
-let joinerror = document.getElementById("joinerror");
-let games;
-let maps; 
-let users;
+    <script>
+        let gamelist = document.getElementById("gamelist");
+        let notloggedin = document.getElementById("notloggedin");
+        let joinerror = document.getElementById("joinerror");
+        let games;
+        let maps; 
+        let users;
 
-const userId = getUserId();
+        const userId = getUserId();
 
-if (userId == null){
-    notloggedin.textContent = "Error: You must be logged in to join a game."; 
-} else {
-    notloggedin.textContent = "";
-
-    initLobby();
-}
-
-function getUserId() {
-    // Example: Retrieve user ID from a cookie, local storage, or a server API call
-    const userIdFromCookies = getCookie('userId');
-    console.log('User ID from Cookies: ', userIdFromCookies); // Debugging log
-    if (userIdFromCookies) {
-        return userIdFromCookies;
-    }
-
-    const userIdFromLocalStorage = localStorage.getItem('userId');
-    console.log('User ID from Local Storage: ', userIdFromLocalStorage); // Debugging log
-    if (userIdFromLocalStorage) {
-        return userIdFromLocalStorage;
-    }
-
-    return null; 
-}
-
- // Helper function to get a cookie by name
- function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-        const cookieValue = parts.pop().split(';').shift();
-        console.log('Cookie found:', name, '=', cookieValue); // Debugging log
-        return cookieValue;
-    }
-    console.log('Cookie not found:', name); // Debugging log
-    return null;
-}
-
-async function initLobby(){
-    const usersResponse = await fetch("/userssafely", {method: "GET"});
-    const usersBody= await usersResponse.json();
-    users = usersBody.rows;
-
-    const mapsResponse = await fetch("/maps", {method: "GET"});
-    const mapsBody = await mapsResponse.json();
-    maps = mapsBody.rows; 
-
-    const openGamesResponse = await fetch("/opengames?userId=" + userId, {method: "GET"});
-    const openGamesBody = await openGamesResponse.json();
-    games = openGamesBody.rows;
-
-    console.log(maps);
-    console.log(users);
-    console.log(games);
-    for (let i = 0; i < games.length; i++){
-        console.log(games[i]);
-        let title = games[i].title;
-        let hostname = users.find(c => c.id == games[i].p1_id).username; 
-        let mapname = maps.find(c => c.id == games[i].map_id).title; 
-
-        let newEntry = document.createElement("div");
-        let titleDiv = document.createElement("div");
-        let hostDiv = document.createElement("div");
-        let mapDiv = document.createElement("div");
-        let joinDiv = document.createElement("div");
-        let joinButton = document.createElement("button");
-        joinButton.textContent = "Join";
-
-        joinButton.addEventListener("click", () => joinGame(games[i].id));
-
-        titleDiv.textContent = "Game title: " + title;
-        hostDiv.textContent = "Host: " + hostname;
-        mapDiv.textContent = "Map: " + mapname; 
-        joinDiv.appendChild(joinButton);
-
-        newEntry.appendChild(titleDiv);
-        newEntry.appendChild(hostDiv);
-        newEntry.appendChild(mapDiv);
-        newEntry.appendChild(joinDiv);
-
-        gamelist.appendChild(newEntry);
-    }
-}
-
-function joinGame(gameId){
-    fetch("/joingame", {
-        method: "POST",
-        headers : {"Content-Type": "application/json"},
-        body: JSON.stringify({"userId": userId, "gameId": gameId})
-    }).then(response => {
-        console.log(response.status);
-        if (response.status == 200){
-            window.location.href = "https://basicwars.fly.dev/gamelist";
+        if (userId == null){
+            notloggedin.textContent = "Error: You must be logged in to join a game."; 
         } else {
-            console.log(response);
-            joinerror.textContent = "Error: something went wrong with joining the game";
-        }                   
-    })
-}
-</script>
+            notloggedin.textContent = "";
+
+            initLobby();
+        }
+
+        function getUserId() {
+            // Example: Retrieve user ID from a cookie, local storage, or a server API call
+            const userIdFromCookies = getCookie('userId');
+            console.log('User ID from Cookies: ', userIdFromCookies); // Debugging log
+            if (userIdFromCookies) {
+                return userIdFromCookies;
+            }
+
+            const userIdFromLocalStorage = localStorage.getItem('userId');
+            console.log('User ID from Local Storage: ', userIdFromLocalStorage); // Debugging log
+            if (userIdFromLocalStorage) {
+                return userIdFromLocalStorage;
+            }
+
+            return null; 
+        }
+
+        // Helper function to get a cookie by name
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) {
+                const cookieValue = parts.pop().split(';').shift();
+                console.log('Cookie found:', name, '=', cookieValue); // Debugging log
+                return cookieValue;
+            }
+            console.log('Cookie not found:', name); // Debugging log
+            return null;
+        }
+
+        async function initLobby(){
+            const usersResponse = await fetch("/userssafely", {method: "GET"});
+            const usersBody= await usersResponse.json();
+            users = usersBody.rows;
+
+            const mapsResponse = await fetch("/maps", {method: "GET"});
+            const mapsBody = await mapsResponse.json();
+            maps = mapsBody.rows; 
+
+            const openGamesResponse = await fetch("/opengames?userId=" + userId, {method: "GET"});
+            const openGamesBody = await openGamesResponse.json();
+            games = openGamesBody.rows;
+
+            console.log(maps);
+            console.log(users);
+            console.log(games);
+            for (let i = 0; i < games.length; i++){
+                console.log(games[i]);
+                let title = games[i].title;
+                let hostname = users.find(c => c.id == games[i].p1_id).username; 
+                let mapname = maps.find(c => c.id == games[i].map_id).title; 
+
+                let newEntry = document.createElement("div");
+                let titleDiv = document.createElement("div");
+                let hostDiv = document.createElement("div");
+                let mapDiv = document.createElement("div");
+                let joinDiv = document.createElement("div");
+                let joinButton = document.createElement("button");
+                joinButton.textContent = "Join";
+
+                joinButton.addEventListener("click", () => joinGame(games[i].id));
+
+                titleDiv.textContent = "Game title: " + title;
+                hostDiv.textContent = "Host: " + hostname;
+                mapDiv.textContent = "Map: " + mapname; 
+                joinDiv.appendChild(joinButton);
+
+                newEntry.appendChild(titleDiv);
+                newEntry.appendChild(hostDiv);
+                newEntry.appendChild(mapDiv);
+                newEntry.appendChild(joinDiv);
+
+                gamelist.appendChild(newEntry);
+            }
+        }
+
+        function joinGame(gameId){
+            fetch("/joingame", {
+                method: "POST",
+                headers : {"Content-Type": "application/json"},
+                body: JSON.stringify({"userId": userId, "gameId": gameId})
+            }).then(response => {
+                console.log(response.status);
+                if (response.status == 200){
+                    window.location.href = "https://basicwars.fly.dev/gamelist";
+                } else {
+                    console.log(response);
+                    joinerror.textContent = "Error: something went wrong with joining the game";
+                }                   
+            })
+        }
+    </script>
+</body>
+</html>
