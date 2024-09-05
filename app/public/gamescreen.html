@@ -572,19 +572,19 @@
         
         u2totalDam = (u1dam - (u2cover + u2armor - u1ap)) * (u1hp / 10);
 
-        if (u1sa.contains(unit2.type.id)){
+        if (u1sa.includes(unit2.type.id)){
             u2totalDam = u2totalDam * 2; 
         }
-        if (u1wa.contains(unit2.type.id)){
+        if (u1wa.includes(unit2.type.id)){
             u2totalDam = u2totalDam / 2;
         }
 
         u1totalDam = (u2dam - (u1cover + u1armor - u2ap)) * ((u2hp - u2totalDam) / 10);
 
-        if (u2sa.contains(unit1.type.id)){
+        if (u2sa.includes(unit1.type.id)){
             u1totalDam = u1totalDam * 2; 
         }
-        if (u2wa.contains(unit1.type.id)){
+        if (u2wa.includes(unit1.type.id)){
             u1totalDam = u1totalDam / 2;
         }
 
