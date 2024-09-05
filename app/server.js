@@ -283,7 +283,7 @@ app.post("/add/unit", (req, res) => {
       VALUES($1, $2, $3, $4, $5, $6, $7, $8) 
       RETURNING id
   `;
-  let values = [parseInt(type_id), parseInt(game_id), parseInt(player_id), parseInt(pos_x), parseInt(pos_y), 100, false, 20];
+  let values = [parseInt(type_id), parseInt(game_id), parseInt(player_id), parseInt(pos_x), parseInt(pos_y), 10, false, 0];
 
   console.log("Executing query:", text, values);
 
