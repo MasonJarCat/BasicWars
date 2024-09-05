@@ -520,7 +520,7 @@
                         let movehighlight = PIXI.Sprite.from('movehighlight.png');
                         movehighlight.zIndex = 2; 
                         movehighlight.x = mapterrain[i].sprite.x + 6;
-                        movehighlight.y = mapterrain[i].sprite.x + 6;
+                        movehighlight.y = mapterrain[i].sprite.y + 6;
                         app.stage.addChild(movehighlight);
                     }
                     if (distance >= selectedUnit.type.minrange && distance <= selectedUnit.type.maxrange) {
