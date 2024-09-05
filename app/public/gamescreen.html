@@ -504,7 +504,7 @@
     }
 
     function setAttack(sprite, type, stats){
-        attacking_unit = sprite;
+        attacking_unit = {'sprite': sprite, 'type': type, 'stats': stats};
         attackWithUnit = true;
     }
 
