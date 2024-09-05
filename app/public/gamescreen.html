@@ -522,6 +522,7 @@
                         movehighlight.x = mapterrain[i].sprite.x + 6;
                         movehighlight.y = mapterrain[i].sprite.y + 6;
                         app.stage.addChild(movehighlight);
+                        highlightLayer.push(movehighlight);
                     }
                     if (distance >= selectedUnit.type.minrange && distance <= selectedUnit.type.maxrange) {
                         selectedUnitAttackableTiles.push(mapterrain[i]);
