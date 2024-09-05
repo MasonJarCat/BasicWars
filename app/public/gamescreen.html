@@ -654,6 +654,16 @@
     
 
     function setAttack(sprite, type, stats){
+        clearHighlight();
+        for (let i = 0; i < selectedUnitAttackableTiles.length; i++){
+            let curTile = selectedUnitAttackableTiles[i]; 
+            let atkHighlight = PIXI.Sprite.from('attackhighlight.png');
+            atkHighlight.zIndex = 2; 
+            atkHighlight.x = curTile.sprite.x + 6;
+            atkHighlight.y = curTile.sprite.y + 6;
+            app.stage.addChild(atkHighlight);
+            highlightLayer.push(atkHighlight);
+        }
         console.log("setting attacking stats:", stats);
         attacking_unit = {'sprite': sprite, 'type': type, 'stats': stats};
         attackWithUnit = true;
