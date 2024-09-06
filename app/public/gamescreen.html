@@ -285,7 +285,7 @@
     function buildMap(mapdata) {
         for (let i = 0; i < mapdata.terrain.length; i++) {
             let row = mapdata.terrain[i];
-            let ownerRow = gamedata['tile_owners'].cellowner[i];
+            let ownerRow = gamedata['tile_owners'][i];
             let y = i * 16;
             for (let j = 0; j < row.length; j++) {
                 let x = j * 16;
