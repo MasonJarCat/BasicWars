@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>settings</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <!-- Horizontal Navbar -->
+    <div class="navbar">
+        <div class="navbar-left">
+        <a href="/">Home</a>
+        <a href="/gamelist">Game List</a>
+        <a href="/creategame">Create Game</a>
+        <a href="/lobby">Lobby</a>
+        <a href="/loginPage">login</a>
+        </div>
+        <div class="navbar-right" id="loggedinUser">Not logged in</div>
+    </div>
+    <div class="content">
+    <h1>Settings</h1>
+
+    <div>
+        <label for="commander">Select Your Favorite Commander:</label>
+        <select id="commander" name="commander">
+            <option value="1">Aaron Arty</option>
+            <option value="2">Commando Connie</option>
+            <option value="3">Tanky Tina</option>
+            <option value="4">Flyboy Frank</option>
+        </select>
+        <p>This commander will be automatically assigned to you whenever you create or join a game.</p>
+    </div>   
+
+    <button id="submit">Save Changes</button>
+    <div id="passorfail"></div>
+    <div id="notloggedin"></div>
+
+</div>
+</body>
+
+<script>
+    let submit = document.getElementById("submit");
+    let passorfail = document.getElementById("passorfail"); 
+    let notloggedin = document.getElementById("notloggedin");
+    let commander = document.getElementById("commander");
+
+    const userId = getUserId();
+
+    if (userId == undefined){
+        notloggedin.textContent = "Warning: You must be logged in to adjust settings."
+    } else {
+        submit.addEventListener("click", submitChanges);
+    }
+
+    function submitChanges(){
+        let commanderId = commander.value; 
+
+        fetch("/setcommander", {
+            method: "POST",
+            headers : {"Content-Type": "application/json"},
+            body: JSON.stringify({"userId": userId, "commanderId": commanderId})
+        }).then(response =>{
+            console.log(response.status);
+            if (response.status == 200){
+                passorfail.textContent = "Changes saved successfully.";
+            } else {
+                passorfail.textContent = "Error: Something went wrong.";
+            }
+        })
+    }
+
+    function getUserId() {
+    // Example: Retrieve user ID from a cookie, local storage, or a server API call
+    const userIdFromCookies = getCookie('userId');
+    console.log('User ID from Cookies: ', userIdFromCookies); // Debugging log
+    if (userIdFromCookies) {
+        return userIdFromCookies;
+    }
+
+    const userIdFromLocalStorage = localStorage.getItem('userId');
+    console.log('User ID from Local Storage: ', userIdFromLocalStorage); // Debugging log
+    if (userIdFromLocalStorage) {
+        return userIdFromLocalStorage;
+    }
+
+    return null; 
+}
+
+// Helper function to get a cookie by name
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+        const cookieValue = parts.pop().split(';').shift();
+        console.log('Cookie found:', name, '=', cookieValue); // Debugging log
+        return cookieValue;
+    }
+    console.log('Cookie not found:', name); // Debugging log
+    return null;
+}
+function displayLoggedInUser() {
+    const loggedInUserDiv = document.getElementById("loggedinUser");
+    const userId = parseInt(getUserId());
+
+    if (userId) {
+        // Make a request to the server to get the username
+        fetch(`/username/${userId}`, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })  .then(response => response.json())
+            .then(data => {
+                if (data.username) {
+                    loggedInUserDiv.textContent = `${data.username}`;
+                } else {
+                    loggedInUserDiv.textContent = "Not logged in";
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching username:', error);
+                loggedInUserDiv.textContent = "Not logged in";
+            });
+    } else {
+        loggedInUserDiv.textContent = "Not logged in";
+    }
+}
+// Call the function when the page loads
+displayLoggedInUser();
+</script>

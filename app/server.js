@@ -147,6 +147,10 @@ app.get("/creategame", (req, res) =>{
   res.sendFile(path.join(__dirname, 'public', 'creategame.html'));
 });
 
+app.get("/settings", (req, res) =>{
+  res.sendFile(path.join(__dirname, 'public', 'settings.html'));
+});
+
 app.get("/lobby", (req, res) =>{
   res.sendFile(path.join(__dirname, 'public', 'lobby.html'));
 });
@@ -289,6 +293,29 @@ app.post("/finishgame", (req, res) => {
     res.status(500).json({ error: err.message });});
   
 });
+
+app.post("/setcommander", (req, res) => {
+  let userId = req.body.userId;
+  let commanderId = req.body.commanderId; 
+  console.log (userId);
+  console.log(commanderId);
+
+  if (userId == NaN || userId == undefined || commanderId == NaN || commanderId == undefined){
+    console.log("id not found");
+    return res.sendStatus(400);
+  }
+
+  const text = "UPDATE users SET fav_commander = $1 WHERE id = $2";
+  const values = [commanderId, userId];
+
+  pool.query(text, values).then(result => {
+    res.setHeader('Content-Type', 'application/json');
+    return res.json(result.rows[0]);
+  }).catch(err => {
+    console.log(err);
+    res.status(500).json({ error: err.message });});
+
+})
 
 
 //Fitz's add game & lobby queries end here
@@ -488,8 +515,8 @@ app.post("/add/user", (req, res) => {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  const query = "INSERT INTO users(username, password) VALUES($1, $2) RETURNING id";
-  const values = [username, password];
+  const query = "INSERT INTO users(username, password, fav_commander) VALUES($1, $2, $3) RETURNING id";
+  const values = [username, password, 1];
 
   pool.query(query, values)
     .then(result => res.json({ id: result.rows[0].id }))
