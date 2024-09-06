@@ -257,6 +257,7 @@ app.post("/joingame", (req, res) => {
   let userId = parseInt(req.body.userId); 
   let gameId = parseInt(req.body.gameId); 
   let commanderId = parseInt(req.body.commanderId);
+  console.log("Commander ID: " + commanderId);
   if (userId == NaN || gameId == NaN || commanderId == NaN){
     return res.sendStatus(400);
   }

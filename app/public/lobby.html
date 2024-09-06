@@ -48,7 +48,6 @@
             notloggedin.textContent = "";
 
             initLobby();
-            curUserFavCommander = users.find(c => c.id == userId)['fav_commander'];
         }
 
 
@@ -56,7 +55,8 @@
         async function initLobby(){
             const usersResponse = await fetch("/userssafely", {method: "GET"});
             const usersBody= await usersResponse.json();
-            users = usersBody.rows;
+            users = usersBody.rows;            
+            curUserFavCommander = users.find(c => c.id == userId)['fav_commander'];
 
             const mapsResponse = await fetch("/maps", {method: "GET"});
             const mapsBody = await mapsResponse.json();
