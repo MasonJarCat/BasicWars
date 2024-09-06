@@ -16,11 +16,15 @@
     <button id="endturnbutton">End Turn</button>
     <button id="forfeit">Forfeit</button>
 
-    <div id="commanderinfo"></div>
+    <aside>
 
-    <div id="selectedunitmenu" style="float:left"></div>
+        <div id="commanderinfo"></div>
 
-    <div id="unitproductionmenu" style="float:left"></div>
+        <div id="selectedunitmenu" style="float:left"></div>
+
+        <div id="unitproductionmenu" style="float:left"></div>
+
+    </aside>
 
 </body>
 
@@ -238,7 +242,31 @@
         commanderImage = document.createElement("img");
         commanderImage.src = curCommander.title + ".png";
         commanderImage.alt = curCommander.backstory; 
+
+        commanderName = document.createElement("b");
+        commanderName.textContent = "Your commander: " + curCommander['readable_title'];
+
+        commanderDesc = document.createElement("p");
+        commanderDesc.textContent = curCommander['effect_description'];
+
+        opCommanderImage = document.createElement("img");
+        opCommanderImage.src = opCommander.title + ".png";
+        opCommanderImage.alt = opCommander.backstory; 
+
+        opCommanderName = document.createElement("b");
+        opCommanderName.textContent = "Opponent commander: " + opCommander['readable_title'];
+
+        opCommanderDesc = document.createElement("p");
+        opCommanderDesc.textContent = opCommander['effect_description'];
+
+
+
+        commanderinfo.append(commanderName);
         commanderinfo.append(commanderImage);
+        commanderinfo.append(commanderDesc);
+        commanderinfo.append(opCommanderName);
+        commanderinfo.append(opCommanderImage);
+        commanderinfo.append(opCommanderDesc);
 
         forfeitbutton.addEventListener("click", quitGame);
     }
