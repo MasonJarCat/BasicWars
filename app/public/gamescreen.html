@@ -393,7 +393,7 @@
         }
         for (let k = 0; k < gameunits.length; k++){
             let unit = gameunits[k];
-            if ((parseInt(currentPlayerId) === gamedata.p1_id && isPlayer1Turn && unit.player_id === gamedata.p1_id) || (parseInt(currentPlayerId) === gamedata.p2_id && !isPlayer1Turn && unit.player_id === gamedata.p2_id)) {
+            if ((parseInt(currentPlayerId) === gamedata.p1_id && unit.player_id === gamedata.p1_id) || (parseInt(currentPlayerId) === gamedata.p2_id && unit.player_id === gamedata.p2_id)) {
                 let unitStats = unittypes[unit['type_id'] - 1]; 
                 for (let i = 0; i < mapterrain.length; i++){
                     let dx = mapterrain[i]['pos_x'] - unit['pos_x'];
