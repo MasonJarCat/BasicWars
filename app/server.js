@@ -279,7 +279,7 @@ app.post("/finishgame", (req, res) => {
   }
 
   const text = "DELETE FROM games WHERE id = $1";
-  const values = [gameid];
+  const values = [gameId];
 
   pool.query(text, values).then(result => {
     res.setHeader('Content-Type', 'application/json');
