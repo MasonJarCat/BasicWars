@@ -40,6 +40,14 @@
     let forfeitbutton = document.getElementById("forfeit");
     let commanderinfo = document.getElementById("commanderinfo");
 
+    let commanderImage;
+    let commanderDesc;
+    let commanderName;
+
+    let opCommanderImage;
+    let opCommanderDesc;
+    let opCommanderName;
+
     let gamedata;
     let unittypes;
     let terraintypes;
@@ -109,14 +117,6 @@
     }
 
     async function initGame() {
-        let commanderImage;
-        let commanderDesc;
-        let commanderName;
-
-        let opCommanderImage;
-        let opCommanderDesc;
-        let opCommanderName;
-
         // Fetch map data
         const mapResponse = await fetch("/map" + querystring, { method: "GET" });
         const mapBody = await mapResponse.json();
@@ -243,7 +243,7 @@
         commanderImage.src = curCommander.title + ".png";
         commanderImage.alt = curCommander.backstory; 
 
-        commanderName = document.createElement("b");
+        commanderName = document.createElement("p");
         commanderName.textContent = "Your commander: " + curCommander['readable_title'];
 
         commanderDesc = document.createElement("p");
@@ -253,7 +253,7 @@
         opCommanderImage.src = opCommander.title + ".png";
         opCommanderImage.alt = opCommander.backstory; 
 
-        opCommanderName = document.createElement("b");
+        opCommanderName = document.createElement("p");
         opCommanderName.textContent = "Opponent commander: " + opCommander['readable_title'];
 
         opCommanderDesc = document.createElement("p");
