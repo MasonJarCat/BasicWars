@@ -31,7 +31,9 @@ body {
 .navbar a:hover {
     background-color: #575757;
 }
-
+.navbar-right text {
+    color: white;
+}
 /* Content Style */
 .content {
     margin-top: 60px; /* Add margin to avoid overlap with navbar */
