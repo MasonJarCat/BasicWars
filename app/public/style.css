@@ -18,17 +18,21 @@ body {
 
 }
 
-/* Horizontal Navbar Style */
 .navbar {
     display: flex;
     background-color: #333;
-    justify-content: center;
+    justify-content: space-between; 
     padding: 10px 0;
     position: fixed;
     width: 100%;
     top: 0;
     left: 0;
     z-index: 1000;
+}
+
+.navbar-left {
+    display: flex; 
+    align-items: center;
 }
 
 .navbar a {
@@ -42,9 +46,14 @@ body {
 .navbar a:hover {
     background-color: #575757;
 }
+
 .navbar-right {
+    display: flex; 
+    align-items: center; 
     color: white;
+    margin-left: auto; 
 }
+
 /* Content Style */
 .content {
     margin-top: 60px; /* Add margin to avoid overlap with navbar */
