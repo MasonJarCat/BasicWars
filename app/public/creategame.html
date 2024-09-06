@@ -8,11 +8,14 @@
 <body>
     <!-- Horizontal Navbar -->
     <div class="navbar">
+        <div class="navbar-left">
         <a href="/">Home</a>
         <a href="/gamelist">Game List</a>
         <a href="/creategame">Create Game</a>
         <a href="/lobby">Lobby</a>
         <a href="/loginPage">login</a>
+        </div>
+        <div class="navbar-right" id="loggedinUser">Not logged in</div>
     </div>
     <div class="content">
     <h1>Create A New Game</h1>
@@ -262,7 +265,7 @@ function displayLoggedInUser() {
         })  .then(response => response.json())
             .then(data => {
                 if (data.username) {
-                    loggedInUserDiv.textContent = `Welcome, ${data.username}`;
+                    loggedInUserDiv.textContent = `${data.username}`;
                 } else {
                     loggedInUserDiv.textContent = "Not logged in";
                 }
