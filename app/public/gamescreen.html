@@ -6,6 +6,17 @@
 	<link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
+    <div class="navbar">
+        <div class="navbar-left">
+        <a href="/">Home</a>
+        <a href="/gamelist">Game List</a>
+        <a href="/creategame">Create Game</a>
+        <a href="/lobby">Lobby</a>
+        <a href="/loginPage">Login</a>
+        <a href="/settings">Settings</a>
+        </div>
+        <div class="navbar-right" id="loggedinUser">Not logged in</div>
+    </div>
     <h1 id="gametitle"></h1>
 
     <p>Welcome to the game!</p>
@@ -1026,6 +1037,34 @@
         })
         
     }
+    function displayLoggedInUser() {
+        const loggedInUserDiv = document.getElementById("loggedinUser");
+        const userId = parseInt(getUserId());
+    
+        if (userId) {
+            // Make a request to the server to get the username
+            fetch(`/username/${userId}`, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })  .then(response => response.json())
+                .then(data => {
+                    if (data.username) {
+                        loggedInUserDiv.textContent = `${data.username}`;
+                    } else {
+                        loggedInUserDiv.textContent = "Not logged in";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching username:', error);
+                    loggedInUserDiv.textContent = "Not logged in";
+                });
+        } else {
+            loggedInUserDiv.textContent = "Not logged in";
+        }
+    }
+    // Call the function when the page loads
+    displayLoggedInUser();
 </script>
 
 </html>
