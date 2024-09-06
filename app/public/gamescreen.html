@@ -222,8 +222,6 @@
         const commandersBody = await commandersResponse.json();
         commanders = commandersBody.rows;
 
-        buildMap(mapdata);
-
         // Fetch game units
         const gameUnitsResponse = await fetch("/gameunits" + querystring, { method: "GET" });
         const gameUnitsBody = await gameUnitsResponse.json();
@@ -241,6 +239,8 @@
         
         console.log("p1_commander: " + gamedata['p1_commander']);
         console.log("p2_commander: " + gamedata['p2_commander']);
+
+        buildMap(mapdata);
 
         if(isPlayer1Turn){
             curCommander = commanders.find(c => c.id == gamedata['p1_commander']);
@@ -285,7 +285,7 @@
     function buildMap(mapdata) {
         for (let i = 0; i < mapdata.terrain.length; i++) {
             let row = mapdata.terrain[i];
-            let ownerRow = mapdata.cellowner[i];
+            let ownerRow = gamedata['tile_owners'].cellowner[i];
             let y = i * 16;
             for (let j = 0; j < row.length; j++) {
                 let x = j * 16;
