@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>winscreen</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+
+    <!-- Horizontal Navbar -->
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/gamelist">Game List</a>
+        <a href="/gamescreen">Game Screen</a>
+        <a href="/creategame">Create Game</a>
+        <a href="/lobby">Lobby</a>
+        <a href="/loginPage">login</a>
+    </div>
+
+    <div class="content">
+        <h1>You Win!</h1>
+
+        <p id="mementomori"></p>
+    </div>
+
+</body>
+
+<script>
+
+    let victorymessage = document.getElementById("mementomori");
+
+    let rand = Math.floor(Math.random() * 10);
+
+    if (rand == 0){
+        victorymessage.textContent = "The blood of thy enemies shall water thy fields forevermore.";
+    } else if (rand == 1){
+        victorymessage.textContent = "Blood for the Blood God, Skulls for the Skull Throne!";
+    } else if (rand == 2){
+        victorymessage.textContent = "Thou shalt break them with a rod of iron; thou shalt dash them in pieces like a potter's vessel. -- Psalms 2:9";
+    } else if (rand == 3){
+        victorymessage.textContent = "If they stand, they're a VC. If they duck, they're a well disciplined VC!";
+    } else if (rand == 4){
+        victorymessage.textContent = "And I saw, and behold a white horse: and he that sat on him had a bow; and a crown was given unto him: and he went forth conquering, and to conquer. -- Revelations 6:2";
+    } else if (rand == 5){
+        victorymessage.textContent = "And there went out another horse that was red: and power was given to him that sat thereon to take peace from the earth, and that they should kill one another: and there was given unto him a great sword. -- Revelations 6:4";
+    } else if (rand == 6){
+        victorymessage.textContent = "Don't @ me for using the King James bible for the other quotes, I know it's a bad translation but it sounds cooler.";
+    } else if (rand == 7){
+        victorymessage.textContent = "A strange game, the only winning move is not to play.";
+    } else if (rand == 8){
+        victorymessage.textContent = "Woe to the Fallen.";
+    } else if (rand == 9){
+        victorymessage.textContent = "Every medal on your chest was somebody's child.";
+    }
+
+</script>
+</html>

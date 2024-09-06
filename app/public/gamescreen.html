@@ -500,7 +500,7 @@
             let dy = mapterrain[i]['pos_y'] - stats['pos_y'];
             let distance = Math.abs(dx) + Math.abs(dy);
 
-            if (distance <= selectedUnit.type.speed) {
+            if (distance > 0 && distance <= selectedUnit.type.speed) {
                 selectedUnitMovableTiles.push(mapterrain[i]); 
             }
             if (distance > selectedUnit.type.minrange && distance <= selectedUnit.type.maxrange) {
