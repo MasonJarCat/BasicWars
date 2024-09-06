@@ -42,7 +42,7 @@ body {
 .navbar a:hover {
     background-color: #575757;
 }
-.navbar-right text {
+.navbar-right {
     color: white;
 }
 /* Content Style */
