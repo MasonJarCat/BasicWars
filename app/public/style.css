@@ -5,6 +5,12 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
+    background-image: url('terminalbackdrop.png');
+    background-size: cover; /* This makes sure the image covers the entire background */
+    background-position: center; /* This centers the image */
+    background-repeat: no-repeat; /* This prevents the image from repeating */
+    position: relative;
+
 }
 
 /* Horizontal Navbar Style */

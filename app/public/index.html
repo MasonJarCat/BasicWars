@@ -114,6 +114,64 @@
 
         // Start spawning commands when the page loads
         window.onload = spawnCommands;
+
+        function getUserId() {
+            // Example: Retrieve user ID from a cookie, local storage, or a server API call
+            const userIdFromCookies = getCookie('userId');
+            console.log('User ID from Cookies: ', userIdFromCookies); // Debugging log
+            if (userIdFromCookies) {
+                return userIdFromCookies;
+            }
+
+            const userIdFromLocalStorage = localStorage.getItem('userId');
+            console.log('User ID from Local Storage: ', userIdFromLocalStorage); // Debugging log
+            if (userIdFromLocalStorage) {
+                return userIdFromLocalStorage;
+            }
+
+            return null; 
+        }
+
+        // Helper function to get a cookie by name
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) {
+                const cookieValue = parts.pop().split(';').shift();
+                console.log('Cookie found:', name, '=', cookieValue); // Debugging log
+                return cookieValue;
+            }
+            console.log('Cookie not found:', name); // Debugging log
+            return null;
+        }
+        function displayLoggedInUser() {
+            const loggedInUserDiv = document.getElementById("loggedinUser");
+            const userId = parseInt(getUserId());
+        
+            if (userId) {
+                // Make a request to the server to get the username
+                fetch(`/username/${userId}`, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })  .then(response => response.json())
+                    .then(data => {
+                        if (data.username) {
+                            loggedInUserDiv.textContent = `Welcome, ${data.username}`;
+                        } else {
+                            loggedInUserDiv.textContent = "Not logged in";
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching username:', error);
+                        loggedInUserDiv.textContent = "Not logged in";
+                    });
+            } else {
+                loggedInUserDiv.textContent = "Not logged in";
+            }
+        }
+        // Call the function when the page loads
+        displayLoggedInUser();
     </script>
 
 </body>
