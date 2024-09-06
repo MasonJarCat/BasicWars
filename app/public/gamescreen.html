@@ -882,11 +882,14 @@
     function quitGame(){
         console.log("quitting game");
         let gameId = gamedata.id; 
-        let winner;
-        if (isPlayer1Turn) {
+        let userId = getUserId();;
+        if (userId == gamedata.p1_id) {
             winner = gamedata.p2_id;
-        } else {
+        } else if (userId == gameData.p2_id) {
             winner = gamedata.p1_id;
+        } else {
+            console.log("Warning: uninvolved user trying to quit game.");
+            return;
         }
 
         fetch("/finishgame", { 
