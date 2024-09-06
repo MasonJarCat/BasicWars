@@ -256,13 +256,14 @@ app.get("/opengames", (req, res) => {
 app.post("/joingame", (req, res) => {
   let userId = parseInt(req.body.userId); 
   let gameId = parseInt(req.body.gameId); 
-  if (userId == NaN || gameId == NaN){
+  let commanderId = parseInt(req.body.commanderId);
+  if (userId == NaN || gameId == NaN || commanderId == NaN){
     return res.sendStatus(400);
   }
 
-  const text = "UPDATE games SET p2_id = $1 WHERE id = $2";
+  const text = "UPDATE games SET p2_id = $1, p2_commander = $2 WHERE id = $3";
 
-  const values = [userId, gameId];
+  const values = [userId, commanderId, gameId];
 
   pool.query(text, values).then(result => {
     res.setHeader('Content-Type', 'application/json');
