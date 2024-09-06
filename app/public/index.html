@@ -157,7 +157,7 @@
                 })  .then(response => response.json())
                     .then(data => {
                         if (data.username) {
-                            loggedInUserDiv.textContent = `Welcome, ${data.username}`;
+                            loggedInUserDiv.textContent = `${data.username}`;
                         } else {
                             loggedInUserDiv.textContent = "Not logged in";
                         }
