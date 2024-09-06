@@ -205,6 +205,12 @@
             initializeGameState(gameStateBody.rows[0], app);
             showUserInfo();
         }
+
+        
+        console.log("p1_commander: " + gamedata['p1_commander']);
+        console.log("p2_commander: " + gamedata['p2_commander']);
+
+        forfeitbutton.addEventListener("click", quitGame);
     }
 
     function buildMap(mapdata) {
@@ -295,11 +301,6 @@
     }
 
     initGame();
-
-    forfeitbutton.addEventListener("click", quitGame);
-
-    console.log("p1_commander: " + gamedata['p1_commander']);
-    console.log("p2_commander: " + gamedata['p2_commander']);
 
     function disableActions() {
         // Disable unit selection, movement, and attacks
