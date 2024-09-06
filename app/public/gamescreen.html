@@ -742,6 +742,7 @@
         let stats = selectedUnit['stats'];
         stats['capturing'] = true;
         stats['capture_prog'] += stats['cur_hp']; 
+        console.log(stats['capture_prog']);
         if (stats['capture_prog'] >= 20){
             tile.sprite.parent.removeChild(tile.sprite);
             let newspritename = (isPlayer1Turn ? 'red' : 'blue') + tile['type']['title'] + '.png';
@@ -858,6 +859,7 @@
     }
 
     function winGame(){
+        console.log("winning game");
         let gameId = gamedata.id; 
         let winner;
         if (isPlayer1Turn) {
