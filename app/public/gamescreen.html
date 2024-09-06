@@ -16,9 +16,11 @@
     <button id="endturnbutton">End Turn</button>
     <button id="forfeit">Forfeit</button>
 
-    <div id="selectedunitmenu"></div>
+    <div id="commanderinfo"></div>
 
-    <div id="unitproductionmenu"></div>
+    <div id="selectedunitmenu" style="float:left"></div>
+
+    <div id="unitproductionmenu" style="float:left"></div>
 
 </body>
 
@@ -32,6 +34,7 @@
     let selectedunitmenu = document.getElementById("selectedunitmenu");
     let endturnbutton = document.getElementById("endturnbutton");
     let forfeitbutton = document.getElementById("forfeit");
+    let commanderinfo = document.getElementById("commanderinfo");
 
     let gamedata;
     let unittypes;
@@ -52,6 +55,9 @@
     let visibleTiles;
     let isPlayer1Turn;
     let currentPlayerId;
+    let commanders;
+    let curCommander;
+    let opCommander;
     let app = new PIXI.Application();
     let mapterrain = new Array();
     let highlightLayer = new Array();
@@ -99,6 +105,13 @@
     }
 
     async function initGame() {
+        let commanderImage;
+        let commanderDesc;
+        let commanderName;
+
+        let opCommanderImage;
+        let opCommanderDesc;
+        let opCommanderName;
 
         // Fetch map data
         const mapResponse = await fetch("/map" + querystring, { method: "GET" });
@@ -190,6 +203,10 @@
         const unitBody = await unitResponse.json();
         unittypes = unitBody.rows;
 
+        const commandersResponse = await fetch("/commanders", {method: "GET"});
+        const commandersBody = await commandersResponse.json();
+        commanders = commandersBody.rows;
+
         buildMap(mapdata);
 
         // Fetch game units
@@ -209,6 +226,19 @@
         
         console.log("p1_commander: " + gamedata['p1_commander']);
         console.log("p2_commander: " + gamedata['p2_commander']);
+
+        if(isPlayer1Turn){
+            curCommander = commanders.find(c => c.id == p1_commander);
+            opCommander = commanders.find(c => c.id == p2_commander);
+        } else {
+            curCommander = commanders.find(c => c.id == p2_commander);
+            opCommander = commanders.find(c => c.id == p1_commander);
+        }
+
+        commanderImage = document.createElement("img");
+        commanderImage.src = curCommander.title + ".png";
+        commanderImage.alt = curCommander.backstory; 
+        commanderinfo.addChild(commanderImage);
 
         forfeitbutton.addEventListener("click", quitGame);
     }
