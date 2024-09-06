@@ -489,6 +489,26 @@ app.post('/updateGameState', authenticateUser, async (req, res) => {
   }
 });
 
+app.post("/deleteunit", (req, res) => {
+  let id = parseInt(req.body.id); 
+
+  if (id == NaN || id == undefined){
+    return res.sendStatus(400);
+  }
+
+  const text = "DELETE FROM units WHERE id = $1";
+  const values = [id];
+
+  pool.query(text, values)
+    .then(() => {
+      res.status(200).json({ message: 'Unit deleted' });
+    })
+    .catch(err => {
+      console.error("Error executing query:", err.message);
+      res.status(500).json({ error: err.message });
+    });
+})
+
 // Get all games according to a given user id
 app.get("/games", (req, res) => {
   let userId = req.query.userId;

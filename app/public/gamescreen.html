@@ -817,6 +817,15 @@
         if (index !== -1) {
             gameunits.splice(index, 1);
         }
+        fetch("/deleteunit", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: unit.stats.id
+            })
+        }).then(response => {console.log(response.status);})
         clearUnitMenu();
     }
     
