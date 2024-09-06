@@ -437,7 +437,7 @@ app.post("/update/unit", (req, res) => {
     });
 });
 app.post('/updateGameState', authenticateUser, async (req, res) => {
-  const { p1_units, p2_units, p1_funds, p2_funds, p1_income, p2_income, tile_owners, fog, turn } = req.body;
+  const { p1_units, p2_units, p1_funds, p2_funds, p1_income, p2_income, tile_owners, fog, turn, } = req.body;
   const gameId = req.query.gameid;
   try {
     // Fetch the game state to determine whose turn it is

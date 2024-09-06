@@ -916,10 +916,13 @@
             p2_funds: !isPlayer1Turn ? funds : gamedata.p2_funds,
             p1_income: isPlayer1Turn ? income : gamedata.p1_income,
             p2_income: !isPlayer1Turn ? income : gamedata.p2_income,
-            tile_owners: gamedata.tile_owners,
+            tile_owners: gamedata['tile_owners'],
             fog: fogEnabled,
-            turn: gamedata.turn + 1
+            turn: gamedata.turn + 1,
+
         };
+
+        console.log(gameStateUpdate.tile_owners);
     
         fetch("/updateGameState" + querystring, {
             method: "POST",
