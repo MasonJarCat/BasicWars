@@ -186,6 +186,18 @@ app.get("/gameunits", (req, res) => {
 
 //Fitz's create game & lobby queries start here
 
+app.get("/commanders", (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+
+  const query = "SELECT * FROM commanders";
+
+  pool.query(query)
+    .then(result => {
+      res.json({ rows: result.rows });}
+  )
+    .catch(err => res.status(500).json({ error: err.message }));
+})
+
 app.get("/maps", (req, res) => {
   res.setHeader('Content-Type', 'application/json');
 
