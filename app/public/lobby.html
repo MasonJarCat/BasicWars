@@ -156,7 +156,7 @@
         }
         function displayLoggedInUser() {
             const loggedInUserDiv = document.getElementById("loggedinUser");
-            const userId = getLoggedInUserId();
+            const userId = parseInt(getLoggedInUserId());
         
             if (userId) {
                 // Make a request to the server to get the username
