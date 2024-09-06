@@ -739,6 +739,7 @@
     }
 
     function captureTile(tile, x, y){
+        clearHighlight();
         let stats = selectedUnit['stats'];
         stats['capturing'] = true;
         stats['capture_prog'] += stats['cur_hp']; 
@@ -763,6 +764,7 @@
         stats['can_move_this_turn'] = false;
         stats['can_attack_this_turn'] = false;
         stats['can_capture_this_turn'] = false;
+        updateUnitStats(selectedUnit);
         clearUnitMenu();
     }
 
