@@ -4,24 +4,117 @@
     <meta charset="utf-8">
     <title>Index</title>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+        /* Define the keyframes for the horizontal movement (left to right) */
+        @keyframes moveHorizontal {
+            0% {
+                transform: translateX(-100vw); /* Start from the left edge */
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: .5;
+            }
+            100% {
+                transform: translateX(100vw); /* Move to the right edge */
+                opacity: 0;
+            }
+        }
+
+        /* Apply the animation to the text */
+        .moving-text {
+            position: absolute;
+            color: green;
+            font-size: 24px;
+            animation: moveHorizontal 10s linear forwards; /* Slower animation (10s) */
+            white-space: nowrap; /* Prevents wrapping */
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden; /* Prevents scrollbars from appearing */
+        }
+
+        body {
+            background-image: url('terminalbackdrop.png');
+            background-size: cover; /* This makes sure the image covers the entire background */
+            background-position: center; /* This centers the image */
+            background-repeat: no-repeat; /* This prevents the image from repeating */
+            position: relative;
+        }
+    </style>
 </head>
 <body>
 
     <!-- Horizontal Navbar -->
     <div class="navbar">
+        <div class="navbar-left">
         <a href="/">Home</a>
         <a href="/gamelist">Game List</a>
-        <a href="/gamescreen">Game Screen</a>
         <a href="/creategame">Create Game</a>
         <a href="/lobby">Lobby</a>
         <a href="/loginPage">login</a>
+        </div>
+        <div class="navbar-right" id="loggedinUser">Not logged in</div>
     </div>
+
 
     <div class="content">
         <h1>Basic Wars</h1>
-
         <p>Welcome to Basic Wars!</p>
     </div>
+
+    <script>
+        // Array of tactical battle commands
+        const battleCommands = [
+            "Delta-5, strike bravo point!",
+            "Echo-7, advance to alpha!",
+            "Foxtrot-2, engage at charlie sector!",
+            "Zulu-9, hold position at delta!",
+            "Sierra-3, launch airstrike!",
+            "Bravo-6, flank enemy forces!",
+            "Alpha-1, deploy reinforcements!",
+            "Oscar-4, secure the extraction point!",
+            "Tango-8, neutralize target at grid 45!"
+        ];
+
+        function createRandomCommand() {
+            // Create a new element for the moving text
+            const command = document.createElement("div");
+            command.classList.add("moving-text");
+
+            // Select a random battle command from the array
+            const randomCommand = battleCommands[Math.floor(Math.random() * battleCommands.length)];
+            command.innerText = randomCommand;
+
+            // Randomize the position (vertically)
+            const randomY = Math.random() * window.innerHeight;
+            command.style.top = `${randomY}px`;
+
+            // Append the command to the body
+            document.body.appendChild(command);
+
+            // Remove the element after the animation completes
+            setTimeout(() => {
+                command.remove();
+            }, 10000); // Matches the animation duration (10s)
+        }
+
+        // Function to spawn commands at random intervals
+        function spawnCommands() {
+            const randomInterval = Math.random() * 2000 + 1000; // Random interval between 1-3 seconds
+            setTimeout(() => {
+                createRandomCommand();
+                spawnCommands(); // Recursively call to continue spawning commands
+            }, randomInterval);
+        }
+
+        // Start spawning commands when the page loads
+        window.onload = spawnCommands;
+    </script>
 
 </body>
 </html>
