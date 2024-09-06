@@ -228,11 +228,11 @@
         console.log("p2_commander: " + gamedata['p2_commander']);
 
         if(isPlayer1Turn){
-            curCommander = commanders.find(c => c.id == p1_commander);
-            opCommander = commanders.find(c => c.id == p2_commander);
+            curCommander = commanders.find(c => c.id == gamedata['p1_commander']);
+            opCommander = commanders.find(c => c.id == gamedata['p2_commander']);
         } else {
-            curCommander = commanders.find(c => c.id == p2_commander);
-            opCommander = commanders.find(c => c.id == p1_commander);
+            curCommander = commanders.find(c => c.id == gamedata['p2_commander']);
+            opCommander = commanders.find(c => c.id == gamedata['p1_commander']);
         }
 
         commanderImage = document.createElement("img");
