@@ -160,8 +160,11 @@
         
             if (userId) {
                 // Make a request to the server to get the username
-                fetch(`/username/${userId}`)
-                    .then(response => response.json())
+                fetch(`/username/${userId}`, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })  .then(response => response.json())
                     .then(data => {
                         if (data.username) {
                             loggedInUserDiv.textContent = `Welcome, ${data.username}`;
