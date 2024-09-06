@@ -587,7 +587,7 @@ app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    return res.status(400).json({ error: 'Missing username or password' });
+    return res.status(400).json({"success": false, error: 'Missing username or password' });
   }
 
   const query = "SELECT * FROM users WHERE username = $1 AND pword = $2";
@@ -609,11 +609,11 @@ app.post("/login", (req, res) => {
             const cookieOptions = { httpOnly: true, secure: true,sameSite: "strict", maxAge: 60 * 60 * 1000 };
             res.cookie('session', sessionId, cookieOptions);
             res.cookie('userId', user.id, {secure: true, sameSite: 'strict', maxAge: 60 * 60 * 1000 });
-            res.status(200).json({ message: 'Login successful' });
+            res.status(200).json({  "success": true, message: 'Login successful' });
           })
-          .catch(err => res.status(500).json({ error: 'Failed to create session' }));
+          .catch(err => res.status(500).json({"success": false, error: 'Failed to create session' }));
       } else {
-        res.status(401).json({ error: 'Invalid username or password' });
+        res.status(401).json({"success": false, error: 'Invalid username or password' });
       }
     })
     .catch(err => res.status(500).json({ error: err.message }));

@@ -65,7 +65,6 @@
 
     <div class="content">
         <h1>Basic Wars</h1>
-        <p>Welcome to Basic Wars!</p>
     </div>
 
     <script>
@@ -91,14 +90,18 @@
             const randomCommand = battleCommands[Math.floor(Math.random() * battleCommands.length)];
             command.innerText = randomCommand;
 
-            // Randomize the position (vertically)
-            const randomY = Math.random() * window.innerHeight;
+            const titleElement = document.getElementsByTagName('h1');
+            const titleHeight = titleElement.offsetHeight;
+            const titleBottom = titleElement.offsetTop + titleHeight;
+        
+            // Randomize the position (vertically) below the title
+            const randomY = titleBottom + (Math.random() * (window.innerHeight - titleBottom));
+            command.style.top = `${randomY}px`;
             command.style.top = `${randomY}px`;
 
             // Append the command to the body
             document.body.appendChild(command);
 
-            // Remove the element after the animation completes
             setTimeout(() => {
                 command.remove();
             }, 10000); // Matches the animation duration (10s)
@@ -106,7 +109,7 @@
 
         // Function to spawn commands at random intervals
         function spawnCommands() {
-            const randomInterval = Math.random() * 2000 + 1000; // Random interval between 1-3 seconds
+            const randomInterval = Math.random() * 2000 + 1000; 
             setTimeout(() => {
                 createRandomCommand();
                 spawnCommands(); // Recursively call to continue spawning commands
