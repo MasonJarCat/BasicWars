@@ -439,6 +439,9 @@
                 if (type['canprintunits']) {
                     type['unitprintlist'].forEach(unitTypeID => {
                         let unitType = unittypes.find(c => c['id'] == unitTypeID);
+                        if (curCommander.id == 2 && (unitTypeID == 1 || unitTypeID == 2)){
+                            unitType['cost'] = 0;
+                        }
                         let printRow = document.createElement('div');
                         printRow.textContent = unitType['title'] + ", " + unitType['cost'];
                         let buybutton = document.createElement('button');
@@ -563,14 +566,25 @@
         selectedUnitAttackableTiles = [];
 
         for (let i = 0; i < mapterrain.length; i++) {
+            let speed = selectedUnit.type.speed;
+            let maxrange = selectedUnit.type.maxrange;
+            if (curCommander.id == 2 && (selectedUnit.type.id == 1 || selectedUnit.type.id == 2)){
+                speed += 1;
+            } 
+            if (curCommander.id == 4 && (selectedUnit.type.id == 9 || selectedUnit.type.id == 10 || selectedUnit.type.id == 11)){
+                speed += 2;
+            }
+            if (curCommander.id == 1 && (selectedUnit.type.id == 6 || selectedUnit.type.id == 7)){
+                maxrange += 1;
+            }
             let dx = mapterrain[i]['pos_x'] - stats['pos_x'];
             let dy = mapterrain[i]['pos_y'] - stats['pos_y'];
             let distance = Math.abs(dx) + Math.abs(dy);
 
-            if (distance > 0 && distance <= selectedUnit.type.speed) {
+            if (distance > 0 && distance <= speed) {
                 selectedUnitMovableTiles.push(mapterrain[i]); 
             }
-            if (distance > selectedUnit.type.minrange && distance <= selectedUnit.type.maxrange) {
+            if (distance > selectedUnit.type.minrange && distance <= maxrange) {
                 selectedUnitAttackableTiles.push(mapterrain[i]);
             }
         }
@@ -633,6 +647,21 @@
         let u1sa = unit1.type['strong_against'];
         let u1wa = unit1.type['weak_against'];
         let u1totalDam;
+
+        if (curCommander.id == 1 && (unit1.type.id == 6 || unit1.type.id == 7)){
+            u1dam += 1;
+            u1ap += 1;
+        }
+        if (curCommander.id == 2 && (unit1.type.id == 1 || unit1.type.id == 2)){
+            u1ap = u1ap * 2; 
+        }
+        if (curCommander.id == 3 && (unit1.type.id == 4 || unit1.type.id == 5)){
+            u1armor += 2;
+            u1dam += 2;
+        }
+        if (curCommander.id == 4 && (unit1.type.id == 9 || unit1.type.id == 10 || unit1.type.id == 11)){
+            u1dam += 1;
+        }
         
         let u1row = mapdata.terrain[u1stats.pos_y];
         let u1tiletype = u1row[u1stats.pos_x];
@@ -649,13 +678,34 @@
         let u2wa = unit2.type['weak_against'];
         let u2totalDam;
 
+        if (opCommander.id == 1 && (unit2.type.id == 6 || unit2.type.id == 7)){
+            u2dam += 1;
+            u2ap += 1;
+        }
+        if (opCommander.id == 2 && (unit2.type.id == 1 || unit2.type.id == 2)){
+            u2ap = u2ap * 2; 
+        }
+        if (opCommander.id == 3 && (unit2.type.id == 4 || unit2.type.id == 5)){
+            u2armor += 2;
+            u2dam += 2;
+        }
+        if (opCommander.id == 4 && (unit2.type.id == 9 || unit2.type.id == 10 || unit2.type.id == 11)){
+            u2dam += 1;
+        }
+
         let u2row = mapdata.terrain[u2stats.pos_y];
         let u2tiletype = u2row[u2stats.pos_x];
         let u2tileData = terraintypes.find(c => c.id == u2tiletype);
         let u2cover = u1tileData.cover; 
 
+        let u2armorAfterAP = u2armor - u1ap;
+
+        if (u2armorAfterAP < 0){
+            u2armorAfterAP = 0;
+        }
+
         
-        u2totalDam = (u1dam - (u2cover + u2armor - u1ap)) * (u1hp / 10);
+        u2totalDam = (u1dam - (u2cover + u2armorAfterAP)) * (u1hp / 10);
 
         if (u1sa.includes(unit2.type.id)){
             u2totalDam = u2totalDam * 2; 
@@ -664,7 +714,13 @@
             u2totalDam = u2totalDam / 2;
         }
 
-        u1totalDam = (u2dam - (u1cover + u1armor - u2ap)) * ((u2hp - u2totalDam) / 10);
+        let u1armorAfterAP = u1armor - u2ap;
+
+        if (u1armorAfterAP < 0){
+            u1armorAfterAP = 0;
+        }
+
+        u1totalDam = (u2dam - (u1cover + u1armorAfterAP)) * ((u2hp - u2totalDam) / 10);
 
         if (u2sa.includes(unit1.type.id)){
             u1totalDam = u1totalDam * 2; 
