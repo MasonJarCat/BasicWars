@@ -127,6 +127,22 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+app.get("/flyboyfrank.png", (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'flyboyfrank.png'));
+});
+
+app.get("/aaronarty.png", (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'aaronarty.png'));
+});
+
+app.get("/tankytina.png", (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'tankytina.png'));
+});
+
+app.get("/commandoconnie.png", (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'commandoconnie.png'));
+});
+
 app.get("/index.html", (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
