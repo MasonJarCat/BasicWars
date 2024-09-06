@@ -139,6 +139,10 @@ app.get("/gamescreen", (req, res) =>{
   res.sendFile(path.join(__dirname, 'public', 'gamescreen.html'));
 });
 
+app.get("/winscreen", (req, res) =>{
+  res.sendFile(path.join(__dirname, 'public', 'winscreen.html'));
+});
+
 app.get("/creategame", (req, res) =>{
   res.sendFile(path.join(__dirname, 'public', 'creategame.html'));
 });
@@ -263,6 +267,27 @@ app.post("/joingame", (req, res) => {
     console.log(err);
     res.status(500).json({ error: err.message });});
 
+});
+
+app.post("/finishgame", (req, res) => {
+  let gameId = req.body.gameId; 
+  console.log(gameId);
+
+  if (gameId == NaN || gameId == undefined){
+    console.log("id not found");
+    return res.sendStatus(400);
+  }
+
+  const text = "DELETE FROM games WHERE id = $1";
+  const values = [gameid];
+
+  pool.query(text, values).then(result => {
+    res.setHeader('Content-Type', 'application/json');
+    return res.json(result.rows[0]);
+  }).catch(err => {
+    console.log(err);
+    res.status(500).json({ error: err.message });});
+  
 });
 
 
