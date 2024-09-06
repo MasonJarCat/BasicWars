@@ -238,7 +238,7 @@
         commanderImage = document.createElement("img");
         commanderImage.src = curCommander.title + ".png";
         commanderImage.alt = curCommander.backstory; 
-        commanderinfo.addChild(commanderImage);
+        commanderinfo.append(commanderImage);
 
         forfeitbutton.addEventListener("click", quitGame);
     }
