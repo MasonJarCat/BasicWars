@@ -475,7 +475,7 @@ app.get("/style.css", (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'style.css'));
 });
 
-app.get("/username:id", (req,res) => {
+app.get("/username/:id", (req,res) => {
   res.setHeader('Content-Type', 'application/json');
   id = req.params['id'];
   const query = "SELECT username FROM users WHERE id = $1";
