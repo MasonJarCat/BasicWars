@@ -475,7 +475,8 @@ app.get("/style.css", (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'style.css'));
 });
 
-app.get("/username:id", (req,res) => {
+app.get("/username/:id", (req,res) => {
+  res.setHeader('Content-Type', 'application/json');
   id = req.params['id'];
   const query = "SELECT username FROM users WHERE id = $1";
   const values = [parseInt(id)];
@@ -491,6 +492,7 @@ app.get("/username:id", (req,res) => {
     })
     .catch(err => res.status(500).json({ error: err.message }));
 });
+
 app.get("/loginPage", (req,res) => {
   // Serve the login.html page
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
