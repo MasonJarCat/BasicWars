@@ -308,6 +308,9 @@
                 terrainBuilder(sprite, x, y, j, i, typeData);
             }
         }
+        if (fogEnabled) {
+            drawFog(app);
+        }
     }
     function drawUnits() {
         // Loop through all game units and place them on the map
@@ -364,9 +367,6 @@
             disableActions();  // Disable unit selection, movement, etc.
         }
         drawUnits();
-        if (fogEnabled) {
-            drawFog(app);
-        }
     }
 
     initGame();
